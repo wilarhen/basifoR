@@ -1,0 +1,12 @@
+Package: Rbasifor
+Type: Package
+Title: Retrieval and Processing of Data of the Spanish National Forest Inventory
+Version: 0.1
+Date: 2018-08-14
+Author: Wilson Lara <wilarhen@gmail.com>, Felipe Bravo <fbravo@pvs.uva.es>, Cristobal Ordonez <a_cristo@pvs.uva.es>
+Maintainer: Maintainer:  Wilson Lara <wilarhen@gmail.com>
+Description: Data sets of the Spanish National Forest Inventory (NFI) are processed computing dendrometric statistics. Function dendroMetrics() controls most of the in-package routines.
+License: GPL-3
+Depends: R (>= 2.10),RODBC
+Imports: foreign,Hmisc,measurements,stats,utils
+LazyData: TRUE
