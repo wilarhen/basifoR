@@ -20,13 +20,13 @@ supported. Some data sets of the 2nd NFI as
 well ass most of the data in the 3rd NFI can
 be imported directly from
 \code{http://mapama.gob.es} using links to the
-compressed files, see example of the
-function. The compressed files of the 4th NFI
-should be read from local paths. The .dfb
-formats in compressed data of the second NFI
-are imported using \code{\link{read.dbf}}. The
-.mdb formats in latter NFIs are imported using
-either \code{\link{RODBC}} (Windows) or
+compressed files. The compressed files of the
+4th NFI should be read from local paths. The
+.dfb formats in compressed data of the second
+NFI are imported using
+\code{\link{read.dbf}}. The .mdb formats in
+latter NFIs are imported using either
+\code{\link{RODBC}} (Windows) or
 \code{\link{mdb.get}} (unix-alike systems). In
 the former case, a 32-bit access driver should
 be installed in the system, and the package

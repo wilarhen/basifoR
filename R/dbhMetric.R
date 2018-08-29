@@ -1,4 +1,4 @@
-dbhMetric <- structure(function#Tree metrics in NFI
+dbhMetric <- structure(function#DBH metrics
 ### This function can format replicates of tree diameters at breast
 ### height \code{'d'} and of tree heights \code{'h'} for these can be
 ### used to derive over bark volumes, according to units/parameters of
@@ -7,9 +7,11 @@ dbhMetric <- structure(function#Tree metrics in NFI
 ### number of trees by hectare \code{'n'}, while considering the
 ### sample design of the NFI, see Details section. Implementation of
 ### this function using records in the NFI can be
-### burdensome. Consequently, use \code{\link{nfiMetrics}} or
-### \code{\link{metrics2Vol}} to recursively implement the function on
-### NFI data.
+### burdensome. Consequently, use \code{\link{dendroMetrics}} to
+### recursively implement the function on NFI data. Functions
+### \code{\link{nfiMetrics}} and \code{\link{metrics2Vol}} can also be
+### implemented if users of the package aims to better understand
+### internal routines of the function.
                        ##details<< Replicates of tree diameter
                        ##\code{'d'} are averaged. The tree heights
                        ##\code{'h'} are formatted from \code{mm} to
