@@ -88,7 +88,7 @@ readNFI <- structure(function#Read NFI data
     return(dset)
 ### \code{data.frame}. A data base  of the NFI.
 }, ex = function(){
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="Rbasifor")
+madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
 rmad <- readNFI(madridNFI)[1:100,]
 head(rmad)
 })

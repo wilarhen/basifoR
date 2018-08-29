@@ -74,7 +74,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
 ### (\code{n}, \code{dimensionless}).
 }, ex = function(){
 ## seconf NFI
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="Rbasifor")
+madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
 rmad <- readNFI(madridNFI)[1:10,]
 head(rmad,3)
 })
