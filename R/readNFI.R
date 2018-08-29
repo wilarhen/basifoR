@@ -27,8 +27,8 @@ readNFI <- structure(function#Read NFI data
               ##either .dbf or .mdb file extensions.
     dt.nm = 'PCMayores' ##<< \code{character}. Name of a data set
                         ##stored in the imported data. Default
-                        ##reads \code{'PCMayores'} in 3rd NFI or
-                        ##\code{'PIESMA'} in 2nd NFI.
+                        ##reads \code{'PCMayores'} (3rd NFI) or
+                        ##\code{'PIESMA'} (2nd NFI).
     
 ) {
     imp <- urlToTemp(url)
