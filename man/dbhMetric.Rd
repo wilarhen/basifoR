@@ -1,6 +1,6 @@
 \name{dbhMetric}
 \alias{dbhMetric}
-\title{Tree metrics in NFI}
+\title{DBH metrics}
 \description{This function can format replicates of tree diameters at breast
 height \code{'d'} and of tree heights \code{'h'} for these can be
 used to derive over bark volumes, according to units/parameters of
@@ -9,9 +9,11 @@ derive basal areas \code{'ba'} (\code{m2 tree-1}) and calculate
 number of trees by hectare \code{'n'}, while considering the
 sample design of the NFI, see Details section. Implementation of
 this function using records in the NFI can be
-burdensome. Consequently, use \code{\link{nfiMetrics}} or
-\code{\link{metrics2Vol}} to recursively implement the function on
-NFI data.}
+burdensome. Consequently, use \code{\link{dendroMetrics}} to
+recursively implement the function on NFI data. Functions
+\code{\link{nfiMetrics}} and \code{\link{metrics2Vol}} can also be
+implemented if users of the package aims to better understand
+internal routines of the function.}
 \usage{dbhMetric(dbh, met = "d")}
 \arguments{
   \item{dbh}{\code{numeric}. Either diameters at breast height
@@ -39,10 +41,10 @@ minimum diameters recorded in the subplots
 are \code{7.5, 12.5, 22.5,} and \code{42.5
 cm} respectively. Considering these, any of
 four estimates is printed: \code{127.32,
-31.83, 14.15} or \code{5.09}.}
+31.83, 14.15}, or \code{5.09}.}
 \value{\code{numeric}. A tree metric: mean diameter (\code{mm}), tree basal area
 (\code{m2 tree-1}), number of trees (dimensionless), or
-tree height \code{dm}.}
+tree height (\code{dm}).}
 
 \author{Wilson Lara <wilarhen@gmail.com>, Felipe Bravo <fbravo@pvs.uva.es>, Cristobal Ordonez <a_cristo@pvs.uva.es>}
 
