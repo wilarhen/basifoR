@@ -51,7 +51,7 @@ tree height \code{h} (\code{'dm'}), the basal area
 
 \examples{
 ## seconf NFI
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="Rbasifor")
+madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
 rmad <- readNFI(madridNFI)[1:10,]
 head(rmad,3)
 }

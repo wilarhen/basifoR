@@ -22,7 +22,7 @@ temporary file}
 
 
 \examples{
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="Rbasifor")
+madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
 tfmad <- urlToTemp(madridNFI)
 tfmad
 }

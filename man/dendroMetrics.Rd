@@ -63,7 +63,7 @@ Details section.}
 
 \examples{
 ## Local NFI Data from the province of Madrid
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="Rbasifor")
+madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
 rmad <- readNFI(madridNFI)[1:100,]
 mmad <- nfiMetrics(rmad)
 vmad <- metrics2Vol(mmad)
