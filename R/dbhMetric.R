@@ -77,7 +77,7 @@ dbhMetric <- structure(function#DBH metrics
             return(y)
 ### \code{numeric}. A tree metric: mean diameter (\code{mm}), tree basal area
 ### (\code{m2 tree-1}), number of trees (dimensionless), or
-### tree height \code{dm}.
+### tree height (\code{dm}).
 }, ex = function(){
     dbh <- dbhMetric(c(10.7, 11.5), 'h')# average tree height (dm) 
     
