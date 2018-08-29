@@ -29,7 +29,7 @@ dbhMetric <- structure(function#DBH metrics
                        ##are \code{7.5, 12.5, 22.5,} and \code{42.5
                        ##cm} respectively. Considering these, any of
                        ##four estimates is printed: \code{127.32,
-                       ##31.83, 14.15} or \code{5.09}.
+                       ##31.83, 14.15}, or \code{5.09}.
 (
     dbh,  ##<<\code{numeric}. Either diameters at breast height
           ##(\code{mm}) or tree heights (\code{m}). Vectors are
