@@ -7,7 +7,8 @@ domheight<-function(h, d, n) {
   ncum = 0 
   for(i in 1:length(h)) {
     ncum = ncum + n[i]
-    if(!is.na(ncum)&&ncum>100) return(sum(h[1:i]*n[1:i], na.rm=TRUE)/sum(h[1:i]*n[1:i]/h[1:i], na.rm=TRUE))
+    if(!is.na(ncum)&&ncum>100){
+        return(sum(h[1:i]*n[1:i], na.rm=TRUE)/sum(h[1:i]*n[1:i]/h[1:i], na.rm=TRUE))}
     ## if(ncum>100) return(sum(h[1:i]*n[1:i], na.rm=TRUE)/sum(h[1:i]*n[1:i]/h[1:i], na.rm=TRUE)) ## this produces an error message if the condition is NA
   }
   return(sum(h*n)/sum(n))
