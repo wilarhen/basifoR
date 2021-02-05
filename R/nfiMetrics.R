@@ -63,8 +63,8 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
     app <- paste(append, collapse = '|')
     gap <- grepl(app,nma, ignore.case = TRUE)
     nms <- nma[gap]
-
-    dmt <- data.frame(dbh[,nms], dmt)
+        dmt <- data.frame(dbh[,nms], dmt)
+        
     return(dmt)
 ### \code{data.frame} containing the columns in \code{append}, plus
 ### the variables in \code{var}: the province \code{pr},
