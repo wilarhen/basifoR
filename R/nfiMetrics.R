@@ -10,7 +10,8 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
               ##a compressed file of the NFI (.zip) having data of
               ##either .dbf or .mdb file extensions, or a data frame
               ##such as that produced by \code{\link{readNFI}}.
-    var = c('pr','d','h','ba','n'), ##<<\code{character}. Variables to
+    var = c('pr','d','h','ba','n','Hd'), 
+    ## var = c('pr','d','h','ba','n'), ##<<\code{character}. Variables to
                                     ##be derived. These can be five:
                                     ##The provincial unit of the data
                                     ##set \code{'pr'}, the mean
@@ -56,6 +57,16 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         if(var%in%'pr'){
             dm <- rep(attr(dbh,'pr.'), nrow(dbh))
         }
+
+##         if(var%in%'Hd'){
+##             return(dm)
+##          spe <- split(dm, c(dm$'Estadillo'))
+##          domhe <- lapply(spe, function(y)
+##              domheight(y$'h',y$'d',y$'n'))
+##          hrb <- do.call('rbind', domhe) 
+##          return(hrb)
+## }
+
         return(dm)}
     dmt <- mapply(function(y)
         fdn(dbh,y), y = var)
