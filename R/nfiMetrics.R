@@ -64,14 +64,6 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
     gap <- grepl(app,nma, ignore.case = TRUE)
     nms <- nma[gap]
         dmt <- data.frame(dbh[,nms], dmt)
-
-## uncomment this:
-
-## spe <- split(dmt, c(dmt$'Estadillo'))
-## domhe <- lapply(spe, function(y)
-##     domheight(y$'h',y$'d',y$'n'))
-## hrb <- do.call('rbind', domhe) 
-## return(hrb)
         
     return(dmt)
 ### \code{data.frame} containing the columns in \code{append}, plus
