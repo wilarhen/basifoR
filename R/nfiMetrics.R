@@ -10,19 +10,22 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
               ##a compressed file of the NFI (.zip) having data of
               ##either .dbf or .mdb file extensions, or a data frame
               ##such as that produced by \code{\link{readNFI}}.
-    var = c('pr','d','h','ba','n'), ##<<\code{character}. Variables to
-                                    ##be derived. These can be five:
-                                    ##The provincial unit of the data
-                                    ##set \code{'pr'}, the mean
-                                    ##diameters \code{'d'}, the tree
-                                    ##heights \code{'h'}, the number
-                                    ##of trees per hectare \code{'n'},
-                                    ##and the basal areas \code{'ba'},
-                                    ##see Details section in
-                                    ##\code{\link{dbhMetric}} for
-                                    ##better understanding of the
-                                    ##metrics units. Default
-                                    ##\code{c('pr','d','h','ba','n')}.
+    var = c('pr','d','h','ba','n','Hd'), ##<<\code{character}. Variables
+                                         ##to be derived. These can be
+                                         ##five: The provincial unit
+                                         ##of the data set
+                                         ##\code{'pr'}, the mean
+                                         ##diameters \code{'d'}, the
+                                         ##tree heights \code{'h'},
+                                         ##the number of trees per
+                                         ##hectare \code{'n'}, the
+                                         ##basal areas \code{'ba'},
+                                         ##and the dominant height
+                                         ##('Hd'), see Details section
+                                         ##in \code{\link{dbhMetric}}
+                                         ##for better understanding of
+                                         ##the metrics units. Default
+                                         ##\code{c('pr','d','h','ba','n','Hd')}.
     append = c('esta','espe') ##<<\code{character}. Vector of strings
                               ##matching names of columns in
                               ##\code{dbh} to be appended to the
@@ -62,16 +65,25 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
     nma <- names(dbh)
     app <- paste(append, collapse = '|')
     gap <- grepl(app,nma, ignore.case = TRUE)
-    nms <- nma[gap]
+        nms <- nma[gap]
+        nm.. <- c(nms, colnames(dmt))
         dmt <- data.frame(dbh[,nms], dmt)
+        names(dmt) <- nm..
+
+        spl <- split(dmt, dmt[,nms], drop = TRUE)
+        dmhe <- Map(function(y)
+            cbind(y, Hd = tryCatch(domheight(y$'h',y$'d',y$'n'),
+                                   error = function(e) NA)), spl)
+        dmt <- do.call('rbind', dmhe) 
+        rownames(dmt) <- NULL
         
     return(dmt)
 ### \code{data.frame} containing the columns in \code{append}, plus
 ### the variables in \code{var}: the province \code{pr},
 ### (\code{dimensionless}), the diameter \code{d} (\code{'mm'}), the
 ### tree height \code{h} (\code{'dm'}), the basal area
-### (\code{ba},\code{'m2 tree-1'}), and the number of trees by hectare
-### (\code{n}, \code{dimensionless}).
+### \code{ba},(\code{'m2 tree-1'}), the number of trees by hectare
+### \code{n}, (\code{dimensionless}), and the dominant height (\code{'m'}).
 }, ex = function(){
 ## seconf NFI
 madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
