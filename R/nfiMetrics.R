@@ -47,6 +47,9 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                       decreasing = TRUE)
         return(cl.nm)}
 
+var. <- var[!var%in%'Hd']
+
+        
     fdn <- function(dbh, var){
         if(var%in%c('d','n','ba'))
             dm <- apply(dbh[,fc(dbh,c('Dn','Diamet'))],1,
@@ -60,8 +63,10 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
             dm <- rep(attr(dbh,'pr.'), nrow(dbh))
         }
         return(dm)}
+    ## dmt <- mapply(function(y)
+    ##     fdn(dbh,y), y = var)
     dmt <- mapply(function(y)
-        fdn(dbh,y), y = var)
+        fdn(dbh,y), y = var.)
     nma <- names(dbh)
     app <- paste(append, collapse = '|')
     gap <- grepl(app,nma, ignore.case = TRUE)
@@ -70,12 +75,17 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         dmt <- data.frame(dbh[,nms], dmt)
         names(dmt) <- nm..
 
+        if('Hd'%in%var){
+            needed <- c('h','d','n')
+            nd <- paste(needed, collapse = '?,')
+            if(!all(needed%in%var))
+                stop(paste0('Hd: missing variables: var = c(',nd,'?, ...)'))
         spl <- split(dmt, dmt[,nms], drop = TRUE)
         dmhe <- Map(function(y)
             cbind(y, Hd = tryCatch(domheight(y$'h',y$'d',y$'n'),
                                    error = function(e) NA)), spl)
         dmt <- do.call('rbind', dmhe) 
-        rownames(dmt) <- NULL
+        rownames(dmt) <- NULL}
         
     return(dmt)
 ### \code{data.frame} containing the columns in \code{append}, plus
