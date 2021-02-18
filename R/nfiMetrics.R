@@ -65,27 +65,27 @@ var. <- var[!var%in%'Hd']
         return(dm)}
     ## dmt <- mapply(function(y)
     ##     fdn(dbh,y), y = var)
-    dmt <- mapply(function(y)
-        fdn(dbh,y), y = var.)
-    nma <- names(dbh)
-    app <- paste(append, collapse = '|')
-    gap <- grepl(app,nma, ignore.case = TRUE)
+        dmt <- mapply(function(y)
+            fdn(dbh,y), y = var.)
+        nma <- names(dbh)
+        app <- paste(append, collapse = '|')
+        gap <- grepl(app,nma, ignore.case = TRUE)
         nms <- nma[gap]
         nm.. <- c(nms, colnames(dmt))
         dmt <- data.frame(dbh[,nms], dmt)
         names(dmt) <- nm..
-
+        
         if('Hd'%in%var){
             needed <- c('h','d','n')
             nd <- paste(needed, collapse = '?,')
             if(!all(needed%in%var))
                 stop(paste0('Hd: missing variables: var = c(',nd,'?, ...)'))
-        spl <- split(dmt, dmt[,nms], drop = TRUE)
-        dmhe <- Map(function(y)
-            cbind(y, Hd = tryCatch(domheight(y$'h',y$'d',y$'n'),
-                                   error = function(e) NA)), spl)
-        dmt <- do.call('rbind', dmhe) 
-        rownames(dmt) <- NULL}
+            spl <- split(dmt, dmt[,nms], drop = TRUE)
+            dmhe <- Map(function(y)
+                cbind(y, Hd = tryCatch(domheight(y$'h',y$'d',y$'n'),
+                                       error = function(e) NA)), spl)
+            dmt <- do.call('rbind', dmhe) 
+            rownames(dmt) <- NULL}
         
     return(dmt)
 ### \code{data.frame} containing the columns in \code{append}, plus
