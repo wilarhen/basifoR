@@ -85,12 +85,12 @@ var. <- var[!var%in%'Hd']
             rownames(dmt) <- NULL}
         
     return(dmt)
-### \code{data.frame} containing the columns in \code{append}, plus
+### \code{data.frame} containing columns matching \code{levels}, plus
 ### the variables in \code{var}: the province \code{pr},
 ### (\code{dimensionless}), the diameter \code{d} (\code{'mm'}), the
 ### tree height \code{h} (\code{'dm'}), the basal area
 ### \code{ba},(\code{'m2 tree-1'}), the number of trees by hectare
-### \code{n}, (\code{dimensionless}), and the dominant height (\code{'m'}).
+### \code{n}, (\code{dimensionless}), and the tree dominant height (\code{'m'}).
 }, ex = function(){
 ## seconf NFI
 madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
