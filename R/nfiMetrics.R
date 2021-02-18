@@ -31,7 +31,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                               ##the metrics are computed. Pattern
                               ##matching is supported. Cases are
                               ##ignored. Default
-                              ##\code{c('esta','espe')} matches both
+                              ##\code{c('esta','espe')} matches both the
                               ##sample plot \code{'Estadillos'} and
                               ##tree species \code{'Especie'}.
 ) {
