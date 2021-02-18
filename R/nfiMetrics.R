@@ -1,10 +1,9 @@
 nfiMetrics <- structure(function#Tree metrics from NFI data
 ### This function recursively implements \code{\link{dbhMetric}} on
-### NFI data, deriving metrics required to compute over bark volumes,
-### according to units/parameters of the Spanish National Forest
-### Inventory (NFI). Metric units of the outputs are described in
-### the Value section.  Use \code{\link{metrics2Vol}} to directly derive
-### over bark volumes.
+### NFI data, and derives tree metrics, according to units/parameters
+### of the Spanish National Forest Inventory (NFI). The metric units
+### are described in the Value section.  Use \code{\link{metrics2Vol}}
+### to directly derive over bark volumes.
 (
         dbh,  ##<<\code{character} or \code{data.frame}.  URL/path to
               ##a compressed file of the NFI (.zip) having data of
