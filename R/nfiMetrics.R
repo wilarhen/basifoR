@@ -10,30 +10,30 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
               ##a compressed file of the NFI (.zip) having data of
               ##either .dbf or .mdb file extensions, or a data frame
               ##such as that produced by \code{\link{readNFI}}.
-    var = c('pr','d','h','ba','n','Hd'), ##<<\code{character}. Variables
-                                         ##to be derived. These can be
-                                         ##five: The provincial unit
-                                         ##of the data set
-                                         ##\code{'pr'}, the mean
-                                         ##diameters \code{'d'}, the
-                                         ##tree heights \code{'h'},
-                                         ##the number of trees per
-                                         ##hectare \code{'n'}, the
-                                         ##basal areas \code{'ba'},
-                                         ##and the dominant height
-                                         ##('Hd'), see Details section
-                                         ##in \code{\link{dbhMetric}}
-                                         ##for better understanding of
-                                         ##the metrics units. Default
+    var = c('pr','d','h','ba','n','Hd'), ##<<\code{character}. Metrics. These
+                                         ##can be five: \code{(1)} The
+                                         ##provincial unit
+                                         ##\code{'pr'}; \code{(2)} the
+                                         ##mean diameter \code{'d'};
+                                         ##\code{(3)} the tree height
+                                         ##\code{'h'}; \code{(4)} the
+                                         ##number of trees per hectare
+                                         ##\code{'n'}; \code{(5)} the
+                                         ##basal areas \code{'ba'};
+                                         ##and \code{(6)} the
+                                         ##dominant height \code{'Hd'}, see
+                                         ##Details section in
+                                         ##\code{\link{dbhMetric}} for
+                                         ##better understanding of the
+                                         ##metrics units. Default
                                          ##\code{c('pr','d','h','ba','n','Hd')}.
-    append = c('esta','espe') ##<<\code{character}. Vector of strings
-                              ##matching names of columns in
-                              ##\code{dbh} to be appended to the
-                              ##output. Cases are ignored. Default
-                              ##\code{c('esta','espe')} matchs columns
-                              ##of codes of sample units
-                              ##\code{'Estadillos'} and tree species
-                              ##\code{'Especie'}.
+    levels = c('pest','espe') ##<<\code{character}. levels at which
+                              ##the metrics are computed. Pattern
+                              ##matching is supported. Cases are
+                              ##ignored. Default
+                              ##\code{c('esta','espe')} matches both
+                              ##sample plot \code{'Estadillos'} and
+                              ##tree species \code{'Especie'}.
 ) {
         if(is.character(dbh)){
         dbh <- readNFI(dbh)
@@ -68,7 +68,7 @@ var. <- var[!var%in%'Hd']
         dmt <- mapply(function(y)
             fdn(dbh,y), y = var.)
         nma <- names(dbh)
-        app <- paste(append, collapse = '|')
+        app <- paste(levels, collapse = '|')
         gap <- grepl(app,nma, ignore.case = TRUE)
         nms <- nma[gap]
         nm.. <- c(nms, colnames(dmt))
