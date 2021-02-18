@@ -62,8 +62,6 @@ var. <- var[!var%in%'Hd']
             dm <- rep(attr(dbh,'pr.'), nrow(dbh))
         }
         return(dm)}
-    ## dmt <- mapply(function(y)
-    ##     fdn(dbh,y), y = var)
         dmt <- mapply(function(y)
             fdn(dbh,y), y = var.)
         nma <- names(dbh)
