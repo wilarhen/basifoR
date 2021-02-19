@@ -46,7 +46,7 @@ four estimates is printed: \code{127.32,
 (\code{m2 tree-1}), number of trees (dimensionless), or
 tree height (\code{dm}).}
 
-\author{Wilson Lara <wilarhen@gmail.com>, Felipe Bravo <fbravo@pvs.uva.es>, Cristobal Ordonez <a_cristo@pvs.uva.es>}
+\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>,Felipe Bravo <fbravo@pvs.uva.es>,}
 
 
 

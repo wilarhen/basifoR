@@ -35,7 +35,7 @@ version. In the case of unix-alike systems the
 package mdb-tools should be installed.}
 \value{\code{data.frame}. A data base  of the NFI.}
 
-\author{Wilson Lara <wilarhen@gmail.com>, Felipe Bravo <fbravo@pvs.uva.es>, Cristobal Ordonez <a_cristo@pvs.uva.es>}
+\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>,Felipe Bravo <fbravo@pvs.uva.es>,}
 
 
 

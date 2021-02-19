@@ -5,7 +5,8 @@
 function computes and summarizes dendrometrics using data of the
 Spanish National Forest Inventory (NFI). This also transforms the
 metric units of the summaries, see details.}
-\usage{dendroMetrics(mmd, summ.vr = "Estadillo", cut.dt = "d == d", 
+\usage{dendroMetrics(mmd, summ.vr = "Estadillo", 
+    cut.dt = "d == d", 
     report = FALSE, ...)}
 \arguments{
   \item{mmd}{\code{character} or \code{data.frame}.  URL/path to
@@ -20,7 +21,7 @@ returned. Default \code{'Estadillo'}}
   \item{cut.dt}{\code{character}. Logical condition used
 to subset the output. Default \code{'d == d'}
 avoids subsetting.}
-  \item{report}{\code{logical}. Print a report of the output
+  \item{report}{\code{logical}. Print a \code{report} of the output
 in the current working directory.}
   \item{\dots}{Additional arguments in \code{\link{metrics2Vol}}.}
 }
@@ -56,7 +57,7 @@ computed using logical expressions in
 \code{\link{metrics2Vol}}, or a summary of the variables, see
 Details section.}
 
-\author{Wilson Lara <wilarhen@gmail.com>, Felipe Bravo <fbravo@pvs.uva.es>, Cristobal Ordonez <a_cristo@pvs.uva.es>}
+\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>,Felipe Bravo <fbravo@pvs.uva.es>,}
 
 
 
