@@ -21,13 +21,15 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
           ##.dbf or .mdb file extensions; or data frame such as that
           ##produced by \code{\link{nfiMetrics}}; or data frame such
           ##as that produced by \code{\link{readNFI}}.
-    fc. = 'freq', ##<< \code{character}. A cubication method. Default
-                  ##\code{'freq'} implements the most frequent form
-                  ##matching the data, see \code{details} section.
-    keep.var = FALSE, ##<< \code{logical}. Maintain the columns used to
-                     ##compute the volumes. Default \code{FALSE}.
-    ... ##<< Additional arguments in \code{\link{metrics2Vol}} or
-        ##\code{\link{nfiMetrics}} or \code{\link{readNFI}}.
+    cub.met = 'freq', ##<< \code{character}. Cubication
+                      ##method. Default \code{'freq'} implements the
+                      ##most frequent form matching the data, see
+                      ##\code{details} section.
+    keep.var = FALSE, ##<< \code{logical}. Keep the variables used to
+                      ##compute the volumes. Default \code{FALSE}.
+    ... ##<< Depending on \code{'nfi'}, additional arguments in
+        ##\code{\link{metrics2Vol}} or \code{\link{nfiMetrics}} or
+        ##\code{\link{readNFI}}.
 ) {
     if(is.character(nfi) | inherits(nfi, 'readNFI')){
         nfi <- na.omit(nfiMetrics(nfi, ...))
@@ -99,9 +101,9 @@ nd <- paste(needed, collapse = '?,')
         tm <- as.character(tm$'Var1')[1]
         return(tm)    
     }
-    if(fc.%in%'freq')
-        fc. <- ffreq(mmd)
-    mmd <- subset(mmd, fc%in%as.factor(fc.))
+    if(cub.met%in%'freq')
+        cub.met <- ffreq(mmd)
+    mmd <- subset(mmd, fc%in%as.factor(cub.met))
     if(!keep.var)
         mmd <- mmd[,!names(mmd)%in%'fc']
     rownames(mmd) <- NULL
