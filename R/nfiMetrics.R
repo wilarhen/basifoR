@@ -5,10 +5,10 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
 ### are described in the Value section.  Use \code{\link{metrics2Vol}}
 ### to directly derive over bark volumes.
 (
-        dbh,  ##<<\code{character} or \code{data.frame}.  URL/path to
-              ##a compressed file of the NFI (.zip) having data of
-              ##either .dbf or .mdb file extensions, or a data frame
-              ##such as that produced by \code{\link{readNFI}}.
+    nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to a
+          ##compressed file of the NFI (.zip) having data of either
+          ##.dbf or .mdb file extensions, or a data frame such as that
+          ##produced by \code{\link{readNFI}}.
     var = c('pr','d','h','ba','n','Hd'), ##<<\code{character}. Metrics. These
                                          ##can be five: \code{(1)} The
                                          ##provincial unit
@@ -34,8 +34,8 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                               ##sample plot \code{'Estadillos'} and
                               ##tree species \code{'Especie'}.
 ) {
-        if(is.character(dbh)){
-        dbh <- readNFI(dbh)
+        if(is.character(nfi)){
+        nfi <- readNFI(nfi)
     }
 
     fc <- function(dt, cl.){
@@ -45,10 +45,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         cl.nm <- sort(names(dt)[nt..],
                       decreasing = TRUE)
         return(cl.nm)}
-
-var. <- var[!var%in%'Hd']
-
-        
+        var. <- var[!var%in%'Hd']
     fdn <- function(dbh, var){
         if(var%in%c('d','n','ba'))
             dm <- apply(dbh[,fc(dbh,c('Dn','Diamet'))],1,
@@ -63,13 +60,13 @@ var. <- var[!var%in%'Hd']
         }
         return(dm)}
         dmt <- mapply(function(y)
-            fdn(dbh,y), y = var.)
-        nma <- names(dbh)
+            fdn(nfi,y), y = var.)
+        nma <- names(nfi)
         app <- paste(levels, collapse = '|')
         gap <- grepl(app,nma, ignore.case = TRUE)
         nms <- nma[gap]
         nm.. <- c(nms, colnames(dmt))
-        dmt <- data.frame(dbh[,nms], dmt)
+        dmt <- data.frame(nfi[,nms], dmt)
         names(dmt) <- nm..
         
         if('Hd'%in%var){

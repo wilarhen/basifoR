@@ -2,27 +2,25 @@ readNFI <- structure(function#Read NFI data
 ### This function can retrieve data sets of the
 ### Spanish National Forest Inventory (NFI) using either remote or
 ### local paths to compressed (.zip) files.
-                      ##details<< Compressed files having data
-                      ##extensions other than .dbf or .mdb are not
-                      ##supported. Some data sets of the 2nd NFI as
-                      ##well ass most of the data in the 3rd NFI can
-                      ##be imported directly from
+                      ##details<< Compressed data having file
+                      ##extensions other than \code{.dbf} or
+                      ##\code{.mdb} are not supported. Most data in
+                      ##2nd and 3rd NFIs can be imported directly from
                       ##\href{https://www.mapama.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/cartografia_informacion_disp.aspx}{http://mapama.gob.es}
-                      ##using links to the compressed files. The
-                      ##compressed files of the 4th NFI must be read
-                      ##from local paths. The \code{.dbf} formats in
-                      ##compressed data of the second NFI are imported
-                      ##using \code{\link{read.dbf}}. The .mdb formats
-                      ##in latter NFIs are imported using either
-                      ##\code{\link{RODBC}} (Windows) or
-                      ##\code{\link{mdb.get}} (unix-alike systems). In
-                      ##the former case, a 32-bit access driver should
-                      ##be installed in the system, and the package
-                      ##should be implemented using a 32-bit R
-                      ##version. In the case of unix-alike systems the
-                      ##package mdb-tools should be installed.
+                      ##using links to the compressed files. Data in
+                      ##the 4th NFI must be read from local
+                      ##paths. Data in second NFI are imported using
+                      ##\code{\link{read.dbf}}. Data in latter NFIs
+                      ##are imported using either \code{\link{RODBC}}
+                      ##(Windows) or \code{\link{mdb.get}} (unix-alike
+                      ##systems). In the former case, a 32-bit access
+                      ##driver should be installed in the system, and
+                      ##the package must be implemented using a 32-bit
+                      ##R version. In the case of unix-alike systems
+                      ##the \code{mdb-tools} package must be
+                      ##installed.
 (
-        url,  ##<<\code{character} or \code{data.frame}.  URL/path to
+        nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to
               ##a compressed file of the NFI (.zip) having data of
               ##either .dbf or .mdb file extensions.
     dt.nm = 'PCMayores' ##<< \code{character}. Name of a data set
@@ -31,7 +29,7 @@ readNFI <- structure(function#Read NFI data
                         ##\code{'PIESMA'} (2nd NFI).
     
 ) {
-    imp <- urlToTemp(url)
+    imp <- urlToTemp(nfi)
     fwin <- function(x, dt.nm){
         ife <- RODBC::odbcConnectAccess(x) 
         on.exit(odbcClose(ife))
