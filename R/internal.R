@@ -29,7 +29,7 @@ else
     { packageStartupMessage(
           "Package 'basifoR' version ", version) } 
 
-  packageStartupMessage("Type 'citation(\"ecochange\")' for citing this R package in publications.")
+  packageStartupMessage("Type 'citation(\"basifoR\")' for citing this R package in publications.")
   invisible()
 }
 
