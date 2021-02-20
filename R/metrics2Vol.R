@@ -4,39 +4,41 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
 ### parameters established in 2nd NFI. To derive dendrometric
 ### summaries use \code{\link{dendroMetrics}}.
                          ##details<< The volumes are computed using
-                         ##parameters derived in the second NFI. The
-                         ##functions used have the forms \code{'v ~
-                         ##par1 + par2 * (d^2) * h'}, and \code{'v ~
-                         ##par1 * (d^par2) * (h^par3)'}. Parameter of
-                         ##both functions depend on provincial units,
-                         ##tree species, diameters, and tree
-                         ##heights. Consequently, objects from
-                         ##\code{\link{nfiMetrics}} must incorporate
-                         ##such variables.
+                         ##parameters derived during the second
+                         ##NFI. The functions used have the forms
+                         ##\code{'v ~ par1 + par2 * (d^2) * h'}, and
+                         ##\code{'v ~ par1 * (d^par2) *
+                         ##(h^par3)'}. Routines in the function assign
+                         ##equation form and parameters depending on
+                         ##several variables, including the provincial
+                         ##unit, tree species, tree diameter, and tree
+                         ##height. Consequently, objects from
+                         ##\code{\link{nfiMetrics}} must have these
+                         ##variables.
 (
-    dbm,  ##<<\code{character} or \code{data.frame}.  URL/path to a
+    nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to a
           ##compressed file of the NFI (.zip) having data of either
           ##.dbf or .mdb file extensions; or data frame such as that
           ##produced by \code{\link{nfiMetrics}}; or data frame such
           ##as that produced by \code{\link{readNFI}}.
-    fc. = 'freq', ##<< \code{character}. A Cubication form. Default
+    fc. = 'freq', ##<< \code{character}. A cubication method. Default
                   ##\code{'freq'} implements the most frequent form
-                  ##matching the data.
+                  ##matching the data, see \code{details} section.
     keep.var = FALSE, ##<< \code{logical}. Maintain the columns used to
                      ##compute the volumes. Default \code{FALSE}.
     ... ##<< Additional arguments in \code{\link{metrics2Vol}} or
         ##\code{\link{nfiMetrics}} or \code{\link{readNFI}}.
 ) {
-    if(is.character(dbm) | inherits(dbm, 'readNFI')){
-        dbm <- na.omit(nfiMetrics(dbm, ...))
+    if(is.character(nfi) | inherits(nfi, 'readNFI')){
+        nfi <- na.omit(nfiMetrics(nfi, ...))
     }
-spec. <- names(dbm)[grepl('spec', names(dbm), ignore.case = TRUE)]
+spec. <- names(nfi)[grepl('spec', names(nfi), ignore.case = TRUE)]
 var <- c('pr','h','d')
 needed <- c('Especie/ESPECIE', var)
 nd <- paste(needed, collapse = '?,')
-    if(!all(length(spec.) != 0 & var%in%names(dbm))){
+    if(!all(length(spec.) != 0 & var%in%names(nfi))){
         warning("nfiMetrics: change arguments 'var'and/or 'levels'")
-    stop(paste0('v: missing variables: dbm[,c(',nd,'?, ...)]'))
+    stop(paste0('v: missing variables: nfi[,c(',nd,'?, ...)]'))
 }
         
     mds <- c('1'  = 'v ~ par1 + par2 * (d^2) * h',
@@ -80,7 +82,7 @@ nd <- paste(needed, collapse = '?,')
         vl <- cbind(vt, vl)
         names(vl) <- c(names(vt),dep)
         return(vl)}
-    vt <- fmdV(dbm)
+    vt <- fmdV(nfi)
     lvs <- levels(as.factor(vt$'Modelo'))
     spm <- split(vt, vt[,'Modelo'])
     nms. <- names(spm)
