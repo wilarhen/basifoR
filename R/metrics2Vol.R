@@ -54,7 +54,7 @@ nd <- paste(needed, collapse = '?,')
                       decreasing = TRUE)
         return(cl.nm)}
     fmdV <- function(mdb2, ntm = c('pr','spec')){
-        data(parEqVcc, envir = environment())
+        ## data(parEqVcc, envir = environment())
         ## load('parEqVcc.RData')
         vt <- merge(mdb2, parEqVcc,
                     by.x = fc(mdb2, ntm),
