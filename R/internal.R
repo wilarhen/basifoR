@@ -1,5 +1,7 @@
 ## Internal utility functions used by basifoR
 
+## /IFNdyn-master/ github proyect with dominantHeight function for NFI
+## https://github.com/miquelcaceres/IFNdyn
 domheight<-function(h, d, n) {
   o <-order(d, decreasing=TRUE)
   h = h[o]
