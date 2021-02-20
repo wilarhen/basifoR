@@ -3,16 +3,16 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
 ### tree metrics from NFI data and matching the metrics with volume
 ### parameters established in 2nd NFI. To derive dendrometric
 ### summaries use \code{\link{dendroMetrics}}.
-                         ##details<< The volumes are computed deriving
-                         ##metrics with \code{\link{nfiMetrics}} and
-                         ##matching the metrics with volume parameters
-                         ##developed in second NFI. Data sets are
-                         ##matched using two factors: the provincial
-                         ##unit (\code{'pr'}) and the tree species
-                         ##(\code{'Especie'}). The function implement
-                         ##parameters in two models: \code{'v ~ par1 +
-                         ##par2 * (d^2) * h'}, and \code{v ~ par1 *
-                         ##(d^par2) * (h^par3)}.
+                         ##details<< The volumes are computed using
+                         ##parameters derived in the second NFI. The
+                         ##functions used have the forms \code{'v ~
+                         ##par1 + par2 * (d^2) * h'}, and \code{'v ~
+                         ##par1 * (d^par2) * (h^par3)'}. Parameter of
+                         ##both functions depend on provincial units,
+                         ##tree species, diameters, and tree
+                         ##heights. Consequently, objects from
+                         ##\code{\link{nfiMetrics}} must incorporate
+                         ##such variables.
 (
     dbm,  ##<<\code{character} or \code{data.frame}.  URL/path to a
           ##compressed file of the NFI (.zip) having data of either
