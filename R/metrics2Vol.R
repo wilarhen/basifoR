@@ -23,8 +23,9 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
           ##as that produced by \code{\link{readNFI}}.
     cub.met = 'freq', ##<< \code{character}. Cubication
                       ##method. Default \code{'freq'} implements the
-                      ##most frequent form matching the data, see
-                      ##\code{details} section.
+                      ##equation form that most frequently match the
+                      ##data, see \code{details} section. Additional
+                      ##methods have not yet been implemented.
     keep.var = FALSE, ##<< \code{logical}. Keep the variables used to
                       ##compute the volumes. Default \code{FALSE}.
     ... ##<< Depending on \code{'nfi'}, additional arguments in
@@ -53,8 +54,8 @@ nd <- paste(needed, collapse = '?,')
                       decreasing = TRUE)
         return(cl.nm)}
     fmdV <- function(mdb2, ntm = c('pr','spec')){
-        ## data(parEqVcc, envir = environment())
-        load('parEqVcc.RData')
+        data(parEqVcc, envir = environment())
+        ## load('parEqVcc.RData')
         vt <- merge(mdb2, parEqVcc,
                     by.x = fc(mdb2, ntm),
                     by.y = fc(parEqVcc, ntm),

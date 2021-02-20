@@ -6,7 +6,7 @@ readNFI <- structure(function#Read NFI data
                       ##extensions other than \code{.dbf} or
                       ##\code{.mdb} are not supported. Most data in
                       ##2nd and 3rd NFIs can be imported directly from
-                      ##\href{https://www.mapama.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/cartografia_informacion_disp.aspx}{http://mapama.gob.es}
+                      ##\code{http://mapama.gob.es}
                       ##using links to the compressed files. Data in
                       ##the 4th NFI must be read from local
                       ##paths. Data in second NFI are imported using

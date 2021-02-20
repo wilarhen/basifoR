@@ -9,10 +9,11 @@ metric units of the summaries, see details.}
     cut.dt = "d == d", 
     report = FALSE, ...)}
 \arguments{
-  \item{mmd}{\code{character} or \code{data.frame}.  URL/path to
-a compressed file of the NFI (.zip), having data of
-either .dbf or .mdb file extensions, or a data frame
-such as that produced by \code{\link{metrics2Vol}}.}
+  \item{mmd}{\code{character} or \code{data.frame}.  URL/path to a
+compressed file of the NFI (.zip) having data of either
+.dbf or .mdb file extensions; or data frame such as that
+produced by \code{\link{nfiMetrics}}; or data frame such
+as that produced by \code{\link{readNFI}}.}
   \item{summ.vr}{\code{character} or \code{NULL}. Name
 of a Column used to summarize the
 outputs. If \code{NULL} then output from
@@ -23,7 +24,8 @@ to subset the output. Default \code{'d == d'}
 avoids subsetting.}
   \item{report}{\code{logical}. Print a \code{report} of the output
 in the current working directory.}
-  \item{\dots}{Additional arguments in \code{\link{metrics2Vol}}.}
+  \item{\dots}{Additional arguments in \code{\link{metrics2Vol}} or
+\code{\link{nfiMetrics}} or \code{\link{readNFI}}.}
 }
 \details{Units of measurement of the
 derived dendrometrics are transformed to
@@ -57,7 +59,7 @@ computed using logical expressions in
 \code{\link{metrics2Vol}}, or a summary of the variables, see
 Details section.}
 
-\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>,Felipe Bravo <fbravo@pvs.uva.es>,}
+\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>}
 
 
 

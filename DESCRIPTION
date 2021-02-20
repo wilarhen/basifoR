@@ -5,7 +5,7 @@ Version: 0.2
 Date: 2021-02-18
 Author: Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>
 Maintainer: Maintainer:  Wilson Lara <wilarhen@gmail.com>
-Description: Data sets of the Spanish National Forest Inventory (NFI) are processed to compute dendrometric statistics. Function dendroMetrics() controls most of the in-package routines.
+Description: Data sets of the Spanish National Forest Inventory (NFI) are processed to compute tree metrics and statistics. Function dendroMetrics() controls most of the in-package routines.
 License: GPL-3
 Depends: R (>= 2.10),RODBC
 Imports: foreign,Hmisc,measurements,stats,utils

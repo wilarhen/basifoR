@@ -6,15 +6,15 @@ NFI data, and derives tree metrics, according to units/parameters
 of the Spanish National Forest Inventory (NFI). The metric units
 are described in the Value section.  Use \code{\link{metrics2Vol}}
 to directly derive over bark volumes.}
-\usage{nfiMetrics(dbh, var = c("pr", 
+\usage{nfiMetrics(nfi, var = c("pr", 
     "d", "h", "ba", "n", 
-    "Hd"), levels = c("pest", 
+    "Hd"), levels = c("esta", 
     "espe"))}
 \arguments{
-  \item{dbh}{\code{character} or \code{data.frame}.  URL/path to
-a compressed file of the NFI (.zip) having data of
-either .dbf or .mdb file extensions, or a data frame
-such as that produced by \code{\link{readNFI}}.}
+  \item{nfi}{\code{character} or \code{data.frame}.  URL/path to a
+compressed file of the NFI (.zip) having data of either
+.dbf or .mdb file extensions, or a data frame such as that
+produced by \code{\link{readNFI}}.}
   \item{var}{\code{character}. Metrics. These
 can be five: \code{(1)} The
 provincial unit
@@ -48,7 +48,7 @@ tree height \code{h} (\code{'dm'}), the basal area
 \code{ba},(\code{'m2 tree-1'}), the number of trees by hectare
 \code{n}, (\code{dimensionless}), and the tree dominant height (\code{'m'}).}
 
-\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>,Felipe Bravo <fbravo@pvs.uva.es>,}
+\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>}
 
 
 

@@ -16,7 +16,7 @@ supported.}
 \value{\code{character}. Path to the NFI data (.mdb or .dbf) stored in a
 temporary file}
 
-\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>,Felipe Bravo <fbravo@pvs.uva.es>,}
+\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>}
 
 
 
