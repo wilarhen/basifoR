@@ -27,7 +27,7 @@ version: ", version)
 }
 else
     { packageStartupMessage(
-          "Package 'ecochange' version ", version) } 
+          "Package 'basifoR' version ", version) } 
 
   packageStartupMessage("Type 'citation(\"ecochange\")' for citing this R package in publications.")
   invisible()
