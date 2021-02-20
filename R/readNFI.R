@@ -1,7 +1,7 @@
 readNFI <- structure(function#Read NFI data
-### This function can retrieve data sets of the
-### Spanish National Forest Inventory (NFI) using either remote or
-### local paths to compressed (.zip) files.
+### This function can retrieve data sets in the Spanish National
+### Forest Inventory (NFI); this processes either remote URLs or local
+### file paths to compressed (.zip) NFI files.
                       ##details<< Compressed data having file
                       ##extensions other than \code{.dbf} or
                       ##\code{.mdb} are not supported. Most data in
@@ -16,9 +16,8 @@ readNFI <- structure(function#Read NFI data
                       ##systems). In the former case, a 32-bit access
                       ##driver should be installed in the system, and
                       ##the package must be implemented using a 32-bit
-                      ##R version. In the case of unix-alike systems
-                      ##the \code{mdb-tools} package must be
-                      ##installed.
+                      ##R version. In the case of unix-alike systems,
+                      ##dependence \code{mdb-tools} must be installed.
 (
         nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to
               ##a compressed file of the NFI (.zip) having data of
