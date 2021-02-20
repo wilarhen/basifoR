@@ -26,7 +26,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                                          ##better understanding of the
                                          ##metrics units. Default
                                          ##\code{c('pr','d','h','ba','n','Hd')}.
-    levels = c('pest','espe') ##<<\code{character}. levels at which
+    levels = c('esta','espe') ##<<\code{character}. levels at which
                               ##the metrics are computed. Pattern
                               ##matching is supported. Cases are
                               ##ignored. Default

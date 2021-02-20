@@ -5,29 +5,39 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
 ### summaries use \code{\link{dendroMetrics}}.
                          ##details<< The volumes are computed deriving
                          ##metrics with \code{\link{nfiMetrics}} and
-                         ##matching these to volume parameters
-                         ##developed in second NFI. The data are
+                         ##matching the metrics with volume parameters
+                         ##developed in second NFI. Data sets are
                          ##matched using two factors: the provincial
                          ##unit (\code{'pr'}) and the tree species
-                         ##(\code{'Especie'}). The functions supports
+                         ##(\code{'Especie'}). The function implement
                          ##parameters in two models: \code{'v ~ par1 +
                          ##par2 * (d^2) * h'}, and \code{v ~ par1 *
                          ##(d^par2) * (h^par3)}.
 (
     dbm,  ##<<\code{character} or \code{data.frame}.  URL/path to a
           ##compressed file of the NFI (.zip) having data of either
-          ##.dbf or .mdb file extensions, or a data frame such as that
-          ##produced by \code{\link{nfiMetrics}}.
+          ##.dbf or .mdb file extensions; or data frame such as that
+          ##produced by \code{\link{nfiMetrics}}; or data frame such
+          ##as that produced by \code{\link{readNFI}}.
     fc. = 'freq', ##<< \code{character}. A Cubication form. Default
                   ##\code{'freq'} implements the most frequent form
                   ##matching the data.
-    all.col = FALSE, ##<< \code{logical}. Maintain the columns used to
+    keep.var = FALSE, ##<< \code{logical}. Maintain the columns used to
                      ##compute the volumes. Default \code{FALSE}.
-    ... ##<<Additional arguments in \code{\link{nfiMetrics}}
+    ... ##<< Additional arguments in \code{\link{metrics2Vol}} or
+        ##\code{\link{nfiMetrics}} or \code{\link{readNFI}}.
 ) {
-    if(is.character(dbm)){
+    if(is.character(dbm) | inherits(dbm, 'readNFI')){
         dbm <- na.omit(nfiMetrics(dbm, ...))
     }
+spec. <- names(dbm)[grepl('spec', names(dbm), ignore.case = TRUE)]
+var <- c('pr','h','d')
+needed <- c('Especie/ESPECIE', var)
+nd <- paste(needed, collapse = '?,')
+    if(!all(length(spec.) != 0 & var%in%names(dbm))){
+        warning("nfiMetrics: change arguments 'var'and/or 'levels'")
+    stop(paste0('v: missing variables: dbm[,c(',nd,'?, ...)]'))
+}
         
     mds <- c('1'  = 'v ~ par1 + par2 * (d^2) * h',
              '11' = 'v ~ par1 * (d^par2) * (h^par3)')
@@ -38,7 +48,7 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
         cl.nm <- sort(names(dt)[nt..],
                       decreasing = TRUE)
         return(cl.nm)}
-    fmdV <- function(mdb2, ntm = c('pr','espe')){
+    fmdV <- function(mdb2, ntm = c('pr','spec')){
         ## data(parEqVcc, envir = environment())
         load('parEqVcc.RData')
         vt <- merge(mdb2, parEqVcc,
@@ -79,7 +89,7 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
         feV(x,y),x = spm, y = mds.)
     mmd <- do.call('rbind', mmod)
     tex <- fc(mmd,c('mod','par')) 
-    if(!all.col)
+    if(!keep.var)
         mmd <- mmd[,!names(mmd)%in%tex]
     ffreq <- function(df){
         tm <- data.frame(table(df$'fc'))
@@ -90,20 +100,19 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     if(fc.%in%'freq')
         fc. <- ffreq(mmd)
     mmd <- subset(mmd, fc%in%as.factor(fc.))
-    if(!all.col)
+    if(!keep.var)
         mmd <- mmd[,!names(mmd)%in%'fc']
     rownames(mmd) <- NULL
     return(mmd)
 ### \code{data.frame}. Either short or expanded data, depending on the
-### \code{all.col} argument.  The short data contains the volumes
+### \code{keep.var} argument.  The short data contains the volumes
 ### (\code{v}, \code{'dm3'}) plus the tree metrics defined in
 ### \code{\link{nfiMetrics}}, see value of such a function to better
 ### understand the metric units. The expanded data contains additional
 ### columns used to compute the volumes.
 }, ex = function(){
     madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- readNFI(madridNFI)[1:100,]
-    mmad <- nfiMetrics(rmad)
-    vmad <- metrics2Vol(mmad)
+    rmad <- readNFI(madridNFI)[1:10,]
+    vmad <- metrics2Vol(rmad)
     head(vmad)
 })

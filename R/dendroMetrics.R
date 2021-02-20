@@ -32,10 +32,11 @@ dendroMetrics <- structure(function#Summarize dendrometrics
                            ##\code{cut.dt}, see syntax in
                            ##\code{\link{Logic}}.
 (
-         mmd,  ##<<\code{character} or \code{data.frame}.  URL/path to
-              ##a compressed file of the NFI (.zip), having data of
-              ##either .dbf or .mdb file extensions, or a data frame
-              ##such as that produced by \code{\link{metrics2Vol}}.
+    mmd, ##<<\code{character} or \code{data.frame}.  URL/path to a
+          ##compressed file of the NFI (.zip) having data of either
+          ##.dbf or .mdb file extensions; or data frame such as that
+          ##produced by \code{\link{nfiMetrics}}; or data frame such
+          ##as that produced by \code{\link{readNFI}}.
     summ.vr = 'Estadillo', ##<< \code{character} or \code{NULL}. Name
                            ##of a Column used to summarize the
                            ##outputs. If \code{NULL} then output from
@@ -46,16 +47,17 @@ dendroMetrics <- structure(function#Summarize dendrometrics
                        ##avoids subsetting.
     report = FALSE, ##<< \code{logical}. Print a report of the output
                     ##in the current working directory.
-    ... ##<< Additional arguments in \code{\link{metrics2Vol}}.
+    ... ##<< Additional arguments in \code{\link{metrics2Vol}} or
+        ##\code{\link{nfiMetrics}} or \code{\link{readNFI}}.
 ) {
-    if(is.character(mmd)){
+    if(is.character(mmd) | inherits(mmd, 'readNFI')){
         mmd <- metrics2Vol(mmd, ...)
     }
     if(is.null(summ.vr)){
         mmd <- subset(mmd,
                       eval(parse(text = cut.dt)))
         if(report)
-            write.csv(mmd, file = 'report.csv')
+            write.csv(mmd, file = 'report.csv', row.names = FALSE)
         return(mmd)
     }
     fc <- function(dt, cl.){
@@ -68,6 +70,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     summ.vr <- fc(mmd, summ.vr)
     msp <- split(mmd, mmd[summ.vr])
     msp <- Filter(nrow, msp)
+    ## return(msp)
     fsun <- function(dt){
     un. <- data.frame(
         var = c('d','h','ba','v'),
@@ -103,8 +106,9 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     resm <- data.frame(resm)
     resm <- subset(resm,
                    eval(parse(text = cut.dt)))
+    rownames(resm) <- NULL
     if(report)
-        write.csv(resm, file = 'report.csv')
+        write.csv(resm, file = 'report.csv', row.names = FALSE)
     return(resm)
 ### \code{data.frame}. Depending on \code{summ.vr = NULL}, an output from
 ### \code{\link{metrics2Vol}}, or a summary of the variables, see

@@ -1,5 +1,5 @@
 readNFI <- structure(function#Read NFI data
-### This function can download into the R environmet Data sets of the
+### This function can retrieve data sets of the
 ### Spanish National Forest Inventory (NFI) using either remote or
 ### local paths to compressed (.zip) files.
                       ##details<< Compressed files having data
@@ -9,8 +9,8 @@ readNFI <- structure(function#Read NFI data
                       ##be imported directly from
                       ##\href{https://www.mapama.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/cartografia_informacion_disp.aspx}{http://mapama.gob.es}
                       ##using links to the compressed files. The
-                      ##compressed files of the 4th NFI should be read
-                      ##from local paths. The .dfb formats in
+                      ##compressed files of the 4th NFI must be read
+                      ##from local paths. The \code{.dbf} formats in
                       ##compressed data of the second NFI are imported
                       ##using \code{\link{read.dbf}}. The .mdb formats
                       ##in latter NFIs are imported using either
@@ -26,7 +26,7 @@ readNFI <- structure(function#Read NFI data
               ##a compressed file of the NFI (.zip) having data of
               ##either .dbf or .mdb file extensions.
     dt.nm = 'PCMayores' ##<< \code{character}. Name of a data set
-                        ##stored in the imported data. Default
+                        ##stored in the imported NFI data. Default
                         ##reads \code{'PCMayores'} (3rd NFI) or
                         ##\code{'PIESMA'} (2nd NFI).
     
@@ -84,7 +84,7 @@ readNFI <- structure(function#Read NFI data
     if(dt.nm.[1]%in%'PIESMA')
         pr. <- unique(dset$'PROVINCIA')
     attributes(dset) <- c(attributes(dset), list(pr. = pr.))
-
+        class(dset) <- append('readNFI',class(dset))
     return(dset)
 ### \code{data.frame}. A data base  of the NFI.
 }, ex = function(){
