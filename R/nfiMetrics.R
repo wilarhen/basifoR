@@ -34,10 +34,11 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                               ##sample plot \code{'Estadillos'} and
                               ##tree species \code{'Especie'}.
 ) {
-        if(is.character(nfi)){
+        if(is.null(nfi)|is.character(nfi)){
+            nfi. <- nfi
         nfi <- readNFI(nfi)
-    }
-
+        if(is.null(nfi.))
+            return(nfi)}
     fc <- function(dt, cl.){
         nt. <- paste(cl., collapse = '|')
         nt.. <- grep(nt., names(dt),

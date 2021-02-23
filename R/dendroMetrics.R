@@ -50,8 +50,11 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     ... ##<< Additional arguments in \code{\link{metrics2Vol}} or
         ##\code{\link{nfiMetrics}} or \code{\link{readNFI}}.
 ) {
-    if(is.character(mmd) | inherits(mmd, 'readNFI')){
+    if(is.null(mmd) | is.character(mmd) | inherits(mmd, 'readNFI')){
+        mmd. <- mmd
         mmd <- metrics2Vol(mmd, ...)
+        if(is.null(mmd.))
+            return(mmd)
     }
     if(is.null(summ.vr)){
         mmd <- subset(mmd,

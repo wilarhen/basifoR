@@ -49,7 +49,7 @@ readNFI <- structure(function#Read NFI data
     is_i386 <- grepl('i386',R.Version()['system'])
     if(is_mdb){
         if(is_win & !is_i386){
-            print('Access driver: change to R i386!')
+            print('Access driver needed: change to R i386!')
             return(NULL)
         }
         if(is_win & is_i386){

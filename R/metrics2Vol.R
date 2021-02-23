@@ -32,9 +32,11 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
         ##\code{\link{metrics2Vol}} or \code{\link{nfiMetrics}} or
         ##\code{\link{readNFI}}.
 ) {
-    if(is.character(nfi) | inherits(nfi, 'readNFI')){
+    if(is.null(nfi) | is.character(nfi) | inherits(nfi, 'readNFI')){
+        nfi. <- nfi
         nfi <- na.omit(nfiMetrics(nfi, ...))
-    }
+    if(is.null(nfi.))
+            return(nfi)}
 spec. <- names(nfi)[grepl('spec', names(nfi), ignore.case = TRUE)]
 var <- c('pr','h','d')
 needed <- c('Especie/ESPECIE', var)

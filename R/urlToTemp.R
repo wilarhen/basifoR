@@ -10,6 +10,8 @@ urlToTemp <- structure(function#Temporary NFI data
 (
     url.  ##<<\code{character}.  Paths to the data in the temporary file.
 ) {
+    if(is.null(url.))
+        return(NULL)
     temp <- tempfile()
     is.remote <- grepl('www.mapama.gob.es',url.)
     if(is.remote)
