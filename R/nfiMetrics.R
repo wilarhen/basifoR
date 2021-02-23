@@ -46,7 +46,8 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         cl.nm <- sort(names(dt)[nt..],
                       decreasing = TRUE)
         return(cl.nm)}
-        var. <- var[!var%in%'Hd']
+        var. <- var
+        ## var. <- var[!var%in%'Hd']
     fdn <- function(dbh, var){
         if(var%in%c('d','n','ba'))
             dm <- apply(dbh[,fc(dbh,c('Dn','Diamet'))],1,
@@ -55,11 +56,21 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
             ht <- fc(dbh,c('altura','Ht'))
             dbh[,ht] <- as.numeric(as.character(dbh[,ht]))
             dm <- conv_unit(dbh[,ht],
-                            from = 'm', to = 'dm')}
+                            ## from = 'm', to = 'dm')}
+                           from = 'm', to = 'dm')}
         if(var%in%'pr'){
             dm <- rep(attr(dbh,'pr.'), nrow(dbh))
         }
+
+        if(var%in%'Hd'){
+            Hd = tryCatch(
+                domheight(y$'h',y$'d',y$'n'),
+                error = function(e) NA)
+            dm <- rep(Hd, nrow(dbh))}
         return(dm)}
+
+
+        
         dmt <- mapply(function(y)
             fdn(nfi,y), y = var.)
         nma <- names(nfi)
@@ -70,17 +81,17 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         dmt <- data.frame(nfi[,nms], dmt)
         names(dmt) <- nm..
         
-        if('Hd'%in%var){
-            needed <- c('h','d','n')
-            nd <- paste(needed, collapse = '?,')
-            if(!all(needed%in%var))
-                stop(paste0('Hd: missing variables: var = c(',nd,'?, ...)'))
-            spl <- split(dmt, dmt[,nms], drop = TRUE)
-            dmhe <- Map(function(y)
-                cbind(y, Hd = tryCatch(domheight(y$'h',y$'d',y$'n'),
-                                       error = function(e) NA)), spl)
-            dmt <- do.call('rbind', dmhe) 
-            rownames(dmt) <- NULL}
+        ## if('Hd'%in%var){
+        ##     needed <- c('h','d','n')
+        ##     nd <- paste(needed, collapse = '?,')
+        ##     if(!all(needed%in%var))
+        ##         stop(paste0('Hd: missing variables: var = c(',nd,'?, ...)'))
+        ##     spl <- split(dmt, dmt[,nms], drop = TRUE)
+        ##     dmhe <- Map(function(y)
+        ##         cbind(y, Hd = tryCatch(domheight(y$'h',y$'d',y$'n'),
+        ##                                error = function(e) NA)), spl)
+        ##     dmt <- do.call('rbind', dmhe) 
+        ##     rownames(dmt) <- NULL}
         
     return(dmt)
 ### \code{data.frame} containing columns matching \code{levels}, plus
