@@ -1,5 +1,5 @@
 metrics2Vol <- structure(function#Tree volumes in NFI data
-### This function computes over bark volumes (\code{dm3}) by deriving
+### This function computes over bark volumes (\code{m3}) by deriving
 ### tree metrics from NFI data and matching the metrics with volume
 ### parameters established in 2nd NFI. To derive dendrometric
 ### summaries use \code{\link{dendroMetrics}}.
@@ -44,8 +44,10 @@ nd <- paste(needed, collapse = '?,')
     if(!all(length(spec.) != 0 & var%in%names(nfi))){
         warning("nfiMetrics: change arguments 'var'and/or 'levels'")
     stop(paste0('v: missing variables: nfi[,c(',nd,'?, ...)]'))
-}
-        
+    }
+
+    nfi. <- nfi
+    nfi[,'h'] <- conv_unit(nfi[,'h'],from = 'm', to = 'dm')
     mds <- c('1'  = 'v ~ par1 + par2 * (d^2) * h',
              '11' = 'v ~ par1 * (d^par2) * (h^par3)')
     fc <- function(dt, cl.){
@@ -57,7 +59,7 @@ nd <- paste(needed, collapse = '?,')
         return(cl.nm)}
     fmdV <- function(mdb2, ntm = c('pr','spec')){
         ## data(parEqVcc, envir = environment())
-        ## load('parEqVcc.RData')
+        load('parEqVcc.RData')
         vt <- merge(mdb2, parEqVcc,
                     by.x = fc(mdb2, ntm),
                     by.y = fc(parEqVcc, ntm),
@@ -109,6 +111,9 @@ nd <- paste(needed, collapse = '?,')
     mmd <- subset(mmd, fc%in%as.factor(cub.met))
     if(!keep.var)
         mmd <- mmd[,!names(mmd)%in%'fc']
+mmd[, 'v'] <- conv_unit(mmd[,'v'],from = 'dm3', to = 'm3')
+mmd[, 'h'] <- nfi.[,'h']
+
     rownames(mmd) <- NULL
     return(mmd)
 ### \code{data.frame}. Either short or expanded data, depending on the
