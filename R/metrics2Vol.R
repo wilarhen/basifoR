@@ -1,5 +1,5 @@
 metrics2Vol <- structure(function#Tree volumes in NFI data
-### This function computes over bark volumes (\code{m3}) by deriving
+### This function computes over bark volumes (\code{dm3}) by deriving
 ### tree metrics from NFI data and matching the metrics with volume
 ### parameters established in 2nd NFI. To derive dendrometric
 ### summaries use \code{\link{dendroMetrics}}.
@@ -34,20 +34,32 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
 ) {
     if(is.null(nfi) | is.character(nfi) | inherits(nfi, 'readNFI')){
         nfi. <- nfi
-        nfi <- na.omit(nfiMetrics(nfi, ...))
+        ## nfi <- na.omit(nfiMetrics(nfi, ...))
+        nfi <- nfiMetrics(nfi, ...)
     if(is.null(nfi.))
-            return(nfi)}
-spec. <- names(nfi)[grepl('spec', names(nfi), ignore.case = TRUE)]
-var <- c('pr','h','d')
-needed <- c('Especie/ESPECIE', var)
-nd <- paste(needed, collapse = '?,')
+        return(nfi)}
+    spec. <- names(nfi)[grepl('spec', names(nfi), ignore.case = TRUE)]
+    var <- c('pr','h','d')
+    needed <- c('Especie/ESPECIE', var)
+    nd <- paste(needed, collapse = '?,')
     if(!all(length(spec.) != 0 & var%in%names(nfi))){
         warning("nfiMetrics: change arguments 'var'and/or 'levels'")
-    stop(paste0('v: missing variables: nfi[,c(',nd,'?, ...)]'))
+        stop(paste0('v: missing variables: nfi[,c(',nd,'?, ...)]'))
     }
 
+    var.. <- getOption('units')
+    var.. <- var..[var..%in%names(nfi)]
+    attr_un <- attr(nfi,'units')
+    if(!is.null(attr_un))
+        names(var..)[var..%in%attr_un] <- names(attr_un)
     nfi. <- nfi
-    nfi[,'h'] <- conv_unit(nfi[,'h'],from = 'm', to = 'dm')
+
+    
+    ## nfi[,'h'] <- conv_unit(nfi[,'h'],from = 'm', to = 'dm')
+nfi <- conv(nfi, 'h', 'dm')
+
+    return(nfi)
+    
     mds <- c('1'  = 'v ~ par1 + par2 * (d^2) * h',
              '11' = 'v ~ par1 * (d^par2) * (h^par3)')
     fc <- function(dt, cl.){
@@ -89,6 +101,7 @@ nd <- paste(needed, collapse = '?,')
         vl <- cbind(vt, vl)
         names(vl) <- c(names(vt),dep)
         return(vl)}
+
     vt <- fmdV(nfi)
     lvs <- levels(as.factor(vt$'Modelo'))
     spm <- split(vt, vt[,'Modelo'])
@@ -111,9 +124,11 @@ nd <- paste(needed, collapse = '?,')
     mmd <- subset(mmd, fc%in%as.factor(cub.met))
     if(!keep.var)
         mmd <- mmd[,!names(mmd)%in%'fc']
-mmd[, 'v'] <- conv_unit(mmd[,'v'],from = 'dm3', to = 'm3')
-mmd[, 'h'] <- nfi.[,'h']
+    ## mmd[, 'v'] <- conv_unit(mmd[,'v'],from = 'dm3', to = 'm3')
+    ## mmd[, 'h'] <- conv_unit(mmd[,'h'],from = 'dm', to = 'm')
 
+## mmd <- conv(mmd, c('v','h'), c('m3','m'))
+    
     rownames(mmd) <- NULL
     return(mmd)
 ### \code{data.frame}. Either short or expanded data, depending on the

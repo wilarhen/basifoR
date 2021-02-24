@@ -25,13 +25,17 @@ mean diameter \code{'d'};
 number of trees per hectare
 \code{'n'}; \code{(5)} the
 basal areas \code{'ba'};
-and \code{(6)} the
-dominant height \code{'Hd'}, see
+and \code{(6)} the dominant
+height \code{'Hd'}, see
 Details section in
 \code{\link{dbhMetric}} for
 better understanding of the
-metrics units. Default
-\code{c('pr','d','h','ba','n','Hd')}.}
+metrics \code{\link{units.}} Default
+\code{c('pr','d','h','ba','n','Hd')}.
+imp.un = c('','cm','m','m2','','m'), ##<<\code{character}. Input
+##units.
+out.un = c('','cm','dm','m2','','m'), ##<<\code{character}. Output
+##units.}
   \item{levels}{\code{character}. \code{levels} at which
 the metrics are computed. Pattern
 matching is supported. Cases are
