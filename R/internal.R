@@ -56,8 +56,8 @@ else
   invisible()
 }
 
-units. <- c('d','h','ba','n','Hd','v')
-names(units.) <- c('mm','m','m2',NA,'m','dm3')
+units. <- c('d','h','ba','Hd','v')
+names(units.) <- c('mm','m','m2','m','dm3')
 
 .onLoad <- function(libname, pkgname){
     op <- options()
