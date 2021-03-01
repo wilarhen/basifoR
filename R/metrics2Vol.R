@@ -54,11 +54,7 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
         names(var..)[var..%in%attr_un] <- names(attr_un)
     nfi. <- nfi
 
-    
-    ## nfi[,'h'] <- conv_unit(nfi[,'h'],from = 'm', to = 'dm')
-nfi <- conv(nfi, 'h', 'dm')
-
-    return(nfi)
+    nfi <- conv_units(nfi, var = c('d','h'), un = c('mm','dm'))
     
     mds <- c('1'  = 'v ~ par1 + par2 * (d^2) * h',
              '11' = 'v ~ par1 * (d^par2) * (h^par3)')
@@ -124,11 +120,11 @@ nfi <- conv(nfi, 'h', 'dm')
     mmd <- subset(mmd, fc%in%as.factor(cub.met))
     if(!keep.var)
         mmd <- mmd[,!names(mmd)%in%'fc']
-    ## mmd[, 'v'] <- conv_unit(mmd[,'v'],from = 'dm3', to = 'm3')
-    ## mmd[, 'h'] <- conv_unit(mmd[,'h'],from = 'dm', to = 'm')
 
-## mmd <- conv(mmd, c('v','h'), c('m3','m'))
-    
+    mmd <- conv_units(mmd, var = c('d','h'), un = c('cm','m'))
+    ## vun <- getOption('units')[getOption('units')=='v']
+    ## attr(mmd, 'units') <- c(attr(mmd, 'units'), vun) 
+        
     rownames(mmd) <- NULL
     return(mmd)
 ### \code{data.frame}. Either short or expanded data, depending on the

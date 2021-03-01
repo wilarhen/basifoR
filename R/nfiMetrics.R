@@ -66,6 +66,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         return(dm)}
         dmt <- mapply(function(y)
             fdn(nfi,y), y = var.)
+        if(!is.null(attr(nfi,'pr.')))
         dmt <- cbind(pr = attr(nfi,'pr.'), dmt)
         nma <- names(nfi)
         app <- paste(levels, collapse = '|')
@@ -87,7 +88,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
             dmt <- do.call('rbind', dmhe) 
             rownames(dmt) <- NULL}
 
-dmt <- conv(dmt, 'd', 'cm')
+        dmt <- conv_units(dmt)
         
     return(dmt)
 ### \code{data.frame} containing columns matching \code{levels}, plus
