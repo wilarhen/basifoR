@@ -120,11 +120,9 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     mmd <- subset(mmd, fc%in%as.factor(cub.met))
     if(!keep.var)
         mmd <- mmd[,!names(mmd)%in%'fc']
-
-    mmd <- conv_units(mmd, var = c('d','h'), un = c('cm','m'))
-    ## vun <- getOption('units')[getOption('units')=='v']
-    ## attr(mmd, 'units') <- c(attr(mmd, 'units'), vun) 
-        
+    vun <- getOption('units')[getOption('units')=='v']
+    attr(mmd, 'units') <- c(attr(nfi, 'units'), vun) 
+    mmd <- conv_units(mmd, var = c('d','h','v'), un = c('cm','m','m3'))        
     rownames(mmd) <- NULL
     return(mmd)
 ### \code{data.frame}. Either short or expanded data, depending on the

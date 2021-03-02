@@ -71,40 +71,33 @@ dendroMetrics <- structure(function#Summarize dendrometrics
                       decreasing = TRUE)
         return(cl.nm)}
     summ.vr <- fc(mmd, summ.vr)
+
+    var <- getOption('units1')[getOption('units1')%in%names(mmd)]
+    frm. <- names(attr(mmd, 'units'))
+    to. <- names(var)
+    var. <- var[var!='n']
+    mmd <- conv_units(mmd, var = var, un = to.)
+    
     msp <- split(mmd, mmd[summ.vr])
-    msp <- Filter(nrow, msp)
-    ## return(msp)
-    fsun <- function(dt){
-    un. <- data.frame(
-        var = c('d','h','ba','v'),
-        frm.= c('mm', 'dm', 'm2','dm3'), 
-        to. = c('cm','m', 'm2','m3'))
-    un.. <- subset(
-        un., get('var')%in%names(dt))
-    un.. <- lapply(un.., as.character)
-    unv <- un..$'var'
-    cols <- lapply(seq_len(ncol(dt[,unv])),
-                   function(x)dt[,unv][x])
-    ncu <- mapply(function(x,y,z)
-        conv_unit(x, from = y, to = z),
-        x = cols, y = un..$'frm.', z = un..$'to.')
-    if(!is.matrix(ncu))
-        nun <- do.call('cbind', ncu)
-    dt[,unv] <- nun
-    dt[,unv] <- dt[,unv] * dt[,'n'] 
-    summ <- apply(dt[,c(unv,'n')], 2,
-                  sum, na.rm = TRUE)
-    summ[c('d','h')] <- summ[c('d','h')]/summ['n'] 
-    summ['dg'] <- sqrt((4E4 * summ['ba']/summ['n'])/pi)
-    summ <- summ[order(names(summ))]
-    summ <- sapply(summ,function(x) round(x,3))
-    summ <- t(as.matrix(summ))
-    fcs. <- !names(dt)%in%c(unv,'n')
-    fcs <- dt[1,fcs.]
-    resd <- cbind(fcs, summ)
-    return(resd)}
+    msp <- Filter('nrow', msp)
+
+
+    fsum <- function(dt){
+        dt[,var.] <- dt[,var.] * dt[,'n'] 
+        summ <- apply(dt[,var], 2,
+                      sum, na.rm = TRUE)
+        ## summ['Hd'] <- domheight(summ['h'],summ['d'],summ['n'])
+        summ[c('d','h', 'Hd')] <- summ[c('d','h','Hd')]/summ['n'] 
+        summ['dg'] <- sqrt((4E4 * summ['ba']/summ['n'])/pi)
+        summ <- summ[order(names(summ))]
+        summ <- sapply(summ,function(x) round(x,3))
+        summ <- t(as.matrix(summ))
+        fcs. <- names(dt)[!names(dt)%in%var]
+        fcs <- dt[1,fcs.]
+        resd <- cbind(fcs, summ)}
+
     resm <- Map(function(x)
-        fsun(x), x= msp)
+        fsum(x), x= msp)
     resm <- Reduce('rbind',resm)
     resm <- data.frame(resm)
     resm <- subset(resm,

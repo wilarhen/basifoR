@@ -50,6 +50,10 @@ conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
 units. <- c('d','h','ba','n','Hd','v')
 names(units.) <- c('mm','m','m2','','m','dm3')
 
+units.. <- units.
+names(units..) <- c('cm','m','m2','','m','m3')
+
+
 
 ## /IFNdyn-master/ github proyect with dominantHeight function for NFI
 ## https://github.com/miquelcaceres/IFNdyn
@@ -95,7 +99,8 @@ else
                   utm1 = "+proj=utm +zone=utm.z +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0",
                   longlat = '+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs',
                   fapp = 'mcmapply',
-                  units = units.)
+                  units = units.,
+                  units1 = units..)
 
 toset <- !(names(op.FC) %in% names(op))
   if(any(toset)) options(op.FC[toset])
