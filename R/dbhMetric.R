@@ -1,17 +1,12 @@
 dbhMetric <- structure(function#DBH metrics
-### This function can format replicates of tree diameters at breast
-### height \code{'d'} and of tree heights \code{'h'} for these can be
-### used to derive over bark volumes, according to units/parameters of
-### the Spanish National Forest Inventory (NFI). The function can also
-### derive basal areas \code{'ba'} (\code{m2 tree-1}) and calculate
-### number of trees by hectare \code{'n'}, while considering the
-### sample design of the NFI, see Details section. Implementation of
-### this function using records in the NFI can be
-### burdensome. Consequently, use \code{\link{dendroMetrics}} to
-### recursively implement the function on NFI data. Functions
-### \code{\link{nfiMetrics}} and \code{\link{metrics2Vol}} can also be
-### implemented if users of the package aims to better understand
-### internal routines of the function.
+###This function can format tree diameters at breast height and tree
+###heights according to the sampling design of the Spanish National
+###Forest Inventories (SNFIs). The function is used by other routines
+###of basifoR to derive basal areas 'ba' (m2 tree-1) and numbers of
+###trees per hectare 'n'see Details section. Implementation of this
+###function using data sets of the SNFIs can be burdensome. Use
+###\code{\link{dendroMetrics}} instead to recursively compute these
+###and other tree metrics.
                        ##details<< Replicates of tree diameter
                        ##\code{'d'} are averaged. The tree heights
                        ##\code{'h'} are formatted from \code{mm} to
@@ -20,8 +15,8 @@ dbhMetric <- structure(function#DBH metrics
                        ##transforming the diameters from \code{mm} to
                        ##\code{cm} and using the formula: \code{ba(m2
                        ##tree-1 ha-1) = pi * d(cm)^2 * (4 *
-                       ##1E4)^-1}. The number of trees by hectare
-                       ##\code{'n'} is calculated considering the
+                       ##1E4)^-1}. The number of trees per hectare
+                       ##\code{'n'} are calculated considering the
                        ##sample design of the NFI: each plot consists
                        ##of four concentric subplots with radii
                        ##\code{5, 10, 15,} and \code{25 m}. The
