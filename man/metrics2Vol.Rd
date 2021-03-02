@@ -1,7 +1,7 @@
 \name{metrics2Vol}
 \alias{metrics2Vol}
 \title{Tree volumes in NFI data}
-\description{This function computes over bark volumes (\code{m3}) by deriving
+\description{This function computes over bark volumes (\code{dm3}) by deriving
 tree metrics from NFI data and matching the metrics with volume
 parameters established in 2nd NFI. To derive dendrometric
 summaries use \code{\link{dendroMetrics}}.}
@@ -41,7 +41,7 @@ variables.}
 \code{keep.var} argument.  The short data contains the volumes
 (\code{v}, \code{'dm3'}) plus the tree metrics defined in
 \code{\link{nfiMetrics}}, see value of such a function to better
-understand the metric \code{\link{units.}} The expanded data contains additional
+understand the metric units. The expanded data contains additional
 columns used to compute the volumes.}
 
 \author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>}

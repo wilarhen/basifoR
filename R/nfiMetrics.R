@@ -6,21 +6,21 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
 ### volumes.
 (
     nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to a
-    ## compressed file of the NFI (.zip) having data of either .dbf or
-    ## .mdb file extensions, or a data frame such as that produced by
-    ## \code{\link{readNFI}}.  var = c('pr','d','h','ba','n','Hd'),
-    ## ##<<\code{character}. Metrics. These
+          ##compressed file of the NFI (.zip) having data of either
+          ##.dbf or .mdb file extensions, or a data frame such as that
+          ##produced by \code{\link{readNFI}}.
     var = c('d','h','ba','n','Hd'), ##<<\code{character}. Metrics. These
                                          ##can be five: \code{(1)} the
                                          ##mean diameter \code{'d'};
                                          ##\code{(2)} the tree height
                                          ##\code{'h'}; \code{(3)} the
-                                         ##number of trees per hectare
-                                         ##\code{'n'}; \code{(4)} the
-                                         ##basal areas \code{'ba'};
-                                         ##and \code{(5)} the dominant
-                                         ##height \code{'Hd'}, see
-                                         ##Details section in
+                                         ##basal area \code{'ba'};
+                                         ##code{(4)} the number of
+                                         ##trees per hectare
+                                         ##\code{'n'}; and \code{(5)}
+                                         ##the dominant height
+                                         ##\code{'Hd'}, see Details
+                                         ##section in
                                          ##\code{\link{dbhMetric}} for
                                          ##better understanding of the
                                          ##metrics units. Default
