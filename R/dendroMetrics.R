@@ -2,11 +2,11 @@ dendroMetrics <- structure(function#Summarize dendrometrics
 
 ###This function can summarize dendrometric data from the Spanish
 ###National Forest Inventory (SNFI). It can also control most other
-###routines of the package. The output summary is formated into stand
+###routines of the package. Outputs are formated into stand
 ###units, see the Details section.
                            ##details<< Outputs can be summarized using
-                           ## levels in \code{summ.vr}. The summaries
-                           ## can include: 1) Categorical columns
+                           ## levels in \code{summ.vr}. The outputs
+                           ## include: 1) Categorical columns
                            ## formulated in argument \code{summ.vr};
                            ## 2) the tree basal area (\code{ba},
                            ## \code{'m2 ha-1'}); 3) the average
@@ -44,32 +44,36 @@ dendroMetrics <- structure(function#Summarize dendrometrics
 ) {
     if(is.null(nfi) | is.character(nfi) | inherits(nfi, 'readNFI')){
         nfi. <- nfi
-        nfi <- metrics2Vol(nfi, ...)
+        nfi <- metrics2Vol(nfi, levels = ...)
         if(is.null(nfi.))
             return(nfi)
     }
+    frm. <- names(attr(nfi, 'units'))
     if(is.null(summ.vr)){
         nfi <- subset(nfi,
                       eval(parse(text = cut.dt)))
+        attributes(nfi) <- c(attributes(nfi), list(units = frm.))
+    
         if(report)
             write.csv(nfi, file = 'report.csv', row.names = FALSE)
         return(nfi)
     }
-    fc <- function(dt, cl.){
-        nt. <- paste(cl., collapse = '|')
-        nt.. <- grep(nt., names(dt),
-                     ignore.case = TRUE)
-        cl.nm <- sort(names(dt)[nt..],
-                      decreasing = TRUE)
-        return(cl.nm)}
-    summ.vr <- fc(nfi, summ.vr)
+    ## fc <- function(dt, cl.){
+    ##     nt. <- paste(cl., collapse = '|')
+    ##     nt.. <- grep(nt., names(dt),
+    ##                  ignore.case = TRUE)
+    ##     cl.nm <- sort(names(dt)[nt..],
+    ##                   decreasing = TRUE)
+    ##     return(cl.nm)}
+    ## summ.vr <- fc(nfi, summ.vr)
+        summ.vr <- flev(nfi, summ.vr)
 
     var <- getOption('units1')[getOption('units1')%in%names(nfi)]
     frm. <- names(attr(nfi, 'units'))
     to. <- names(var)
     var. <- var[var!='n']
     nfi <- conv_units(nfi, var = var, un = to.)
-    
+
     msp <- split(nfi, nfi[summ.vr])
     msp <- Filter('nrow', msp)
 
@@ -97,6 +101,12 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     rownames(resm) <- NULL
     if(report)
         write.csv(resm, file = 'report.csv', row.names = FALSE)
+
+    ## dgcm <- 'dg'
+    ## names(dgcm) <- 'cm'
+    attr. <- c(names(attr(nfi,'units')), 'cm')
+    attributes(resm) <- c(attributes(resm), list(units = attr.))
+
     return(resm)
 ### \code{data.frame}. Depending on \code{summ.vr = NULL}, an output from
 ### \code{\link{metrics2Vol}}, or a summary of the variables, see
@@ -109,6 +119,8 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     vmad <- metrics2Vol(mmad)
     dmad <- dendroMetrics(vmad, cut.dt = 'h > 8')
     head(dmad)
+## see SI units
+attr(dmad,'units')
 
-
+    
 })

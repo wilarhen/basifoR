@@ -6,7 +6,6 @@ conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
         units.  <- attr(nfi,'units')
     cols <- units.[units.%in%names(nfi)]
     units_ini <- units_out <- names(cols)
-    ## units_out <- names(cols)
     matches <- sapply(var,function(m) paste0("^",m,"$"))
     pos. <- sapply(matches,function(m) grep(m, cols))
     units_out[pos.]  <- un
@@ -26,25 +25,13 @@ conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
     attributes(nfi) <- c(attributes(nfi), list(units = un_attr))
     return(nfi)}
 
-## conv <- function(nfi,var. = NULL, to = NULL, from = NULL){
-##     nm <- colnames(nfi)
-##     if(is.null(var.))
-##         var. <- nm
-##     if(is.null(to))
-##         return(nfi)
-##     unts. <- getOption('units')
-##     if(is.null(from)){
-##         un <- unts.[unts.%in%var.]
-##         from <- names(un)}
-##     unts.. <- unts. 
-##     names(unts..)[unts..%in%var.] <- to
-##     nfi[,var.] <- data.frame(mapply(function(x,y,z)
-##         conv_unit(nfi[,x], from = y, to = z),
-##         var., from, to, SIMPLIFY = TRUE))
-##     unts3 <- unts..[unts..%in%var.]
-##     colnames(nfi) <- nm
-##     attributes(nfi) <- append(attributes(nfi), list(units = unts3))
-##     return(nfi)} 
+flev <- function(vmad, levels){
+nma <- names(vmad)
+app <- paste(levels, collapse = '|')
+gap <- grepl(app,nma, ignore.case = TRUE)
+nms <- nma[gap]
+return(nms)}
+
 
 
 units. <- c('d','h','ba','n','Hd','v')

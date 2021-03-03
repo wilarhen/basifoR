@@ -68,10 +68,11 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
             fdn(nfi,y), y = var.)
         if(!is.null(attr(nfi,'pr.')))
         dmt <- cbind(pr = attr(nfi,'pr.'), dmt)
-        nma <- names(nfi)
-        app <- paste(levels, collapse = '|')
-        gap <- grepl(app,nma, ignore.case = TRUE)
-        nms <- nma[gap]
+        ## nma <- names(nfi)
+        ## app <- paste(levels, collapse = '|')
+        ## gap <- grepl(app,nma, ignore.case = TRUE)
+        ## nms <- nma[gap]
+        nms <- flev(nfi, levels)
         nm.. <- c(nms, colnames(dmt))
         dmt <- data.frame(nfi[,nms], dmt)
         names(dmt) <- nm..
