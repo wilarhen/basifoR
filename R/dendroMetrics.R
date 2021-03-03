@@ -1,39 +1,29 @@
 dendroMetrics <- structure(function#Summarize dendrometrics
-### This function can control most of the in-package routines. The
-### function computes and summarizes dendrometrics using data of the
-### Spanish National Forest Inventory (NFI). This also transforms the
-### metric units of the summaries, see details.
-                           ##details<< Units of measurement of the
-                           ##derived dendrometrics are transformed to
-                           ##stand units and the data is summarized
-                           ##using levels in
-                           ##\code{summ.vr}. Consequently the metric
-                           ##units of the summarized variables do not
-                           ##correspond to the metric units of data
-                           ##from \code{\link{metrics2Vol}}.  The
-                           ##summaries contain following variables: 1)
-                           ##three factor columns: the province
-                           ##(\code{pr}), the tree species
-                           ##(\code{'ESPECIE'} or \code{'Especie'},
-                           ##depending on whether the data belongs to
-                           ##2nd or 3rd NFIs), the sample units
-                           ##(\code{'ESTADILLO'} or
-                           ##\code{'Estadillo'}); 2) the tree basal
-                           ##area (\code{ba}, \code{'m2 ha-1'}); 3)
-                           ##the average diameter (\code{d},
-                           ##\code{'cm'}); 4) the quadratic mean
-                           ##diameter (\code{dg}, \code{'cm'}); 5) The
-                           ##average tree height (\code{h},
-                           ##\code{'m'}); 6) the number of trees by
-                           ##hectare (\code{n}, dimensionless), and
-                           ##the over bark volume (\code{v}, \code{'m3
-                           ##ha-1'}). Subsets of the summaries are
-                           ##computed using logical expressions in
-                           ##\code{cut.dt}, see syntax in
-                           ##\code{\link{Logic}}.
+
+###This function can summarize dendrometric data from the Spanish
+###National Forest Inventory (SNFI). It can also control most other
+###routines of the package. The output summary is formated into stand
+###units, see the Details section.
+                           ##details<< Outputs can be summarized using
+                           ## levels in \code{summ.vr}. The summaries
+                           ## can include: 1) Categorical columns
+                           ## formulated in argument \code{summ.vr};
+                           ## 2) the tree basal area (\code{ba},
+                           ## \code{'m2 ha-1'}); 3) the average
+                           ## diameter (\code{d}, \code{'cm'}); 4) the
+                           ## quadratic mean diameter (\code{dg},
+                           ## \code{'cm'}); 5) The average tree height
+                           ## (\code{h}, \code{'m'}); 6) the number of
+                           ## trees by hectare (\code{n},
+                           ## 'dimensionless'), and the over bark
+                           ## volume (\code{v}, \code{'m3 ha-1'}). The
+                           ## output summary can be subsetted using
+                           ## logical expressions in argument
+                           ## \code{'cut.dt'}, see syntax in
+                           ## \code{\link{Logic}}.
 (
-    mmd, ##<<\code{character} or \code{data.frame}.  URL/path to a
-          ##compressed file of the NFI (.zip) having data of either
+    nfi, ##<<\code{character} or \code{data.frame}.  URL/path to a
+          ##compressed SNFI file (.zip) having data of either
           ##.dbf or .mdb file extensions; or data frame such as that
           ##produced by \code{\link{nfiMetrics}}; or data frame such
           ##as that produced by \code{\link{readNFI}}.
@@ -50,18 +40,18 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     ... ##<< Additional arguments in \code{\link{metrics2Vol}} or
         ##\code{\link{nfiMetrics}} or \code{\link{readNFI}}.
 ) {
-    if(is.null(mmd) | is.character(mmd) | inherits(mmd, 'readNFI')){
-        mmd. <- mmd
-        mmd <- metrics2Vol(mmd, ...)
-        if(is.null(mmd.))
-            return(mmd)
+    if(is.null(nfi) | is.character(nfi) | inherits(nfi, 'readNFI')){
+        nfi. <- nfi
+        nfi <- metrics2Vol(nfi, ...)
+        if(is.null(nfi.))
+            return(nfi)
     }
     if(is.null(summ.vr)){
-        mmd <- subset(mmd,
+        nfi <- subset(nfi,
                       eval(parse(text = cut.dt)))
         if(report)
-            write.csv(mmd, file = 'report.csv', row.names = FALSE)
-        return(mmd)
+            write.csv(nfi, file = 'report.csv', row.names = FALSE)
+        return(nfi)
     }
     fc <- function(dt, cl.){
         nt. <- paste(cl., collapse = '|')
@@ -70,15 +60,15 @@ dendroMetrics <- structure(function#Summarize dendrometrics
         cl.nm <- sort(names(dt)[nt..],
                       decreasing = TRUE)
         return(cl.nm)}
-    summ.vr <- fc(mmd, summ.vr)
+    summ.vr <- fc(nfi, summ.vr)
 
-    var <- getOption('units1')[getOption('units1')%in%names(mmd)]
-    frm. <- names(attr(mmd, 'units'))
+    var <- getOption('units1')[getOption('units1')%in%names(nfi)]
+    frm. <- names(attr(nfi, 'units'))
     to. <- names(var)
     var. <- var[var!='n']
-    mmd <- conv_units(mmd, var = var, un = to.)
+    nfi <- conv_units(nfi, var = var, un = to.)
     
-    msp <- split(mmd, mmd[summ.vr])
+    msp <- split(nfi, nfi[summ.vr])
     msp <- Filter('nrow', msp)
 
 
