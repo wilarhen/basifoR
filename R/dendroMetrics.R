@@ -5,9 +5,9 @@ dendroMetrics <- structure(function#Summarize dendrometrics
 ###transformed into stand units, see the Details section.
                            ##details<< Dendrometric variables are
                            ## summarized according to the levels of
-                           ## the argument \code{summ.vr}. The summary
+                           ## the argument \code{levels}. The summary
                            ## outputs include: 1) Categorical columns
-                           ## formulated in argument \code{summ.vr};
+                           ## formulated in argument \code{levels};
                            ## 2) the tree basal area (\code{ba},
                            ## \code{'m2 ha-1'}); 3) the average
                            ## diameter (\code{d}, \code{'cm'}); 4) the
@@ -43,14 +43,17 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     ... ##<< Additional arguments in \code{\link{metrics2Vol}} or
         ##\code{\link{nfiMetrics}} or \code{\link{readNFI}}.
 ) {
+    levels. <- levels
+    if(is.null(levels))
+        levels. <- c('esta','espe')
     if(is.null(nfi) | is.character(nfi) | inherits(nfi, 'readNFI')){
         nfi. <- nfi
-        nfi <- metrics2Vol(nfi, levels = ...)
+        nfi <- metrics2Vol(nfi, levels = levels., ...)
         if(is.null(nfi.))
             return(nfi)
     }
     frm. <- names(attr(nfi, 'units'))
-    if(is.null(summ.vr)){
+    if(is.null(levels)){
         nfi <- subset(nfi,
                       eval(parse(text = cut.dt)))
         attributes(nfi) <- c(attributes(nfi), list(units = frm.))
@@ -67,7 +70,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     ##                   decreasing = TRUE)
     ##     return(cl.nm)}
     ## summ.vr <- fc(nfi, summ.vr)
-        summ.vr <- flev(nfi, summ.vr)
+        levels <- flev(nfi, levels)
 
     var <- getOption('units1')[getOption('units1')%in%names(nfi)]
     frm. <- names(attr(nfi, 'units'))
@@ -75,7 +78,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     var. <- var[var!='n']
     nfi <- conv_units(nfi, var = var, un = to.)
 
-    msp <- split(nfi, nfi[summ.vr])
+    msp <- split(nfi, nfi[levels])
     msp <- Filter('nrow', msp)
 
 
@@ -84,6 +87,8 @@ dendroMetrics <- structure(function#Summarize dendrometrics
         summ <- apply(dt[,var], 2,
                       sum, na.rm = TRUE)
         ## summ['Hd'] <- domheight(summ['h'],summ['d'],summ['n'])
+        if(sum(diff(summ['Hd']))!=0)
+            warning("Different 'Hd' within levels: average was computed")
         summ[c('d','h', 'Hd')] <- summ[c('d','h','Hd')]/summ['n'] 
         summ['dg'] <- sqrt((4E4 * summ['ba']/summ['n'])/pi)
         summ <- summ[order(names(summ))]
@@ -109,7 +114,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     attributes(resm) <- c(attributes(resm), list(units = attr.))
 
     return(resm)
-### \code{data.frame}. Depending on \code{summ.vr = NULL}, an output from
+### \code{data.frame}. Depending on \code{levels = NULL}, an output from
 ### \code{\link{metrics2Vol}}, or a summary of the variables, see
 ### Details section.
 }, ex = function(){
