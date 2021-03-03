@@ -28,10 +28,12 @@ dendroMetrics <- structure(function#Summarize dendrometrics
           ##produced by \code{\link{nfiMetrics}}; or data frame such
           ##as that produced by \code{\link{readNFI}}.
     summ.vr = 'Estadillo', ##<< \code{character} or \code{NULL}. Name
-                           ##of a Column used to summarize the
-                           ##outputs. If \code{NULL} then output from
+                           ##of a Categorical variables in the SNFI
+                           ##data used to summarize the outputs. If
+                           ##\code{NULL} then output from
                            ##\code{\link{metrics2Vol}} is
                            ##returned. Default \code{'Estadillo'}
+                           ##processes sample plots.
     cut.dt = 'd == d', ##<< \code{character}. Logical condition used
                        ##to subset the output. Default \code{'d == d'}
                        ##avoids subsetting.
