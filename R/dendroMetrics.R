@@ -1,12 +1,12 @@
 dendroMetrics <- structure(function#Summarize dendrometrics
-
 ###This function can summarize dendrometric data from the Spanish
 ###National Forest Inventory (SNFI). It can also control most other
-###routines of the package. Outputs are formated into stand
-###units, see the Details section.
-                           ##details<< Outputs can be summarized using
-                           ## levels in \code{summ.vr}. The outputs
-                           ## include: 1) Categorical columns
+###functions of the package. Dendrometric variables in the outputs are
+###transformed into stand units, see the Details section.
+                           ##details<< Dendrometric variables are
+                           ## summarized according to the levels of
+                           ## the argument \code{summ.vr}. The summary
+                           ## outputs include: 1) Categorical columns
                            ## formulated in argument \code{summ.vr};
                            ## 2) the tree basal area (\code{ba},
                            ## \code{'m2 ha-1'}); 3) the average
@@ -27,7 +27,8 @@ dendroMetrics <- structure(function#Summarize dendrometrics
           ##.dbf or .mdb file extensions; or data frame such as that
           ##produced by \code{\link{nfiMetrics}}; or data frame such
           ##as that produced by \code{\link{readNFI}}.
-    summ.vr = 'Estadillo', ##<< \code{character} or \code{NULL}. Name
+    levels = c('esta','espe'),
+    ## summ.vr = 'Estadillo', ##<< \code{character} or \code{NULL}. Name
                            ##of a Categorical variables in the SNFI
                            ##data used to summarize the outputs. If
                            ##\code{NULL} then output from
