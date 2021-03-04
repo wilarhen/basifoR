@@ -92,4 +92,17 @@ readNFI <- structure(function#Read NFI data
 madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
 rmad <- readNFI(madridNFI)[1:100,]
 head(rmad)
+
+    ## Retrieval of a data base from the second SNFI:
+
+
+    ## donttest{
+    ## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+    ## url2 <- httr::modify_url("http://www.mapama.gob.es", path = path)
+    ## dmad <- readNFI(url2)
+    ## head(dmad)
+    ## attr(dmad, 'units')
+    ## }
+
+
 })
