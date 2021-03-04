@@ -1,14 +1,15 @@
 urlToTemp <- structure(function#Temporary NFI data 
 ### This function is implemented by other routines of the package to
-### decompress .zip data of the NFI using either URLs or local
-### paths.
-                       ##details<< The decompressed data is stored in
-                       ##a temporary file of the local
+### decompress \code{.zip} files with data sets of the SNFI. 
+                       ##details<< The data sets are decompressed in a
+                       ##temporary file of the local
                        ##machine. Compressed data containing file
-                       ##extensions other than .mdb or .dbf are not
-                       ##supported.
+                       ##extensions other than \code{.mdb} or
+                       ##\code{.dbf} are not supported.
 (
-    url.  ##<<\code{character}.  Paths to the data in the temporary file.
+    url.  ##<<\code{character}.  URL/path to a compressed file of the
+              ##SNFI (.zip) having data of either .dbf or .mdb file
+              ##extensions..
 ) {
     if(is.null(url.))
         return(NULL)
