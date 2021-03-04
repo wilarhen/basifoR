@@ -1,9 +1,8 @@
 metrics2Vol <- structure(function#Tree volumes in NFI data
-### This function computes over bark volumes (\code{'m3'}) by deriving
-### tree metrics from NFI data and matching the metrics with volume
-### equations and parameters established in 2nd NFI, see Details
-### section. To derive dendrometric summaries use
-### \code{\link{dendroMetrics}}.
+### This function computes over bark volumes (\code{'m3'}) processing
+### tree metrics from databases of the SNFI data and using volume
+### equations established in 2nd NFI, see Details section. To derive
+### dendrometric summaries use \code{\link{dendroMetrics}}.
                          ##details<< The quations from the second SNFI
                          ##used have the forms \code{'v ~ par1 + par2
                          ##* (d^2) * h'}, and \code{'v ~ par1 *
@@ -128,10 +127,10 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     rownames(mmd) <- NULL
     return(mmd)
 ### \code{data.frame}. Depending on \code{keep.var}, short or expanded
-###  data set.  The short data contains the volumes (\code{v},
-###  \code{'m3'}) plus tree metrics defined in \code{var} from
-###  \code{\link{nfiMetrics}}. The expanded data contains columns with
-###  additional variables used to compute the volumes.
+###  data set.  Short data sets contain the volumes (\code{v},
+###  \code{'m3'}) plus the metrics defined in
+###  \code{\link{nfiMetrics}}. The expanded data contains additional
+###  columns with the variables used to compute the volumes.
 }, ex = function(){
     madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
     rmad <- readNFI(madridNFI)[1:10,]
