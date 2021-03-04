@@ -41,7 +41,7 @@ readNFI <- structure(function#Read NFI data
     }
     fmdb <- function(x,dt.nm){
         ## mdb.get(x,tables = dt.nm)
-        tryCatch(mdb.get(x,tables = dt.nm)
+        tryCatch(mdb.get(x,tables = dt.nm),
                  error = function(e) NULL)
     }
     fdbf <- function(x,dt.nm){
@@ -66,8 +66,6 @@ readNFI <- structure(function#Read NFI data
     if(is_dbf){
         fnim <- 'fdbf'
     }
-    ## dset <- tryCatch(do.call(fnim, list(imp, dt.nm)),
-    ##                  error = function(e) NULL)
     dt.nm. <- dt.nm
     may. <- grepl('mayores',dt.nm, ignore.case = TRUE)
     may2. <- grepl('dbf', fnim)
@@ -78,6 +76,8 @@ readNFI <- structure(function#Read NFI data
         dt.nm. <- 'PIESMA'
     dset <- tryCatch(do.call(fnim, list(imp, dt.nm.)),
                      error = function(e) NULL)
+    if(is.null(dset))
+        return(dset)
     if(!may. & !dt.nm.[1]%in%'PIESMA')
         return(dset)
     if(may. & !may2.){
