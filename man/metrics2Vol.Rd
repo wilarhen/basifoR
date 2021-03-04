@@ -50,8 +50,10 @@ columns used to compute the volumes.}
 
 
 \examples{
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-rmad <- readNFI(madridNFI)[1:10,]
-vmad <- metrics2Vol(rmad)
-head(vmad)
+    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
+    rmad <- readNFI(madridNFI)[1:10,]
+    vmad <- metrics2Vol(rmad)
+    head(vmad)
+## see metric units
+attr(vmad,'units')
 }

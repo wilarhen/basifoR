@@ -64,7 +64,7 @@ Details section.}
     vmad <- metrics2Vol(mmad)
     dmad <- dendroMetrics(vmad, cut.dt = 'h > 8')
     head(dmad)
-## see SI units
+## see metric units
 attr(dmad,'units')
 
     
