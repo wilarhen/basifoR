@@ -49,12 +49,10 @@ dendroMetrics <- structure(function#Summarize dendrometrics
             return(nfi)
     }
     frm. <- attr(nfi, 'units')
-    ## frm. <- names(attr(nfi, 'units'))
     if(is.null(summ.vr)){
         nfi <- subset(nfi,
                       eval(parse(text = cut.dt)))
         attributes(nfi) <- c(attributes(nfi), list(units = frm.))
-    
         if(report)
             write.csv(nfi, file = 'report.csv', row.names = FALSE)
         return(nfi)
@@ -93,7 +91,6 @@ dendroMetrics <- structure(function#Summarize dendrometrics
 
     dgcm <- 'dg'
     names(dgcm) <- 'cm'
-    ## attr. <- c(names(attr(nfi,'units')), 'cm')
     attr. <- c(attr(nfi,'units'), dgcm)
     attributes(resm) <- c(attributes(resm), list(units = attr.))
 
@@ -111,6 +108,17 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     head(dmad)
     ## see metric units
     attr(dmad,'units')
+
+    ## Retrieval of SNFI data in 'www.mapama.gob.es' and computation
+    ## of dendrometric summary:
     
+    ## \donttest{
+    ##     url2 <- 'http://www.mapama.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+    ## dmad <- dendroMetrics(url2, cut.dt = 'h >= 11')
+    ## head(dmad)
+    ## attr(dmad, 'units')
+
+    ## }
+
     
 })
