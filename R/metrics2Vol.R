@@ -127,12 +127,11 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     mmd <- conv_units(mmd, var = c('d','h','v'), un = c('cm','m','m3'))        
     rownames(mmd) <- NULL
     return(mmd)
-### \code{data.frame}. Either short or expanded data, depending on the
-### \code{keep.var} argument.  The short data contains the volumes
-### (\code{v}, \code{'dm3'}) plus the tree metrics defined in
-### \code{\link{nfiMetrics}}, see value of such a function to better
-### understand the metric units. The expanded data contains additional
-### columns used to compute the volumes.
+### \code{data.frame}. Depending on \code{keep.var}, short or expanded
+###  data set.  The short data contains the volumes (\code{v},
+###  \code{'m3'}) plus tree metrics defined in \code{var} from
+###  \code{\link{nfiMetrics}}. The expanded data contains columns with
+###  additional variables used to compute the volumes.
 }, ex = function(){
     madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
     rmad <- readNFI(madridNFI)[1:10,]
