@@ -57,15 +57,26 @@ Details section.}
 
 
 \examples{
-    ## Local NFI Data from the province of Madrid
-    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- readNFI(madridNFI)[1:100,]
-    mmad <- nfiMetrics(rmad)
-    vmad <- metrics2Vol(mmad)
-    dmad <- dendroMetrics(vmad, cut.dt = 'h > 8')
-    head(dmad)
+## SNFI Data from the province of Madrid
+madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
+rmad <- readNFI(madridNFI)[1:100,]
+mmad <- nfiMetrics(rmad)
+vmad <- metrics2Vol(mmad)
+dmad <- dendroMetrics(vmad, cut.dt = 'h > 8')
+head(dmad)
 ## see metric units
 attr(dmad,'units')
 
-    
+## Retrieval of SNFI data from 'www.mapama.gob.es' and computation
+## of the corresponding dendrometric summary:
+
+\donttest{
+    url2 <- 'http://www.mapama.gob.es/es/biodiversidad/servicios/
+    banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+dmad <- dendroMetrics(url2, cut.dt = 'h >= 11')
+head(dmad)
+attr(dmad, 'units')
+}
+
+
 }

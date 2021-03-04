@@ -110,7 +110,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     attr(dmad,'units')
 
     ## Retrieval of SNFI data in 'www.mapama.gob.es' and computation
-    ## of dendrometric summary:
+    ## of the corresponding dendrometric summary:
     
     ## \donttest{
     ##     url2 <- 'http://www.mapama.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
