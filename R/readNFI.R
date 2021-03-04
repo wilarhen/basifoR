@@ -40,7 +40,9 @@ readNFI <- structure(function#Read NFI data
         return(ifc)
     }
     fmdb <- function(x,dt.nm){
-        mdb.get(x,tables = dt.nm)
+        ## mdb.get(x,tables = dt.nm)
+        tryCatch(mdb.get(x,tables = dt.nm)
+                 error = function(e) NULL)
     }
     fdbf <- function(x,dt.nm){
         x <- x[grepl(dt.nm, x)]
