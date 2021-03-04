@@ -2,17 +2,18 @@
 \alias{urlToTemp}
 \title{Temporary NFI data }
 \description{This function is implemented by other routines of the package to
-decompress .zip data of the NFI using either URLs or local
-paths.}
+decompress \code{.zip} files with data sets of the SNFI. }
 \usage{urlToTemp(url.)}
 \arguments{
-  \item{url.}{\code{character}.  Paths to the data in the temporary file.}
+  \item{url.}{\code{character}.  URL/path to a compressed file of the
+SNFI (.zip) having data of either .dbf or .mdb file
+extensions..}
 }
-\details{The decompressed data is stored in
-a temporary file of the local
+\details{The data sets are decompressed in a
+temporary file of the local
 machine. Compressed data containing file
-extensions other than .mdb or .dbf are not
-supported.}
+extensions other than \code{.mdb} or
+\code{.dbf} are not supported.}
 \value{\code{character}. Path to the NFI data (.mdb or .dbf) stored in a
 temporary file}
 

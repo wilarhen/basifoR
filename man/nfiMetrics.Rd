@@ -3,9 +3,8 @@
 \title{Tree metrics from NFI data}
 \description{This function recursively implements \code{\link{dbhMetric}} on
 the Spanish National Forest Inventory (NFI) to derive a variety of
-tree metrics. The metric units are described in the Value section.
-Use \code{\link{metrics2Vol}} to directly derive over bark
-volumes.}
+tree metrics. Use \code{\link{metrics2Vol}} to directly derive
+over bark volumes.}
 \usage{nfiMetrics(nfi, var = c("d", 
     "h", "ba", "n", "Hd"), 
     levels = c("esta", 
@@ -40,12 +39,13 @@ the sample plot \code{'Estadillos'}
 and tree species \code{'Especie'}.}
 }
 
-\value{\code{data.frame} containing columns matching \code{levels}, plus
-the variables in \code{var}: the province \code{pr},
-(\code{dimensionless}), the diameter \code{d} (\code{'mm'}), the
-tree height \code{h} (\code{'dm'}), the basal area
-\code{ba},(\code{'m2 tree-1'}), the number of trees by hectare
-\code{n}, (\code{dimensionless}), and the tree dominant height (\code{'m'}).}
+\value{\code{data.frame} containing columns which match the strings in
+\code{levels}, plus the variables defined in \code{var}, including
+the province \code{pr} (\code{dimensionless}), the diameter
+\code{d} (\code{'mm'}), the tree height \code{h} (\code{'dm'}),
+the basal area \code{ba} (\code{'m2 tree-1'}), the number of trees
+by hectare \code{n} (\code{dimensionless}), and the tree dominant
+height \code{Hd} (\code{'m'}).}
 
 \author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>}
 

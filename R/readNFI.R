@@ -23,7 +23,7 @@ readNFI <- structure(function#Read NFI data
                       ##dependence \code{mdb-tools} must be installed.
 (
         nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to
-              ##a compressed file of the NFI (.zip) having data of
+              ##a compressed file of the SNFI (.zip) having data of
               ##either .dbf or .mdb file extensions.
     dt.nm = 'PCMayores' ##<< \code{character}. Name of a data set
                         ##stored in the imported NFI data. Default
@@ -93,15 +93,15 @@ madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
 rmad <- readNFI(madridNFI)[1:100,]
 head(rmad)
 
-    ## Retrieval of a data base from the second SNFI:
+## Retrieval of a data base from the second stage of the second SNFI:
 
 
-    ## donttest{
-    ## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-    ## url2 <- httr::modify_url("http://www.mapama.gob.es", path = path)
-    ## rnfi <- readNFI(url2)
-    ## head(rnfi,3)
-    ## }
+## donttest{
+## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+## url2 <- httr::modify_url("http://www.mapama.gob.es", path = path)
+## rnfi <- readNFI(url2)
+## head(rnfi,3)
+## }
 
 
 })
