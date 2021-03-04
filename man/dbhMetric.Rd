@@ -24,7 +24,7 @@ height (\code{'h'}). Default \code{'d'}.}
 \code{dm} for further evaluation of volume
 equations. The basal areas are computed
 transforming the diameters from \code{mm} to
-\code{cm} and using the formula: \code{ba(m2
+\code{cm} and using the formula: \code{ba (m2
 tree-1 ha-1) = pi * d(cm)^2 * (4 *
 1E4)^-1}. The number of trees per hectare
 \code{'n'} are calculated considering the

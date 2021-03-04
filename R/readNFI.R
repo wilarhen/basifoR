@@ -20,7 +20,8 @@ readNFI <- structure(function#Read NFI data
                       ##be installed in the system, and the package
                       ##must be implemented using a 32-bit R
                       ##version. In the case of unix-alike systems,
-                      ##dependence \code{mdb-tools} must be installed.
+                      ##the it is assumed that the linux dependence
+                      ##\code{mdbtools} is installed.
 (
         nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to
               ##a compressed file of the SNFI (.zip) having data of
