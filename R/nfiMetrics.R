@@ -1,9 +1,8 @@
 nfiMetrics <- structure(function#Tree metrics from NFI data
 ### This function recursively implements \code{\link{dbhMetric}} on
 ### the Spanish National Forest Inventory (NFI) to derive a variety of
-### tree metrics. The metric units are described in the Value section.
-### Use \code{\link{metrics2Vol}} to directly derive over bark
-### volumes.
+### tree metrics. Use \code{\link{metrics2Vol}} to directly derive
+### over bark volumes.
 (
     nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to a
           ##compressed file of the NFI (.zip) having data of either
@@ -92,12 +91,13 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         dmt <- conv_units(dmt)
         
     return(dmt)
-### \code{data.frame} containing columns matching \code{levels}, plus
-### the variables in \code{var}: the province \code{pr},
-### (\code{dimensionless}), the diameter \code{d} (\code{'mm'}), the
-### tree height \code{h} (\code{'dm'}), the basal area
-### \code{ba},(\code{'m2 tree-1'}), the number of trees by hectare
-### \code{n}, (\code{dimensionless}), and the tree dominant height (\code{'m'}).
+### \code{data.frame} containing columns which match the strings in
+### \code{levels}, plus the variables defined in \code{var}, including
+### the province \code{pr} (\code{dimensionless}), the diameter
+### \code{d} (\code{'mm'}), the tree height \code{h} (\code{'dm'}),
+### the basal area \code{ba} (\code{'m2 tree-1'}), the number of trees
+### by hectare \code{n} (\code{dimensionless}), and the tree dominant
+### height \code{Hd} (\code{'m'}).
 }, ex = function(){
 ## seconf NFI
 madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")

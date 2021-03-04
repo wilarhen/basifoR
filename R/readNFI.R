@@ -1,22 +1,25 @@
 readNFI <- structure(function#Read NFI data
-### This function can retrieve data sets in the Spanish National
-### Forest Inventory (NFI); this processes either remote URLs or local
-### file paths to compressed (.zip) NFI files.
+### This function can retrieve data sets of the Spanish National
+### Forest Inventory (SNFI). It can process either \code{URLs} to data
+### stored in the SNFI web page (\code{"http://www.mapama.gob.es"}) or
+### paths to files locally stored.
                       ##details<< Compressed data having file
                       ##extensions other than \code{.dbf} or
-                      ##\code{.mdb} are not supported. Most data in
-                      ##2nd and 3rd NFIs can be imported directly from
-                      ##\code{http://mapama.gob.es}
-                      ##using links to the compressed files. Data in
-                      ##the 4th NFI must be read from local
-                      ##paths. Data in second NFI are imported using
-                      ##\code{\link{read.dbf}}. Data in latter NFIs
-                      ##are imported using either \code{\link{RODBC}}
-                      ##(Windows) or \code{\link{mdb.get}} (unix-alike
-                      ##systems). In the former case, a 32-bit access
-                      ##driver should be installed in the system, and
-                      ##the package must be implemented using a 32-bit
-                      ##R version. In the case of unix-alike systems,
+                      ##\code{.mdb} are not supported. Most data bases
+                      ##in \code{2nd} and \code{3rd} stages of the
+                      ##SNFI can be imported directly from
+                      ##\code{http://mapama.gob.es} using appropriate
+                      ##links to the files. Data in the 4th NFI must
+                      ##be read from local paths. Data bases from the
+                      ##second stage of the SNFI are imported using
+                      ##\code{\link{read.dbf}}. Data bases from latter
+                      ##stages are imported using either
+                      ##\code{\link{RODBC}} (Windows) or
+                      ##\code{\link{mdb.get}} (unix-alike systems). In
+                      ##the former case, a 32-bit access driver should
+                      ##be installed in the system, and the package
+                      ##must be implemented using a 32-bit R
+                      ##version. In the case of unix-alike systems,
                       ##dependence \code{mdb-tools} must be installed.
 (
         nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to
