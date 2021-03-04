@@ -15,13 +15,14 @@ readNFI <- structure(function#Read NFI data
                       ##\code{\link{read.dbf}}. Data bases from latter
                       ##stages are imported using either
                       ##\code{\link{RODBC}} (Windows) or
-                      ##\code{\link{mdb.get}} (unix-alike systems). In
-                      ##the former case, a 32-bit access driver should
-                      ##be installed in the system, and the package
-                      ##must be implemented using a 32-bit R
-                      ##version. In the case of unix-alike systems,
-                      ##the it is assumed that the linux dependence
-                      ##\code{mdbtools} is installed.
+                      ##\code{\link{mdb.get}} (unix-alike systems). On
+                      ##Windows, a driver for Office 2010 can be
+                      ##installed via the installer
+                      ##\code{'AccessDatabaseEngine.exe'} available
+                      ##from Microsoft, and the package must be
+                      ##implemented using a 32-bit R version. In the
+                      ##case of unix-alike systems, the linux
+                      ##dependence \code{mdbtools} must be installed.
 (
         nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to
               ##a compressed file of the SNFI (.zip) having data of
