@@ -1,17 +1,20 @@
 metrics2Vol <- structure(function#Tree volumes in NFI data
-### This function computes over bark volumes (\code{dm3}) by deriving
+### This function computes over bark volumes (\code{'m3'}) by deriving
 ### tree metrics from NFI data and matching the metrics with volume
-### parameters established in 2nd NFI. To derive dendrometric
-### summaries use \code{\link{dendroMetrics}}.
-                         ##details<< Volumes are computed using
-                         ##equations from the second NFI. The
-                         ##functions used have the forms \code{'v ~
-                         ##par1 + par2 * (d^2) * h'}, and \code{'v ~
-                         ##par1 * (d^par2) * (h^par3)'}. Routines in
-                         ##the function assign equation form and
+### equations and parameters established in 2nd NFI, see Details
+### section. To derive dendrometric summaries use
+### \code{\link{dendroMetrics}}.
+                         ##details<< The quations from the second SNFI
+                         ##used have the forms \code{'v ~ par1 + par2
+                         ##* (d^2) * h'}, and \code{'v ~ par1 *
+                         ##(d^par2) * (h^par3)'}. These equations
+                         ##estimate over bark volumes in \code{'dcm3'}
+                         ##but the function transform the units so the
+                         ##output volumes have \code{'m3'} units. The
+                         ##function assign equation forms and
                          ##parameters depending on several variables,
-                         ##including the provincial unit, tree
-                         ##species, tree diameter, and tree
+                         ##including the provincial unit, the tree
+                         ##species, the tree diameter, and the tree
                          ##height. Consequently, objects from
                          ##\code{\link{nfiMetrics}} must have these
                          ##variables.
