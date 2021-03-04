@@ -127,8 +127,8 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     rownames(mmd) <- NULL
     return(mmd)
 ### \code{data.frame}. Depending on \code{keep.var}, short or expanded
-###  data set.  Short data sets contain the volumes (\code{v},
-###  \code{'m3'}) plus the metrics defined in
+###  data set.  Short data sets contain the volumes \code{v}
+###  (\code{'m3'}) plus the metrics defined in
 ###  \code{\link{nfiMetrics}}. The expanded data contains additional
 ###  columns with the variables used to compute the volumes.
 }, ex = function(){
@@ -136,6 +136,6 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     rmad <- readNFI(madridNFI)[1:10,]
     vmad <- metrics2Vol(rmad)
     head(vmad)
-## see metric units
-attr(vmad,'units')
+    ## see metric units
+    attr(vmad,'units')
 })

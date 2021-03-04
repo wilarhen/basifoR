@@ -95,7 +95,6 @@ head(rmad)
 
 ## Retrieval of a data base from the second stage of the second SNFI:
 
-
 ## donttest{
 ## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
 ## url2 <- httr::modify_url("http://www.mapama.gob.es", path = path)

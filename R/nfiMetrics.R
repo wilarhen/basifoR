@@ -1,8 +1,8 @@
 nfiMetrics <- structure(function#Tree metrics from NFI data
 ### This function recursively implements \code{\link{dbhMetric}} on
-### the Spanish National Forest Inventory (NFI) to derive a variety of
-### tree metrics. Use \code{\link{metrics2Vol}} to directly derive
-### over bark volumes.
+### data bases of the Spanish National Forest Inventory (NFI) to
+### derive a variety of tree metrics. Use \code{\link{metrics2Vol}} to
+### recursively derive the metrics plus over bark volumes.
 (
     nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to a
           ##compressed file of the NFI (.zip) having data of either
@@ -100,11 +100,10 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
 ### height \code{Hd} (\code{'m'}).
 }, ex = function(){
 ## seconf NFI
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-rmad <- readNFI(madridNFI)[1:10,]
+    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
+    rmad <- readNFI(madridNFI)[1:10,]
     mmad <- nfiMetrics(rmad)
-head(rmad,3)
-## see metric units
-attr(rmad,'units')
-
+    head(rmad,3)
+    ## see metric units
+    attr(rmad,'units')
 })

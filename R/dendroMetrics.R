@@ -1,26 +1,29 @@
 dendroMetrics <- structure(function#Summarize dendrometrics
-###This function can summarize dendrometric data from the Spanish
+###This function can summarize dendrometric data of the Spanish
 ###National Forest Inventory (SNFI). It can also control most other
 ###functions of the package. Dendrometric variables in the outputs are
 ###transformed into stand units, see the Details section.
                            ##details<< Dendrometric variables are
                            ## summarized according to the levels of
                            ## the argument \code{summ.vr}. The summary
-                           ## outputs include: 1) Categorical columns
-                           ## formulated in argument \code{summ.vr};
-                           ## 2) the tree basal area (\code{ba},
-                           ## \code{'m2 ha-1'}); 3) the average
-                           ## diameter (\code{d}, \code{'cm'}); 4) the
-                           ## quadratic mean diameter (\code{dg},
-                           ## \code{'cm'}); 5) The average tree height
-                           ## (\code{h}, \code{'m'}); 6) the number of
-                           ## trees by hectare (\code{n},
-                           ## 'dimensionless'), and the over bark
-                           ## volume (\code{v}, \code{'m3 ha-1'}). The
-                           ## output summary can be subsetted using
-                           ## logical expressions in argument
-                           ## \code{'cut.dt'}, see syntax in
-                           ## \code{\link{Logic}}.
+                           ## outputs include the categorical columns
+                           ## formulated in \code{summ.vr} and the
+                           ## variables defined using
+                           ## arguments/defaults in
+                           ## \code{\link{nfiMetrics}}. These
+                           ## variables include the tree basal area
+                           ## \code{ba} (\code{'m2 ha-1'}), the
+                           ## average diameter at breast height
+                           ## \code{d} (\code{'cm'}), the quadratic
+                           ## mean diameter \code{dg} (\code{'cm'}),
+                           ## the average tree height \code{h}
+                           ## (\code{'m'}), the number of trees by
+                           ## hectare \code{n} ('dimensionless'), and
+                           ## the over bark volume \code{v} (\code{'m3
+                           ## ha-1'}). Subsets of the output summary
+                           ## are extracted using logical expressions
+                           ## in argument \code{'cut.dt'}, see syntax
+                           ## in \code{\link{Logic}}.
 (
     nfi, ##<<\code{character} or \code{data.frame}.  URL/path to a
           ##compressed SNFI file (.zip) having data of either
