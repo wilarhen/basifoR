@@ -34,7 +34,6 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
 ) {
     if(is.null(nfi) | is.character(nfi) | inherits(nfi, 'readNFI')){
         nfi. <- nfi
-        ## nfi <- na.omit(nfiMetrics(nfi, ...))
         nfi <- nfiMetrics(nfi, ...)
     if(is.null(nfi.))
         return(nfi)}
@@ -67,7 +66,7 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
         return(cl.nm)}
     fmdV <- function(mdb2, ntm = c('pr','spec')){
         ## data(parEqVcc, envir = environment())
-        load('parEqVcc.RData')
+        ## load('parEqVcc.RData')
         vt <- merge(mdb2, parEqVcc,
                     by.x = fc(mdb2, ntm),
                     by.y = fc(parEqVcc, ntm),
