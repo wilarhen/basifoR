@@ -48,7 +48,8 @@ dendroMetrics <- structure(function#Summarize dendrometrics
         if(is.null(nfi.))
             return(nfi)
     }
-    frm. <- names(attr(nfi, 'units'))
+    frm. <- attr(nfi, 'units')
+    ## frm. <- names(attr(nfi, 'units'))
     if(is.null(summ.vr)){
         nfi <- subset(nfi,
                       eval(parse(text = cut.dt)))
@@ -58,31 +59,19 @@ dendroMetrics <- structure(function#Summarize dendrometrics
             write.csv(nfi, file = 'report.csv', row.names = FALSE)
         return(nfi)
     }
-    ## fc <- function(dt, cl.){
-    ##     nt. <- paste(cl., collapse = '|')
-    ##     nt.. <- grep(nt., names(dt),
-    ##                  ignore.case = TRUE)
-    ##     cl.nm <- sort(names(dt)[nt..],
-    ##                   decreasing = TRUE)
-    ##     return(cl.nm)}
-    ## summ.vr <- fc(nfi, summ.vr)
-        summ.vr <- flev(nfi, summ.vr)
-
+    summ.vr <- flev(nfi, summ.vr)
     var <- getOption('units1')[getOption('units1')%in%names(nfi)]
     frm. <- names(attr(nfi, 'units'))
     to. <- names(var)
     var. <- var[var!='n']
     nfi <- conv_units(nfi, var = var, un = to.)
-
     msp <- split(nfi, nfi[summ.vr])
     msp <- Filter('nrow', msp)
-
 
     fsum <- function(dt){
         dt[,var.] <- dt[,var.] * dt[,'n'] 
         summ <- apply(dt[,var], 2,
                       sum, na.rm = TRUE)
-        ## summ['Hd'] <- domheight(summ['h'],summ['d'],summ['n'])
         summ[c('d','h', 'Hd')] <- summ[c('d','h','Hd')]/summ['n'] 
         summ['dg'] <- sqrt((4E4 * summ['ba']/summ['n'])/pi)
         summ <- summ[order(names(summ))]
@@ -102,9 +91,10 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     if(report)
         write.csv(resm, file = 'report.csv', row.names = FALSE)
 
-    ## dgcm <- 'dg'
-    ## names(dgcm) <- 'cm'
-    attr. <- c(names(attr(nfi,'units')), 'cm')
+    dgcm <- 'dg'
+    names(dgcm) <- 'cm'
+    ## attr. <- c(names(attr(nfi,'units')), 'cm')
+    attr. <- c(attr(nfi,'units'), dgcm)
     attributes(resm) <- c(attributes(resm), list(units = attr.))
 
     return(resm)
@@ -119,7 +109,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     vmad <- metrics2Vol(mmad)
     dmad <- dendroMetrics(vmad, cut.dt = 'h > 8')
     head(dmad)
-## see SI units
+## see metric units
 attr(dmad,'units')
 
     

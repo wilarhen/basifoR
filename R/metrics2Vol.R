@@ -135,4 +135,6 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     rmad <- readNFI(madridNFI)[1:10,]
     vmad <- metrics2Vol(rmad)
     head(vmad)
+## see metric units
+attr(vmad,'units')
 })
