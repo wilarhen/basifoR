@@ -1,7 +1,7 @@
 readNFI <- structure(function#Read NFI data
 ### This function can retrieve data sets of the Spanish National
 ### Forest Inventory (SNFI). It can process either \code{URLs} to data
-### stored in the SNFI web page (\code{"http://www.mapama.gob.es"}) or
+### stored in the SNFI web page (\code{"http://www.miteco.gob.es"}) or
 ### paths to files locally stored.
                       ##details<< Compressed data having file
                       ##extensions other than \code{.dbf} or
