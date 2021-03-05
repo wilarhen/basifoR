@@ -112,7 +112,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     ## see metric units
     attr(dmad,'units')
 
-    ## Retrieval of SNFI data in 'www.mapama.gob.es' and computation
+    ## Retrieval of SNFI data in 'www.miteco.gob.es' and computation
     ## of the corresponding dendrometric summary:
     
     ## donttest{
