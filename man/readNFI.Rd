@@ -20,7 +20,7 @@ extensions other than \code{.dbf} or
 \code{.mdb} are not supported. Most data bases
 in \code{2nd} and \code{3rd} stages of the
 SNFI can be imported directly from
-\code{http://mapama.gob.es} using appropriate
+\code{http://www.miteco.gob.es} using appropriate
 \code{URLs}. Data in the 4th NFI must
 be read from local paths. Data bases from the
 second stage of the SNFI are imported using
