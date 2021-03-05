@@ -27,12 +27,14 @@ second stage of the SNFI are imported using
 \code{\link{read.dbf}}. Data bases from latter
 stages are imported using either
 \code{\link{RODBC}} (Windows) or
-\code{\link{mdb.get}} (unix-alike systems). In
-the former case, a 32-bit access driver should
-be installed in the system, and the package
-must be implemented using a 32-bit R
-version. In the case of unix-alike systems,
-dependence \code{mdb-tools} must be installed.}
+\code{\link{mdb.get}} (unix-alike systems). On
+Windows, a driver for Office 2010 can be
+installed via the installer
+\code{'AccessDatabaseEngine.exe'} available
+from Microsoft, and the package must be
+implemented using a 32-bit R version. In the
+case of unix-alike systems, the linux
+dependence \code{mdbtools} must be installed.}
 \value{\code{data.frame}. A data base  of the NFI.}
 
 \author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>}
