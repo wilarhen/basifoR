@@ -3,7 +3,7 @@
 \title{Read NFI data}
 \description{This function can retrieve data sets of the Spanish National
 Forest Inventory (SNFI). It can process either \code{URLs} to data
-stored in the SNFI web page (\code{"http://www.mapama.gob.es"}) or
+stored in the SNFI web page (\code{"http://www.miteco.gob.es"}) or
 paths to files locally stored.}
 \usage{readNFI(nfi, dt.nm = "PCMayores")}
 \arguments{
@@ -51,7 +51,7 @@ head(rmad)
 
 \donttest{
 path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-url2 <- httr::modify_url("http://www.mapama.gob.es", path = path)
+url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
 rnfi <- readNFI(url2)
 head(rnfi,3)
 }
