@@ -15,7 +15,6 @@ urlToTemp <- structure(function#Temporary NFI data
         return(NULL)
     temp <- tempfile()
     is.remote <- grepl('www.',url.)
-    ## is.remote <- grepl('www.mapama.gob.es',url.)
     if(is.remote)
         download.file(url.,temp)
     if(!is.remote)
