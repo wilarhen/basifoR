@@ -101,7 +101,7 @@ head(rmad)
 
 ## donttest{
 ## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-## url2 <- httr::modify_url("http://www.mapama.gob.es", path = path)
+## url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
 ## rnfi <- readNFI(url2)
 ## head(rnfi,3)
 ## }

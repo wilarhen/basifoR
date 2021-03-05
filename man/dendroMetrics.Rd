@@ -81,5 +81,4 @@ head(dmad)
 attr(dmad, 'units')
 }
 
-
 }
