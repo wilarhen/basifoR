@@ -80,7 +80,8 @@ else
 
 .onLoad <- function(libname, pkgname){
     op <- options()
-    op.FC <- list(url2 = "http://www.mapama.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip",
+    op.FC <- list(api = 'www.miteco.gov.es',
+                  url2 = "http://www.mapama.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip",
                   url3 = "http://www.mapama.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/ifn3p01_tcm30-293907.zip",
                   utm = "+proj=utm +zone=utm.z +ellps=GRS80 +datum=NAD83 +units=m +no_defs",
                   utm1 = "+proj=utm +zone=utm.z +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0",
