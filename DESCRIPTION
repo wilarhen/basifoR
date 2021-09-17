@@ -3,9 +3,19 @@ Type: Package
 Title: Retrieval and Processing of the Spanish National Forest Inventory
 Version: 0.4
 Date: 2021-09-15
-Author: Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>
-Maintainer: Maintainer:  Wilson Lara <wilarhen@gmail.com>
-Description: Data sets of the Spanish National Forest Inventory are processed to compute tree metrics and statistics. Function metrics2Vol() controls most of the routines.
+Authors@R: 
+    c(person(given = "Wilson",
+             family = "Lara Henao",
+             role = c("aut", "cre"),
+             email = "wilarhen@gmail.com"),
+      person(given = "Cristobal",
+             family = "Ordonez",
+             role = "aut"),
+      person(given = "Felipe",
+             family = "Bravo",
+             role = "aut"))
+Maintainer: Wilson Lara <wilarhen@gmail.com>
+Description: Data sets of the Spanish National Forest Inventory <https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/> are processed to compute tree metrics and statistics. Function metrics2Vol() controls most of the routines.
 License: GPL-3
 Depends: R (>= 2.10),RODBC
 Imports: curl,foreign,Hmisc,httr,measurements,stats,utils
