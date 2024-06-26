@@ -3,16 +3,16 @@ urlToTemp <- structure(function#Temporary NFI data
 ### decompress \code{.zip} files with data sets of the SNFI. 
                        ##details<< The data sets are decompressed in a
                        ##temporary file of the local
-                       ##machine. Compressed data containing file
-                       ##extensions other than \code{.mdb} or
-                       ##\code{.dbf} are not supported.
+                       ##machine. Compressed data contains file
+                       ##extensions in argument \code{file_ext}.
 (
     url.,  ##<<\code{character}.  URL/path to a compressed file of the
            ##SNFI (.zip) having data of either .dbf or .mdb file
            ##extensions..
-    timeOut = timeout(60) ##<<\code{request}. Maximum request time,
-                          ##see \code{\link{timeout}}. Default
-                          ##\code{timeout(60)}
+    timeOut = timeout(60), ##<<\code{request}. Maximum request time,
+                           ##see \code{\link{timeout}}. Default
+                           ##\code{timeout(60)}
+    file_ext = c('mdb','DBF') ##<<\code{character}. File extension extension
 ) {
     if(is.null(url.))
         return(NULL)
@@ -32,7 +32,8 @@ urlToTemp <- structure(function#Temporary NFI data
     con <- unzip(temp,
                  exdir = tempdir(),
                  files = NULL)
-    supr.only <- c('mdb','DBF')
+    ## supr.only <- c('mdb','DBF')
+    supr.only <- file_ext
     tos <- grepl(paste(supr.only,
                        collapse = "|"), con)
     con <- con[tos]
