@@ -1,5 +1,10 @@
 ## Internal utility functions used by basifoR
 
+file_exten <- function(texts)
+    sapply(texts, function(x) sub(".*\\.(.*)", "\\1", x),
+           USE.NAMES = FALSE)
+
+
 conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
     units. <- getOption('units')
     if(!is.null(attr(nfi,'units')))
