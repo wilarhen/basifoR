@@ -52,7 +52,8 @@ readNFI <- structure(function#Read NFI data
         read.dbf(x)
     }
     is_dbf <- all(grepl('.DBF',imp))
-    is_mdb <- all(grepl('.mdb',imp))
+    ## is_mdb <- all(grepl('.mdb',imp))
+    is_mdb <- all(grepl('\\.mdb$|\\.accdb$',imp))
     is_win <- Sys.info()['sysname']%in%'Windows'
     is_i386 <- grepl('i386',R.Version()['system'])
     if(is_mdb){

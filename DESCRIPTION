@@ -9,3 +9,4 @@ Description: Data sets of the Spanish National Forest Inventory <https://www.mit
 License: GPL-3
 Depends: R (>= 2.10),RODBC
 Imports: curl,foreign,Hmisc,httr,measurements,stats,utils
+SystemRequirements: accessdatabaseengine.exe (Windows with a a 32-bit R version); mdbtools (Linux)
