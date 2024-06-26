@@ -24,9 +24,10 @@ readNFI <- structure(function#Read NFI data
                       ##case of unix-alike systems, the linux
                       ##dependence \code{mdbtools} must be installed.
 (
-    nfi,  ##<<\code{character} or \code{data.frame}.  \code{URL/path}
-          ##to a compressed file of the SNFI (\code{.zip}) having data
-          ##of either .dbf or .mdb file extensions.
+    nfi,  ##<<\code{character}.  \code{URL/path} to a compressed file
+          ##of the SNFI (\code{.zip}) having data of either .dbf,
+          ##.mdb, or .accdb, file extensions, or to a decompressed
+          ##file with these supported extensions.
     dt.nm = 'PCMayores', ##<< \code{character}. Name of a data set
                          ##stored in the imported NFI data. Default
                          ##reads \code{'PCMayores'} (3rd NFI) or
@@ -34,6 +35,8 @@ readNFI <- structure(function#Read NFI data
     ... ##<< Additional arguments in \code{\link{urlToTemp}}.
     
 ) {
+    imp <- nfi
+    if(file_exten(imp) == 'zip')
     imp <- urlToTemp(nfi, ...)
     fwin <- function(x, dt.nm){
         ife <- RODBC::odbcConnectAccess(x) 
