@@ -97,25 +97,45 @@ domheight<-function(h, d, n) {
   return(sum(h*n)/sum(n))
 }
 
+basifoR_figlet <- function(){
+msg <- cat(
+## "  _               _  __     _____  
+##  | |             (_)/ _|    |  __ \\ 
+##  | |__   __ _ ___ _| |_ ___ | |__) |
+##  | '_ \\ / _` / __| |  _/ _\\|  _  / 
+##  | |_) | (_| \\__ \\ ||| (_) | |\\\\ 
+##  |_.__/\\__,_|___/_|_| \\___/|_|  \\_\\  \n\n"
+"
+ _           _ ___     _____ 
+| |_ ___ ___|_|  _|___| __  |
+| . | .'|_ -| |  _| . |    -|
+|___|__,|___|_|_| |___|__|__|\n
+"
+)
+vrs <- paste0('basifoR version ',packageVersion("basifoR"),'\n')
+cat(vrs)
+}
+
+msg <- basifoR_figlet()
 
 .onAttach <- function(lib, pkg)
 {
   version <- read.dcf(file.path(lib, pkg, "DESCRIPTION"), "Version")
   
   if(interactive())
-    { # > figlet basifoR
-        packageStartupMessage(
-          "basifoR
-version: ", version)
-}
-else
+  { # > figlet basifoR
+      msg <- basifoR_figlet()
+      packageStartupMessage(msg)
+    }
+    else
     { packageStartupMessage(
-          "Package 'basifoR' version ", version) } 
-
-  packageStartupMessage("Type 'citation(\"basifoR\")' for citing this R package in publications.")
-  invisible()
+          "Package 'basifoR' version ", version) }
+    packageStartupMessage("Type 'citation(\"basifoR\")' for citing this R package in publications.")
+    invisible()
 }
 
+
+        
 
 .onLoad <- function(libname, pkgname){
     op <- options()

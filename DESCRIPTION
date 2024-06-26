@@ -1,12 +1,13 @@
 Package: basifoR
 Type: Package
 Title: Retrieval and Processing of the Spanish National Forest Inventory
-Version: 0.4
-Date: 2021-09-15
+Version: 0.5
+Date: 2024-06-26
 Author: Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>
 Maintainer: Wilson Lara <wilarhen@gmail.com>
-Description: Data sets of the Spanish National Forest Inventory <https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/> are processed to compute tree metrics and statistics. Function metrics2Vol() controls most of the routines.
+Description: Data sets of the Spanish National Forest Inventory are processed to compute tree metrics and statistics. Function metrics2Vol() controls most of the routines.
+URL: https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional.html
 License: GPL-3
-Depends: R (>= 2.10),RODBC
-Imports: curl,foreign,Hmisc,httr,measurements,stats,utils
+Depends: R (>= 2.10),RODBC,Hmisc
+Imports: curl,foreign,httr,measurements,stats,utils
 SystemRequirements: accessdatabaseengine.exe (Windows with a a 32-bit R version); mdbtools (Linux)
