@@ -5,6 +5,6 @@ importFrom("httr", "GET","http_error","message_for_status","modify_url","timeout
 importFrom("measurements", "conv_unit")
 importFrom("RODBC", "odbcConnect", "odbcClose", "sqlFetch")
 importFrom("stats", "formula","na.omit","update")
-importFrom("utils", "data","download.file", "unzip","write.csv")
+importFrom("utils", "data","download.file", "packageVersion", "unzip","write.csv")
 export(dbhMetric,dendroMetrics,metrics2Vol,nfiMetrics,readNFI,urlToTemp)
 
