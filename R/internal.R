@@ -22,8 +22,6 @@ find_provincia_or_codigo <- function(input) {
   }
   return(result)
 }
-codigo_input <- 'VizCa'
-provincia_found <- find_provincia_or_codigo(codigo_input)
 
 # Function to inspect links
 inspect_links <- function(url, pattern = NULL, ...) {
@@ -38,7 +36,7 @@ inspect_links <- function(url, pattern = NULL, ...) {
 }
 
 ## Function to download ifn4 data using a province code
-ifn4_data <- function(prov){
+nfi4 <- function(prov){
     u <- 'https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html'
 all_links. <- inspect_links(u,'tablas|sig', ignore.case = TRUE) #%>% print()
 all_links <- inspect_links(u, "fn4.*\\.zip") #%>% print()
@@ -55,7 +53,7 @@ if(length(parsed.) == 0){
 return(parsed.)}
 
 ## Function to download ifn3 data using a province code
-ifn3_data <- function(prov){
+nfi3 <- function(prov){
 u <- c('https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_1_25.html',
 'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_26_50.html')
 all_links <- unlist(Map(function(x)inspect_links(x,"fn3.*\\.zip"), u), use.names = FALSE)
@@ -79,7 +77,7 @@ if(length(parsed.) == 0){
 return(parsed.)}
 
 ## Function to download ifn2 data using a province code
-ifn2_data <- function(prov){
+nfi2 <- function(prov){
 u <- c( 'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_1_25.html',
        'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_26_50.html')
 ## all_links <- mapply(function(x)inspect_links(x,'#\\d|zip'), u)
