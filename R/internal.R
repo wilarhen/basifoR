@@ -1,5 +1,106 @@
 ## Internal utility functions used by basifoR
 
+# Function to find provincia if input is numeric, or codigo/codigo2 if input is character (case insensitive)
+find_provincia_or_codigo <- function(input) {
+    load('/home/wihe/Documents/tuh32536/bfRdevel/basifoR/R/sysdata.rda')
+    data <- procods
+    if (is.numeric(input)) {  # Check if input is numeric
+        ## input <- as.numeric(input)
+    result <- data$Provincia[grepl(paste0("^", input, "$"), data$Código, ignore.case = TRUE)]
+    ## result <- data$Provincia[grepl(input, data$Código, ignore.case = TRUE)]
+  } else if (is.character(input)) {  # Assume input is character
+    ## result <- data$Código[grepl(paste0("^", input, "$"), data$Provincia, ignore.case = TRUE)]
+    result <- data$Código[grepl(input, data$Provincia, ignore.case = TRUE)]
+    if (length(result) == 0) {
+      result <- data$Código2[grepl(paste0("^", input, "$"), data$Provincia, ignore.case = TRUE)]
+    }
+  } else {
+    result <- NA
+  }
+  if (length(result) == 0) {
+    result <- NA
+  }
+  return(result)
+}
+codigo_input <- 'VizCa'
+provincia_found <- find_provincia_or_codigo(codigo_input)
+
+# Function to inspect links
+inspect_links <- function(url, pattern = NULL, ...) {
+    webpage <- rvest::read_html(url)
+    links <- rvest::html_nodes(webpage, 'a')
+    links <- rvest::html_attr(links, "href")
+  ## links <- webpage %>% html_nodes("a") %>% html_attr("href")
+  if (!is.null(pattern)) {
+    links <- links[grepl(pattern, links, perl = TRUE, ...)]
+  }
+  return(links)
+}
+
+## Function to download ifn4 data using a province code
+ifn4_data <- function(prov){
+    u <- 'https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html'
+all_links. <- inspect_links(u,'tablas|sig', ignore.case = TRUE) #%>% print()
+all_links <- inspect_links(u, "fn4.*\\.zip") #%>% print()
+all_links <- all_links[!all_links%in%all_links.]
+parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
+prov. <- prov
+if(!is.character(prov))
+prov <- find_provincia_or_codigo(prov)
+parsed. <- parsed[grepl(prov, parsed, ignore.case = TRUE)]
+if(length(parsed.) == 0){
+    cat(paste0("Warning: Data for Código '", prov., "' was not found!\n"))
+    return(invisible(NULL))
+}
+return(parsed.)}
+
+## Function to download ifn3 data using a province code
+ifn3_data <- function(prov){
+u <- c('https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_1_25.html',
+'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_26_50.html')
+all_links <- unlist(Map(function(x)inspect_links(x,"fn3.*\\.zip"), u), use.names = FALSE)
+## parsed <- mapply(function(x){paste("https://www.miteco.gob.es",x, sep ='')}, all_links, USE.NAMES = FALSE)
+parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
+prov. <- prov
+if(is.character(prov))
+ prov <- find_provincia_or_codigo(prov)
+## if(ptt < 10)
+##     ptt <- paste0('0', ptt)
+if(prov < 10)
+    prov <- paste0('0', prov)
+prov <- paste0(prov, '.zip')
+parsed. <- parsed[grepl(prov, parsed)]
+if(length(parsed.) == 0){
+    cat(paste0("Warning: Data for Código '", prov., "' was not found!\n"))
+    return(invisible(NULL))
+}
+return(parsed.)}
+
+## Function to download ifn2 data using a province code
+ifn2_data <- function(prov){
+u <- c( 'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_1_25.html',
+       'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_26_50.html')
+## all_links <- mapply(function(x)inspect_links(x,'#\\d|zip'), u)
+all_links <- unlist(Map(function(x)inspect_links(x,'zip'), u), use.names = FALSE)
+## parsed <- mapply(function(x){paste("https://www.miteco.gob.es",x, sep ='')}, all_links, USE.NAMES = FALSE)
+parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
+prov. <- prov
+if(is.character(prov))
+ prov <- find_provincia_or_codigo(prov)
+ptt <- prov + 5
+if(ptt < 10)
+    ptt <- paste0('0', ptt)
+ptt <- paste0(ptt, '.zip')
+## return(ptt)
+parsed. <- parsed[grepl(ptt, parsed)]
+if(length(parsed.) == 0){
+    cat(paste0("Warning: Data for Código '", prov., "' was not found!\n"))
+    return(invisible(NULL))
+}
+return(parsed.)}
+
+
+
 file_exten <- function(texts)
     sapply(texts, function(x) sub(".*\\.(.*)", "\\1", x),
            USE.NAMES = FALSE)
