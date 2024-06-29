@@ -55,7 +55,8 @@ inspect_links <- function(url, pattern = NULL, ...) {
 nfi4 <- function(prov){
     if(is.null(prov))
         return(invisible(NULL))
-    u <- 'https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html'
+    ## u <- 'https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html'
+u <- miteco_urls_from_paths('path41')
 all_links. <- inspect_links(u,'tablas|sig', ignore.case = TRUE) #%>% print()
 all_links <- inspect_links(u, "fn4.*\\.zip") #%>% print()
 all_links <- all_links[!all_links%in%all_links.]
@@ -74,8 +75,9 @@ return(parsed.)}
 nfi3 <- function(prov){
     if(is.null(prov))
         return(invisible(NULL))
-u <- c('https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_1_25.html',
-'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_26_50.html')
+## u <- c('https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_1_25.html',
+## 'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_26_50.html')
+u <- miteco_urls_from_paths(c('path31', 'path32'))
 all_links <- unlist(Map(function(x)inspect_links(x,"fn3.*\\.zip"), u), use.names = FALSE)
 ## parsed <- mapply(function(x){paste("https://www.miteco.gob.es",x, sep ='')}, all_links, USE.NAMES = FALSE)
 parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
