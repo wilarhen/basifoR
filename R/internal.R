@@ -37,6 +37,8 @@ inspect_links <- function(url, pattern = NULL, ...) {
 
 ## Function to download ifn4 data using a province code
 nfi4 <- function(prov){
+    if(is.null(prov))
+        return(invisible(NULL))
     u <- 'https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html'
 all_links. <- inspect_links(u,'tablas|sig', ignore.case = TRUE) #%>% print()
 all_links <- inspect_links(u, "fn4.*\\.zip") #%>% print()
@@ -54,6 +56,8 @@ return(parsed.)}
 
 ## Function to download ifn3 data using a province code
 nfi3 <- function(prov){
+    if(is.null(prov))
+        return(invisible(NULL))
 u <- c('https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_1_25.html',
 'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_26_50.html')
 all_links <- unlist(Map(function(x)inspect_links(x,"fn3.*\\.zip"), u), use.names = FALSE)
@@ -78,6 +82,8 @@ return(parsed.)}
 
 ## Function to download ifn2 data using a province code
 nfi2 <- function(prov){
+    if(is.null(prov))
+        return(invisible(NULL))
 u <- c( 'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_1_25.html',
        'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_26_50.html')
 ## all_links <- mapply(function(x)inspect_links(x,'#\\d|zip'), u)
