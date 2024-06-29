@@ -73,11 +73,11 @@ attr(dmad,'units')
 ## Retrieval of SNFI data in 'www.miteco.gob.es' and computation
 ## of the corresponding dendrometric summary:
 
-## \\donttest{
-## prov6_ifn2 <- dendroMetrics(provincia = 6,
-##                             nfi = 2, cut.dt = 'h >= 11')
-## head(prov6_ifn2)
-## attr(prov6_ifn2, 'units')
-## }
+ \donttest{
+ prov6_ifn2 <- dendroMetrics(provincia = 6,
+                             nfi = 2, cut.dt = 'h >= 11')
+ head(prov6_ifn2)
+ attr(prov6_ifn2, 'units')
+ }
 
 }

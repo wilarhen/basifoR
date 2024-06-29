@@ -31,10 +31,10 @@ head(rmad)
 ## corresponding to the Spanish province of 'Madrid' from the
 ## second stage of the NFI:
 
-## \\donttest{
-## rnfi <- getNFI(provincia = 28, nfi.nr = 2)[1:100,]
-## str(rnfi,3)
-## }
+ \donttest{
+ rnfi <- getNFI(provincia = 28, nfi.nr = 2)[1:100,]
+ str(rnfi,3)
+ }
 
 
 }

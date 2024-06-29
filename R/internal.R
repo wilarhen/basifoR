@@ -206,7 +206,7 @@ all_links <- unlist(Map(function(x)inspect_links(x,'zip'), u), use.names = FALSE
 ## parsed <- mapply(function(x){paste("https://www.miteco.gob.es",x, sep ='')}, all_links, USE.NAMES = FALSE)
 parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
 prov. <- prov
-msg <- paste0("Warning: Data for Código '", prov., "' was not found!\n")
+msg <- paste0("Warning: Data for codigo '", prov., "' was not found!\n")
 if(is.character(prov))
  prov <- find_provincia_or_codigo(prov)
 if(is.na(prov)){
@@ -235,7 +235,7 @@ all_links <- unlist(Map(function(x)inspect_links(x,"fn3.*\\.zip"), u), use.names
 ## parsed <- mapply(function(x){paste("https://www.miteco.gob.es",x, sep ='')}, all_links, USE.NAMES = FALSE)
 parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
 prov. <- prov
-msg <- paste0("Warning: Data for Código '", prov., "' was not found!\n")
+msg <- paste0("Warning: Data for codigo '", prov., "' was not found!\n")
 if(is.character(prov))
  prov <- find_provincia_or_codigo(prov)
 if(is.na(prov)){
@@ -266,7 +266,7 @@ if(!is.character(prov))
 prov <- find_provincia_or_codigo(prov)
 parsed. <- parsed[grepl(prov, parsed, ignore.case = TRUE)]
 if(length(parsed.) == 0){
-    cat(paste0("Warning: Data for Código '", prov., "' was not found!\n"))
+    cat(paste0("Warning: Data for codigo '", prov., "' was not found!\n"))
     return(invisible(NULL))
 }
 return(parsed.)}
