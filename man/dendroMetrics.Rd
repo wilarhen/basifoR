@@ -73,12 +73,11 @@ attr(dmad,'units')
 ## Retrieval of SNFI data in 'www.miteco.gob.es' and computation
 ## of the corresponding dendrometric summary:
 
-\donttest{
-path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-dmad <- dendroMetrics(url2, cut.dt = 'h >= 11')
-head(dmad)
-attr(dmad, 'units')
-}
+## donttest{
+## prov6_ifn2 <- dendroMetrics(provincia = 6,
+##                             nfi = 2, cut.dt = 'h >= 11')
+## head(prov6_ifn2)
+## attr(prov6_ifn2, 'units')
+## }
 
 }

@@ -1,6 +1,7 @@
 ## Internal utility functions used by basifoR
 
-# Function to convert factor columns to numeric while preserving character columns
+# Function to convert factor columns to numeric while preserving
+# character columns
 convert_factors_to_numeric <- function(df) {
   df[] <- lapply(df, function(col) {
     if (is.factor(col) && all(grepl("^-?\\d*\\.?\\d+$", as.character(col)))) {
@@ -12,7 +13,8 @@ convert_factors_to_numeric <- function(df) {
   return(df)
 }
 
-# Function to find provincia if input is numeric, or codigo/codigo2 if input is character (case insensitive)
+# Function to find provincia if input is numeric, or codigo/codigo2 if
+# input is character (case insensitive)
 find_provincia_or_codigo <- function(input) {
     ## to comment:
     ## load('/home/wihe/Documents/tuh32536/bfRdevel/basifoR/R/sysdata.rda')
@@ -34,7 +36,6 @@ find_provincia_or_codigo <- function(input) {
   }
     if(is.na(result))
     cat(paste0("Warning: Provincia or codigo '", input, "' was not found!\n"))
-        
   return(result)
 }
 
@@ -124,12 +125,9 @@ if(length(parsed.) == 0){
 }
 return(parsed.)}
 
-
-
 file_exten <- function(texts)
     sapply(texts, function(x) sub(".*\\.(.*)", "\\1", x),
            USE.NAMES = FALSE)
-
 
 conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
     units. <- getOption('units')
@@ -177,7 +175,6 @@ gracefully_fail <- function(remote_file, timeOut = timeout(50)) {
   is_response <- function(x) {
     class(x) == "response"
   }
-  
   # First check internet connection
   if (!curl::has_internet()) {
     message("No internet connection.")
@@ -194,18 +191,14 @@ gracefully_fail <- function(remote_file, timeOut = timeout(50)) {
     message_for_status(resp)
     return(invisible(NULL))
   }
-  
 return(TRUE)
 }
-
 
 units. <- c('d','h','ba','n','Hd','v')
 names(units.) <- c('mm','m','m2','','m','dm3')
 
 units.. <- units.
 names(units..) <- c('cm','m','m2','','m','m3')
-
-
 
 ## /IFNdyn-master/ github proyect with dominantHeight function for NFI
 ## https://github.com/miquelcaceres/IFNdyn
@@ -225,12 +218,6 @@ domheight<-function(h, d, n) {
 
 basifoR_figlet <- function(){
 msg <- cat(
-## "  _               _  __     _____  
-##  | |             (_)/ _|    |  __ \\ 
-##  | |__   __ _ ___ _| |_ ___ | |__) |
-##  | '_ \\ / _` / __| |  _/ _\\|  _  / 
-##  | |_) | (_| \\__ \\ ||| (_) | |\\\\ 
-##  |_.__/\\__,_|___/_|_| \\___/|_|  \\_\\  \n\n"
 "
  _           _ ___     _____ 
 | |_ ___ ___|_|  _|___| __  |
@@ -247,7 +234,6 @@ msg <- basifoR_figlet()
 .onAttach <- function(lib, pkg)
 {
   version <- read.dcf(file.path(lib, pkg, "DESCRIPTION"), "Version")
-  
   if(interactive())
   { # > figlet basifoR
       msg <- basifoR_figlet()
@@ -260,25 +246,23 @@ msg <- basifoR_figlet()
     invisible()
 }
 
-
-        
-
 .onLoad <- function(libname, pkgname){
     op <- options()
     op.FC <- list(
         ## api = 'www.miteco.gov.es',
         server = "http://www.miteco.gob.es",
-        ## url2 = "http://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip",
-        ##           url3 = "http://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/ifn3p01_tcm30-293907.zip",
-                  utm = "+proj=utm +zone=utm.z +ellps=GRS80 +datum=NAD83 +units=m +no_defs",
-                  utm1 = "+proj=utm +zone=utm.z +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0",
-                  longlat = '+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs',
-                  fapp = 'mcmapply',
-                  units = units.,
-                  units1 = units..)
-
+        path21 = "es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_1_25.html",
+        path22 = "es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_26_50.html",
+        path31 = "es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_1_25.html",
+        path32 = "es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_26_50.html",
+        path41 = "es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html", 
+        utm = "+proj=utm +zone=utm.z +ellps=GRS80 +datum=NAD83 +units=m +no_defs",
+        utm1 = "+proj=utm +zone=utm.z +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0",
+        longlat = '+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs',
+        fapp = 'mcmapply',
+        units = units.,
+        units1 = units..)
 toset <- !(names(op.FC) %in% names(op))
   if(any(toset)) options(op.FC[toset])
 invisible()
-
 }

@@ -28,7 +28,7 @@ getNFI <- structure(function#get NFI data
     ## second stage of the NFI:
     
     ## donttest{
-    ## rnfi <- getNFI(28, nfi = 2)[1:100,]
+    ## rnfi <- getNFI(provincia = 28, nfi = 2)[1:100,]
     ## str(rnfi,3)
     ## }
 

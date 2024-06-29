@@ -1,8 +1,8 @@
 Package: basifoR
 Type: Package
 Title: Retrieval and Processing of the Spanish National Forest Inventory
-Version: 0.5
-Date: 2024-06-26
+Version: 0.6
+Date: 2024-06-29
 Author: Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>
 Maintainer: Wilson Lara <wilarhen@gmail.com>
 Description: Data sets of the Spanish National Forest Inventory are processed to compute tree metrics and statistics. Function metrics2Vol() controls most of the routines.

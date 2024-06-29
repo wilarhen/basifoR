@@ -8,9 +8,10 @@ paths to files locally stored.}
 \usage{readNFI(nfi, dt.nm = "PCMayores", 
     ...)}
 \arguments{
-  \item{nfi}{\code{character} or \code{data.frame}.  \code{URL/path}
-to a compressed file of the SNFI (\code{.zip}) having data
-of either .dbf or .mdb file extensions.}
+  \item{nfi}{\code{character}.  \code{URL/path} to a compressed file
+of the SNFI (\code{.zip}) having data of either .dbf,
+.mdb, or .accdb, file extensions, or to a decompressed
+file with these supported extensions.}
   \item{dt.nm}{\code{character}. Name of a data set
 stored in the imported NFI data. Default
 reads \code{'PCMayores'} (3rd NFI) or
@@ -51,12 +52,12 @@ head(rmad)
 
 ## Retrieval of a data base from the second stage of the second SNFI:
 
-\donttest{
-path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-rnfi <- readNFI(url2)
-head(rnfi,3)
-}
+## donttest{
+## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+## url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
+## rnfi <- readNFI(url2)
+## head(rnfi,3)
+## }
 
 
 }

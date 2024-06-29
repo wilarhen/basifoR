@@ -20,7 +20,7 @@ mean diameter \code{'d'};
 \code{(2)} the tree height
 \code{'h'}; \code{(3)} the
 basal area \code{'ba'};
-\code{(4)} the number of
+code{(4)} the number of
 trees per hectare
 \code{'n'}; and \code{(5)}
 the dominant height
