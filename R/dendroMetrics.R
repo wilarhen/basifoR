@@ -116,7 +116,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     ## Retrieval of SNFI data in 'www.miteco.gob.es' and computation
     ## of the corresponding dendrometric summary:
     
-    ## donttest{
+    ## \donttest{
     ## prov6_ifn2 <- dendroMetrics(provincia = 6,
     ##                             nfi = 2, cut.dt = 'h >= 11')
     ## head(prov6_ifn2)

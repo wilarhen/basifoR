@@ -23,12 +23,11 @@ getNFI <- structure(function#get NFI data
     rmad <- readNFI(madridNFI)[1:100,]
     head(rmad)
 
-
     ## This will download a database from "http://www.miteco.gob.es"
     ## corresponding to the Spanish province of 'Madrid' from the
     ## second stage of the NFI:
     
-    ## donttest{
+    ## \donttest{
     ## rnfi <- getNFI(provincia = 28, nfi.nr = 2)[1:100,]
     ## str(rnfi,3)
     ## }
