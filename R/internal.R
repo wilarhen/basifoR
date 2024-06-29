@@ -100,9 +100,10 @@ return(parsed.)}
 nfi2 <- function(prov){
     if(is.null(prov))
         return(invisible(NULL))
-u <- c( 'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_1_25.html',
-       'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_26_50.html')
+## u <- c( 'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_1_25.html',
+##        'https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_26_50.html')
 ## all_links <- mapply(function(x)inspect_links(x,'#\\d|zip'), u)
+u <- miteco_urls_from_paths(c('path21', 'path22'))
 all_links <- unlist(Map(function(x)inspect_links(x,'zip'), u), use.names = FALSE)
 ## parsed <- mapply(function(x){paste("https://www.miteco.gob.es",x, sep ='')}, all_links, USE.NAMES = FALSE)
 parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
@@ -245,6 +246,12 @@ msg <- basifoR_figlet()
     packageStartupMessage("Type 'citation(\"basifoR\")' for citing this R package in publications.")
     invisible()
 }
+
+miteco_urls_from_paths <- function(paths = c('path21', 'path22')) 
+    mapply(function(x)
+        httr::modify_url(getOption('server'), path = getOption(x)),
+        paths,
+        USE.NAMES = FALSE)
 
 .onLoad <- function(libname, pkgname){
     op <- options()
