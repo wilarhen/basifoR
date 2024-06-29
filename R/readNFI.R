@@ -32,12 +32,12 @@ readNFI <- structure(function#Read NFI data
                          ##stored in the imported NFI data. Default
                          ##reads \code{'PCMayores'} (3rd NFI) or
                          ##\code{'PIESMA'} (2nd NFI).
-    ... ##<< Additional arguments in \code{\link{urlToTemp}}.
+    ... ##<< Additional arguments in \code{\link{fetchNFI}}.
     
 ) {
     imp <- nfi
-    if(length(imp)!=0&&file_exten(imp) == 'zip')
-        imp <- urlToTemp(nfi, ...)
+    if(length(imp)!=0 && file_exten(imp) == 'zip')
+        imp <- fetchNFI(nfi, ...)
     if(is.null (imp))
         return(imp)
     fwin <- function(x, dt.nm){

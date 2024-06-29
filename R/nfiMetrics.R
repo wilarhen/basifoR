@@ -33,7 +33,6 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
 
 ) {
         if(is.null(nfi)|is.character(nfi)|is.numeric(nfi)){
-        ## if(is.null(nfi)|is.character(nfi)){
             nfi. <- nfi
         ## nfi <- readNFI(nfi, ...)
         nfi <- getNFI(nfi, ...)
