@@ -15,7 +15,7 @@ convert_factors_to_numeric <- function(df) {
 # Function to find provincia if input is numeric, or codigo/codigo2 if input is character (case insensitive)
 find_provincia_or_codigo <- function(input) {
     ## to comment:
-    load('/home/wihe/Documents/tuh32536/bfRdevel/basifoR/R/sysdata.rda')
+    ## load('/home/wihe/Documents/tuh32536/bfRdevel/basifoR/R/sysdata.rda')
     data <- procods
     if (is.numeric(input)) {  # Check if input is numeric
     result <- data$Provincia[grepl(paste0("^", input, "$"), data$Código, ignore.case = TRUE)]
