@@ -10,7 +10,8 @@ getNFI <- structure(function#get NFI data
              ##NFI. Default is set to 4.
     ... ##<< Arguments used in \code{\link{readNFI}}.
 ) {
-    ## if(is.numeric(nfi))
+    ## if(is.null(nfi))
+    ##     return(nfi)
     if(!is.na(find_provincia_or_codigo(provincia))){
         nfi <- paste0('nfi',nfi)
         provincia <- do.call(nfi, list(prov = provincia))}

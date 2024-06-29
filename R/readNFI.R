@@ -36,8 +36,10 @@ readNFI <- structure(function#Read NFI data
     
 ) {
     imp <- nfi
-    if(file_exten(imp) == 'zip')
-    imp <- urlToTemp(nfi, ...)
+    if(length(imp)!=0&&file_exten(imp) == 'zip')
+        imp <- urlToTemp(nfi, ...)
+    if(is.null (imp))
+        return(imp)
     fwin <- function(x, dt.nm){
         ife <- RODBC::odbcConnectAccess(x) 
         on.exit(odbcClose(ife))
@@ -106,9 +108,9 @@ head(rmad)
 ## Retrieval of a data base from the second stage of the second SNFI:
 
 ## donttest{
-## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-## url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-## rnfi <- readNFI(url2)
+path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
+rnfi <- readNFI(url2)
 ## head(rnfi,3)
 ## }
 
