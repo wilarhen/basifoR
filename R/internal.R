@@ -1,18 +1,30 @@
 ## Internal utility functions used by basifoR
 
+# Function to convert factor columns to numeric while preserving character columns
+convert_factors_to_numeric <- function(df) {
+  df[] <- lapply(df, function(col) {
+    if (is.factor(col) && all(grepl("^-?\\d*\\.?\\d+$", as.character(col)))) {
+      return(as.numeric(as.character(col)))
+    } else {
+      return(col)
+    }
+  })
+  return(df)
+}
+
 # Function to find provincia if input is numeric, or codigo/codigo2 if input is character (case insensitive)
 find_provincia_or_codigo <- function(input) {
+    ## to comment:
     load('/home/wihe/Documents/tuh32536/bfRdevel/basifoR/R/sysdata.rda')
     data <- procods
     if (is.numeric(input)) {  # Check if input is numeric
-        ## input <- as.numeric(input)
     result <- data$Provincia[grepl(paste0("^", input, "$"), data$Código, ignore.case = TRUE)]
-    ## result <- data$Provincia[grepl(input, data$Código, ignore.case = TRUE)]
   } else if (is.character(input)) {  # Assume input is character
-    ## result <- data$Código[grepl(paste0("^", input, "$"), data$Provincia, ignore.case = TRUE)]
-    result <- data$Código[grepl(input, data$Provincia, ignore.case = TRUE)]
+      result <- data$Código[grepl(input, data$Provincia,
+                                  ignore.case = TRUE)]
     if (length(result) == 0) {
-      result <- data$Código2[grepl(paste0("^", input, "$"), data$Provincia, ignore.case = TRUE)]
+        result <- data$Código2[grepl(paste0("^", input, "$"),
+                                     data$Provincia, ignore.case = TRUE)]
     }
   } else {
     result <- NA
@@ -20,6 +32,9 @@ find_provincia_or_codigo <- function(input) {
   if (length(result) == 0) {
     result <- NA
   }
+    if(is.na(result))
+    cat(paste0("Warning: Provincia or codigo '", input, "' was not found!\n"))
+        
   return(result)
 }
 

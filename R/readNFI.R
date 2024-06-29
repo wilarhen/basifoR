@@ -93,6 +93,7 @@ readNFI <- structure(function#Read NFI data
     }
     if(dt.nm.[1]%in%'PIESMA')
         pr. <- unique(dset$'PROVINCIA')
+    dset <- convert_factors_to_numeric(dset)
     attributes(dset) <- c(attributes(dset), list(pr. = pr.))
         class(dset) <- append('readNFI',class(dset))
     return(dset)

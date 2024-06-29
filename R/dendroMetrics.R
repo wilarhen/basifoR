@@ -45,7 +45,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     ... ##<< Additional arguments in \code{\link{metrics2Vol}} or
         ##\code{\link{nfiMetrics}} or \code{\link{readNFI}}.
 ) {
-    if(is.null(nfi) | is.character(nfi) | inherits(nfi, 'readNFI')){
+    if(is.null(nfi) | is.character(nfi) | is.numeric(nfi) | inherits(nfi, 'readNFI')){
         nfi. <- nfi
         nfi <- metrics2Vol(nfi, ...)
         if(is.null(nfi.))
@@ -61,6 +61,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
         return(nfi)
     }
     summ.vr <- flev(nfi, summ.vr)
+    ## return(summ.vr)
     var <- getOption('units1')[getOption('units1')%in%names(nfi)]
     frm. <- names(attr(nfi, 'units'))
     to. <- names(var)

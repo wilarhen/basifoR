@@ -10,16 +10,15 @@ getNFI <- structure(function#get NFI data
              ##NFI. Default is set to 4.
     ... ##<< Arguments used in \code{\link{readNFI}}.
 ) {
-    if(is.numeric(nfi))
+    ## if(is.numeric(nfi))
+    if(!is.na(find_provincia_or_codigo(provincia))){
         nfi <- paste0('nfi',nfi)
-    url_ <- provincia
-    if(!grepl('.*\\..*', provincia))
-    url_ <- do.call(nfi, list(prov = provincia))
-    ## return(url_)
-    read <- readNFI(url_, ...)
+        provincia <- do.call(nfi, list(prov = provincia))}
+    read <- readNFI(provincia, ...)
     return(read)
 ### \code{data.frame}. This function returns a database of the NFI.
-}, ex = function(){madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
+}, ex = function(){
+    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
     rmad <- readNFI(madridNFI)[1:100,]
     head(rmad)
 

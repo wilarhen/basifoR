@@ -34,9 +34,11 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         ... ##<< Additional arguments in \code{\link{readNFI}}.
 
 ) {
-        if(is.null(nfi)|is.character(nfi)){
+        if(is.null(nfi)|is.character(nfi)|is.numeric(nfi)){
+        ## if(is.null(nfi)|is.character(nfi)){
             nfi. <- nfi
-        nfi <- readNFI(nfi, ...)
+        ## nfi <- readNFI(nfi, ...)
+        nfi <- getNFI(nfi, ...)
         if(is.null(nfi.))
             return(nfi)}
     fc <- function(dt, cl.){

@@ -20,7 +20,6 @@ urlToTemp <- structure(function#Temporary NFI data
         return(NULL)
     ## temp <- tempfile()
     temp <- tempfile(tmpdir = dir)
-    ## is.remote <- grepl('http',url.)
     is.remote <- grepl('^https?://',url.)
     if(is.remote){
         gf <- gracefully_fail(url., timeOut = timeOut)

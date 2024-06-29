@@ -1,8 +1,21 @@
+# basifoR 0.6
+
+## Major changes
+
+*New getNFI() can download data from the 2nd to the 4th stages of the
+ spanish national inventory using names/codes of Provincias as main
+ argument
+
+## Minor improvements
+
+*readNFI() converts numeric columns that are formatted as factors back
+ to numeric while preserving the format of character columns
+
 # basifoR 0.5
 
 ## Major changes
 
-*Can now download data from the fourth spanish national inventory
+*Can Support access extensions of the fourth spanish national inventory
 
 ## Minor improvements
 
