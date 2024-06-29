@@ -15,17 +15,15 @@ compressed file of the NFI (.zip) having data of either
 .dbf or .mdb file extensions, or a data frame such as that
 produced by \code{\link{readNFI}}.}
   \item{var}{\code{character}. Metrics. These
-can be five: \code{(1)} the
-mean diameter \code{'d'};
-\code{(2)} the tree height
-\code{'h'}; \code{(3)} the
-basal area \code{'ba'};
-code{(4)} the number of
-trees per hectare
-\code{'n'}; and \code{(5)}
-the dominant height
-\code{'Hd'}, see Details
-section in
+can be five: \code{(1)} the mean
+diameter \code{'d'}; \code{(2)}
+the tree height \code{'h'};
+\code{(3)} the basal area
+\code{'ba'}; code{(4)} the
+number of trees per hectare
+\code{'n'}; and \code{(5)} the
+dominant height \code{'Hd'}, see
+Details section in
 \code{\link{dbhMetric}} for
 better understanding of the
 metrics units. Default

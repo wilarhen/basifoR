@@ -115,13 +115,13 @@ find_provincia_or_codigo <- function(input) {
     ##     return(NA)
     data <- procods
     if (is.numeric(input)) {  # Check if input is numeric
-    result <- data$Provincia[grepl(paste0("^", input, "$"), data$Código, ignore.case = TRUE)]
+    result <- data$provincia[grepl(paste0("^", input, "$"), data$codigo, ignore.case = TRUE)]
   } else if (is.character(input)) {  # Assume input is character
-      result <- data$Código[grepl(input, data$Provincia,
+      result <- data$codigo[grepl(input, data$provincia,
                                   ignore.case = TRUE)]
     if (length(result) == 0) {
-        result <- data$Código2[grepl(paste0("^", input, "$"),
-                                     data$Provincia, ignore.case = TRUE)]
+        result <- data$codigo2[grepl(paste0("^", input, "$"),
+                                     data$provincia, ignore.case = TRUE)]
     }
   } else {
     result <- NA
@@ -130,7 +130,7 @@ find_provincia_or_codigo <- function(input) {
     result <- NA
   }
     if(is.na(result))
-    cat(paste0("Warning: Provincia or codigo '", input, "' was not found!\n"))
+    cat(paste0("Warning: provincia or codigo '", input, "' was not found!\n"))
   return(result)
 }
 

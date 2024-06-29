@@ -100,11 +100,14 @@ readNFI <- structure(function#Read NFI data
         class(dset) <- append('readNFI',class(dset))
     return(dset)
 ### \code{data.frame}. A data base  of the NFI.
-}, ex = function(){madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- readNFI(madridNFI)
-    [1:100,] head(rmad) ## Retrieval of a data base from the second stage of the second SNFI:
+}, ex = function(){
+    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
+    rmad <- readNFI(madridNFI)[1:100,]
+    head(rmad)
+
+    ## Retrieval of a data base from the second stage of the second SNFI:
     
-    ## \donttest{
+    ## donttest{
     ## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
     ## url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
     ## rnfi <- readNFI(url2)
