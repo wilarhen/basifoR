@@ -6,14 +6,14 @@ getNFI <- structure(function#get NFI data
     provincia,  ##<< Either a \code{character} or
                 ##\code{numeric}. Specifies the code of a Spanish
                 ##province.
-    nfi = 4, ##<< A \code{numeric} value. Indicates the stage of the
-             ##NFI. Default is set to 4.
+    nfi.nr = 4, ##<< A \code{numeric} value. Indicates the stage of
+                ##the NFI. Default is set to 4.
     ... ##<< Arguments used in \code{\link{readNFI}}.
 ) {
-    ## if(is.null(nfi))
-    ##     return(nfi)
+    if(is.null(provincia))
+        return(provincia)
     if(!is.na(find_provincia_or_codigo(provincia))){
-        nfi <- paste0('nfi',nfi)
+        nfi <- paste0('nfi',nfi.nr)
         provincia <- do.call(nfi, list(prov = provincia))}
     read <- readNFI(provincia, ...)
     return(read)
@@ -29,7 +29,7 @@ getNFI <- structure(function#get NFI data
     ## second stage of the NFI:
     
     ## donttest{
-    ## rnfi <- getNFI(provincia = 28, nfi = 2)[1:100,]
+    ## rnfi <- getNFI(provincia = 28, nfi.nr = 2)[1:100,]
     ## str(rnfi,3)
     ## }
 

@@ -9,21 +9,19 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
           ##.dbf or .mdb file extensions, or a data frame such as that
           ##produced by \code{\link{readNFI}}.
     var = c('d','h','ba','n','Hd'), ##<<\code{character}. Metrics. These
-                                         ##can be five: \code{(1)} the
-                                         ##mean diameter \code{'d'};
-                                         ##\code{(2)} the tree height
-                                         ##\code{'h'}; \code{(3)} the
-                                         ##basal area \code{'ba'};
-                                         ##code{(4)} the number of
-                                         ##trees per hectare
-                                         ##\code{'n'}; and \code{(5)}
-                                         ##the dominant height
-                                         ##\code{'Hd'}, see Details
-                                         ##section in
-                                         ##\code{\link{dbhMetric}} for
-                                         ##better understanding of the
-                                         ##metrics units. Default
-                                         ##\code{c('pr','d','h','ba','n','Hd')}.
+                                    ##can be five: \code{(1)} the mean
+                                    ##diameter \code{'d'}; \code{(2)}
+                                    ##the tree height \code{'h'};
+                                    ##\code{(3)} the basal area
+                                    ##\code{'ba'}; code{(4)} the
+                                    ##number of trees per hectare
+                                    ##\code{'n'}; and \code{(5)} the
+                                    ##dominant height \code{'Hd'}, see
+                                    ##Details section in
+                                    ##\code{\link{dbhMetric}} for
+                                    ##better understanding of the
+                                    ##metrics units. Default
+                                    ##\code{c('pr','d','h','ba','n','Hd')}.
     levels = c('esta','espe'), ##<<\code{character}. levels at which
                               ##the metrics are computed. Pattern
                               ##matching is supported. Cases are

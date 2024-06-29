@@ -68,7 +68,7 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
         return(cl.nm)}
     fmdV <- function(mdb2, ntm = c('pr','spec')){
         ## data(parEqVcc, envir = environment())
-    ## load('/home/wihe/Documents/tuh32536/bfRdevel/basifoR/R/sysdata.rda')
+    load('/home/wihe/Documents/tuh32536/bfRdevel/basifoR/R/sysdata.rda')
         ## load('parEqVcc.RData')
         vt <- merge(mdb2, parEqVcc,
                     by.x = fc(mdb2, ntm),

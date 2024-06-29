@@ -1,9 +1,7 @@
 urlToTemp <- structure(function#Temporary NFI data 
 ### This function is implemented by other routines of the package to
 ### decompress \code{.zip} files with data sets of the SNFI. 
-                       ##details<< The data sets are decompressed in a
-                       ##temporary file of the local
-                       ##machine. Compressed data contains file
+                       ##details<< Compressed data contains file
                        ##extensions in argument \code{file_ext}.
 (
     url.,  ##<<\code{character}.  URL/path to a compressed file of the
@@ -18,7 +16,6 @@ urlToTemp <- structure(function#Temporary NFI data
 ) {
     if(is.null(url.))
         return(NULL)
-    ## temp <- tempfile()
     temp <- tempfile(tmpdir = dir)
     is.remote <- grepl('^https?://',url.)
     if(is.remote){

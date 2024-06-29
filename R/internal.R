@@ -113,7 +113,7 @@ find_provincia_or_codigo <- function(input) {
     load('/home/wihe/Documents/tuh32536/bfRdevel/basifoR/R/sysdata.rda')
     ## if(is.null(input))
     ##     return(NA)
-    ## data <- procods
+    data <- procods
     if (is.numeric(input)) {  # Check if input is numeric
     result <- data$Provincia[grepl(paste0("^", input, "$"), data$Código, ignore.case = TRUE)]
   } else if (is.character(input)) {  # Assume input is character
