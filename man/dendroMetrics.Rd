@@ -91,13 +91,13 @@ attr(dendromet_ifn4p45,'units')
 ## Alternatively, download data from 'www.miteco.gob.es'
 ## Specify province name/number to compute dendrometrics:
 
-## \\donttest{
+\donttest{
 ## Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
-## dendromet_ifn4p45 <- dendroMetrics(provincia=45,nfi=4,cut.dt='h >= 8')
+dendromet_ifn4p45 <- dendroMetrics(provincia=45,nfi=4,cut.dt='h >= 8')
 ## Display first few rows
-## head(dendromet_ifn4p45)
+head(dendromet_ifn4p45)
 ## Check units of metrics
-## attr(dendromet_ifn4p45,'units')
-## }
+attr(dendromet_ifn4p45,'units')
+}
     
 }

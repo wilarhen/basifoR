@@ -39,10 +39,10 @@ str(get_ifn4p45)
 ## Alternatively, download data from 'www.miteco.gob.es'
 ## Specify province name/number to read the data:
 
-## donttest{
+\donttest{
 ## Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
-## dendromet_ifn4p45 <- getNFI(provincia=45,nfi=4)
+dendromet_ifn4p45 <- getNFI(provincia=45,nfi=4)
 ## Display first few rows
-## str(dendromet_ifn4p45)
-## }
+str(dendromet_ifn4p45)
+}
 }
