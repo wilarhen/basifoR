@@ -1,9 +1,9 @@
 metrics2Vol <- structure(function#Tree volumes in NFI data
 ### This function computes over bark volumes (\code{'m3'}) processing
-### tree metrics from databases of the SNFI data and using volume
+### tree metrics from databases of the SNF data and using volume
 ### equations established in 2nd NFI, see Details section. To compute
 ### all in-package metrics, run function \code{\link{dendroMetrics}}.
-                         ##details<< The quations from the second SNFI
+                         ##details<< The quations from the second SNF
                          ##used have the forms \code{'v ~ par1 + par2
                          ##* (d^2) * h'}, and \code{'v ~ par1 *
                          ##(d^par2) * (h^par3)'}. These equations
@@ -133,11 +133,11 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
 ###  \code{\link{nfiMetrics}}. The expanded data contains additional
 ###  columns with the variables used to compute the volumes.
 }, ex = function(){
-## Process SNFI data for Toledo stored locally
+## Process SNF data for Toledo stored locally
 # Path to Toledo data file in 'basifoR' package
 ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-# Decompress SNFI data from the specified file path or URL
+# Decompress SNF data from the specified file path or URL
 fetch_ifn4p45 <- fetchNFI(ifn4p45)
 
 # Read and process the data (first 100 rows)

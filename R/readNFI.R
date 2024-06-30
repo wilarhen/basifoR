@@ -1,17 +1,17 @@
-readNFI <- structure(function#Read SNFI data from path
+readNFI <- structure(function#Read SNF data from path
 ### This function can read compressed data (\code{.zip}) from the 
-### Spanish National Forest Inventory (SNFI). It can process either 
-### \code{URLs} to data stored on the SNFI web page 
+### Spanish National Forest Inventory (SNF). It can process either 
+### \code{URLs} to data stored on the SNF web page 
 ### (\code{"http://www.miteco.gob.es"}) or paths to locally stored files.
-### To read SNFI using codes of Spanish provinces, use \code{\link{getNFI}}.
+### To read SNF using codes of Spanish provinces, use \code{\link{getNFI}}.
                      ## details<< Compressed data files with
                      ## extensions other than \code{.dbf} \code{.mdb}
                      ## (Linux only), or \code{.accdb} are not
                      ## supported.  Most databases in the 2nd and 3rd
-                     ## stages of the SNFI can be imported directly
+                     ## stages of the SNF can be imported directly
                      ## from \code{http://www.miteco.gob.es} using
                      ## appropriate URLs.  Data sets from the 2nd
-                     ## stage of SNFI are imported using
+                     ## stage of SNF are imported using
                      ## \code{\link{read.dbf}}. Data from later stages
                      ## are imported using either \code{\link{RODBC}}
                      ## (Windows) or \code{\link{mdb.get}} (Unix-like
@@ -21,7 +21,7 @@ readNFI <- structure(function#Read SNFI data from path
                      ## the \code{mdbtools} dependency.
 (                                                                                                                                                       
     nfi,  ##<< \code{character}. URL or local path to a compressed
-          ##file (\code{.zip}) containing SNFI data, or to a
+          ##file (\code{.zip}) containing SNF data, or to a
           ##decompressed file with these supported extensions.
     dt.nm = 'PCMayores', ##<< \code{character}. Name of a dataset
                          ##stored in the imported NFI data. Defaults
@@ -97,13 +97,13 @@ readNFI <- structure(function#Read SNFI data from path
     return(dset)
 ### \code{data.frame}. A data base  of the NFI.
 }, ex = function(){    
-    ## Retrieval of a data base from the second stage of the SNFI
-    
     ## donttest{
-    ## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-    ## url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-    ## rnfi <- readNFI(url2)
-    ## head(rnfi,3)
+    ### Retrieval of a database from the second stage of the SNF using a URL resource
+    ##
+    ## ifn2_path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+    ## ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path = path)
+    ## read_ifn2 <- readNFI(ifn_url)
+    ## str(read_ifn2,3)
     ## }
     
     

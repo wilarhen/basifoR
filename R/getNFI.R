@@ -1,7 +1,7 @@
-getNFI <- structure(function#Read SNFI data from Spanish province
+getNFI <- structure(function#Read SNF data from Spanish province
 ### This function processes Spanish provinces to download and process
 ### data sets from the 2nd to the 4th stages of the Spanish National
-### Forest Inventory (SNFI) from the SNFI website
+### Forest Inventory (SNF) from the SNF website
 ### ("http://www.miteco.gob.es").
 (
     provincia,  ##<< Either a \code{character} or \code{numeric}
@@ -20,11 +20,11 @@ getNFI <- structure(function#Read SNFI data from Spanish province
     return(read)
 ### \code{data.frame}. This function returns a database of the NFI.
 }, ex = function(){
-    ## Process SNFI data for Toledo stored locally
+    ## Process SNF data for Toledo stored locally
     # Path to Toledo data file in 'basifoR' package
     ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
     
-    # Decompress SNFI data from the specified file path or URL
+    # Decompress SNF data from the specified file path or URL
     fetch_ifn4p45 <- fetchNFI(ifn4p45)
     
     # Read and process the data (first 100 rows)

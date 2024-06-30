@@ -1,10 +1,10 @@
 dbhMetric <- structure(function#DBH metrics
 ###This function can format tree diameters at breast height and tree
 ###heights according to the sampling design of the Spanish National
-###Forest Inventory (SNFI). The function is used by other routines of
+###Forest Inventory (SNF). The function is used by other routines of
 ###\code{basifoR} to derive tree metrics, see Details
 ###section. Implementation of this function using data sets of the
-###SNFI can be burdensome. Use \code{\link{dendroMetrics}} instead to
+###SNF can be burdensome. Use \code{\link{dendroMetrics}} instead to
 ###recursively derive tree metrics.
                        ##details<< Replicates of tree diameter
                        ##\code{'d'} are averaged. The tree heights

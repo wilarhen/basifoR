@@ -100,11 +100,11 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
 ### by hectare \code{n} (\code{dimensionless}), and the tree dominant
 ### height \code{Hd} (\code{'m'}).
 }, ex = function(){
-## Process SNFI data for Toledo stored locally
+## Process SNF data for Toledo stored locally
 # Path to Toledo data file in 'basifoR' package
 ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-# Decompress SNFI data from the specified file path or URL
+# Decompress SNF data from the specified file path or URL
 fetch_ifn4p45 <- fetchNFI(ifn4p45)
 
 # Read and process the data (first 100 rows)

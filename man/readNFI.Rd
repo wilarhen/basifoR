@@ -29,12 +29,12 @@ to \code{'PCMayores'} (3rd NFI) or
 \examples{
 ## Retrieval of a data base from the second stage of the SNFI
 
-\donttest{
-path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-rnfi <- readNFI(url2)
-head(rnfi,3)
-}
+ \donttest{
+ path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+ url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
+ rnfi <- readNFI(url2)
+ head(rnfi,3)
+ }
 
 
 }

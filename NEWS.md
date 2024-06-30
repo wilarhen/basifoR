@@ -28,7 +28,7 @@
 
 ## Major changes
 
-*urlToTemp: API for the SNFI has changed: 'www.mapama.gob.es' has been
+*urlToTemp: API for the SNF has changed: 'www.mapama.gob.es' has been
 replaced by 'www.miteco.gob.es'. Besides, Internet resources fail
 gracefully with an informative message if the resource is not
 available or has changed (and not give a check warning nor error)
