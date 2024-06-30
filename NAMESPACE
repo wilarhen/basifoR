@@ -7,5 +7,5 @@ importFrom("rvest", "html_attr", "html_nodes", "read_html")
 importFrom("RODBC", "odbcConnect", "odbcClose", "sqlFetch")
 importFrom("stats", "formula","na.omit","update")
 importFrom("utils", "data","download.file", "packageVersion", "unzip","write.csv")
-export(dbhMetric,dendroMetrics,fetchNFI,getNFI,metrics2Vol,nfiMetrics,readNFI)
+export(dbhMetric,dendroMetrics,fetchNFI,getNFI,metrics2Vol,nfiMetrics,readNFI,urlToTemp)
 
