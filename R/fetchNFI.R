@@ -52,6 +52,6 @@ ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
 # Decompress SNF data from the specified file path or URL
 fetch_ifn4p45 <- fetchNFI(ifn4p45)
-print(read_ifn4p45)
+print(fetch_ifn4p45)
     
 })

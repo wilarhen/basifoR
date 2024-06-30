@@ -1,8 +1,8 @@
 \name{fetchNFI}
 \alias{fetchNFI}
-\title{Fetch SNFI Data }
+\title{Fetch SNF Data }
 \description{This function can download and decompress data sets from the Spanish
-National Forest Inventory (SNFI) stored in \code{.zip} files,
+National Forest Inventory (SNF) stored in \code{.zip} files,
 whether they are local or remote (URL-based).}
 \usage{fetchNFI(url., dir = tempdir(), 
     file_ext = c("mdb", 
@@ -10,7 +10,7 @@ whether they are local or remote (URL-based).}
     timeOut = timeout(60))}
 \arguments{
   \item{url.}{\code{character}. Specifies the URL/path to a
-compressed SNFI (.zip).}
+compressed SNF (.zip).}
   \item{dir}{\code{character}. Directory where the fetched
 file will be stored.}
   \item{file_ext}{\code{character}. Supported
@@ -31,12 +31,12 @@ NFI data (.mdb, .DBF, or .accdb) stored in a temporary file.}
 
 
 \examples{
-## Process SNFI data for Toledo stored locally
+## Process SNF data for Toledo stored locally
 # Path to Toledo data file in 'basifoR' package
 ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-# Decompress SNFI data from the specified file path or URL
+# Decompress SNF data from the specified file path or URL
 fetch_ifn4p45 <- fetchNFI(ifn4p45)
-print(read_ifn4p45)
+print(fetch_ifn4p45)
     
 }

@@ -1,9 +1,9 @@
 \name{getNFI}
 \alias{getNFI}
-\title{Read SNFI data from Spanish province}
+\title{Read SNF data from Spanish province}
 \description{This function processes Spanish provinces to download and process
 data sets from the 2nd to the 4th stages of the Spanish National
-Forest Inventory (SNFI) from the SNFI website
+Forest Inventory (SNF) from the SNF website
 ("http://www.miteco.gob.es").}
 \usage{getNFI(provincia, nfi.nr = 4, 
     ...)}
@@ -23,11 +23,11 @@ the NFI. Default is set to 4.}
 
 
 \examples{
-## Process SNFI data for Toledo stored locally
+## Process SNF data for Toledo stored locally
 # Path to Toledo data file in 'basifoR' package
 ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-# Decompress SNFI data from the specified file path or URL
+# Decompress SNF data from the specified file path or URL
 fetch_ifn4p45 <- fetchNFI(ifn4p45)
 
 # Read and process the data (first 100 rows)
@@ -39,10 +39,10 @@ str(get_ifn4p45)
 ## Alternatively, download data from 'www.miteco.gob.es'
 ## Specify province name/number to read the data:
 
- \donttest{
-# Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
- dendromet_ifn4p45 <- getNFI(provincia=45,nfi=4)
-# Display first few rows
- str(dendromet_ifn4p45)
- }
+## donttest{
+### Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
+## dendromet_ifn4p45 <- getNFI(provincia=45,nfi=4)
+### Display first few rows
+## str(dendromet_ifn4p45)
+## }
 }

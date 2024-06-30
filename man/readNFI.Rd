@@ -1,16 +1,16 @@
 \name{readNFI}
 \alias{readNFI}
-\title{Read SNFI data from path}
+\title{Read SNF data from path}
 \description{This function can read compressed data (\code{.zip}) from the 
-Spanish National Forest Inventory (SNFI). It can process either 
-\code{URLs} to data stored on the SNFI web page 
+Spanish National Forest Inventory (SNF). It can process either 
+\code{URLs} to data stored on the SNF web page 
 (\code{"http://www.miteco.gob.es"}) or paths to locally stored files.
-To read SNFI using codes of Spanish provinces, use \code{\link{getNFI}}.}
+To read SNF using codes of Spanish provinces, use \code{\link{getNFI}}.}
 \usage{readNFI(nfi, dt.nm = "PCMayores", 
     ...)}
 \arguments{
   \item{nfi}{\code{character}. URL or local path to a compressed
-file (\code{.zip}) containing SNFI data, or to a
+file (\code{.zip}) containing SNF data, or to a
 decompressed file with these supported extensions.}
   \item{dt.nm}{\code{character}. Name of a dataset
 stored in the imported NFI data. Defaults
@@ -27,14 +27,14 @@ to \code{'PCMayores'} (3rd NFI) or
 
 
 \examples{
-## Retrieval of a data base from the second stage of the SNFI
-
- \donttest{
- path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
- url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
- rnfi <- readNFI(url2)
- head(rnfi,3)
- }
+## donttest{
+### Retrieval of a database from the second stage of the SNF using a URL resource
+##
+## ifn2_path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+## ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path = path)
+## read_ifn2 <- readNFI(ifn_url)
+## str(read_ifn2,3)
+## }
 
 
 }

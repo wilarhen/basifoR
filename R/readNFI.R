@@ -100,7 +100,7 @@ readNFI <- structure(function#Read SNF data from path
     ## donttest{
     ### Retrieval of a database from the second stage of the SNF using a URL resource
     ##
-    ## ifn2_path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+    ## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
     ## ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path = path)
     ## read_ifn2 <- readNFI(ifn_url)
     ## str(read_ifn2,3)

@@ -2,7 +2,7 @@
 \alias{dendroMetrics}
 \title{Summarize dendrometrics}
 \description{This function can summarize dendrometric data of the Spanish
-National Forest Inventory (SNFI). It can also control most other
+National Forest Inventory (SNF). It can also control most other
 functions of the package. Dendrometric variables in the outputs are
 transformed into stand units, see the Details section.}
 \usage{dendroMetrics(nfi, summ.vr = "Estadillo", 
@@ -10,12 +10,12 @@ transformed into stand units, see the Details section.}
     report = FALSE, ...)}
 \arguments{
   \item{nfi}{\code{character} or \code{data.frame}.  URL/path to a
-compressed SNFI file (.zip) having data of either
+compressed SNF file (.zip) having data of either
 .dbf or .mdb file extensions; or data frame such as that
 produced by \code{\link{nfiMetrics}}; or data frame such
 as that produced by \code{\link{readNFI}}.}
   \item{summ.vr}{\code{character} or \code{NULL}. Name
-of a Categorical variables in the SNFI
+of a Categorical variables in the SNF
 data used to summarize the outputs. If
 \code{NULL} then output from
 \code{\link{metrics2Vol}} is
@@ -60,11 +60,11 @@ Details section.}
 
 
 \examples{
-## Process SNFI data for Toledo stored locally
+## Process SNF data for Toledo stored locally
 # Path to Toledo data file in 'basifoR' package
 ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-# Decompress SNFI data from the specified file path or URL
+# Decompress SNF data from the specified file path or URL
 fetch_ifn4p45 <- fetchNFI(ifn4p45)
 
 # Read and process the data (first 100 rows)
@@ -88,13 +88,13 @@ attr(dendromet_ifn4p45,'units')
 ## Alternatively, download data from 'www.miteco.gob.es'
 ## Specify province name/number to compute dendrometrics:
 
- \donttest{
-# Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
- dendromet_ifn4p45 <- dendroMetrics(provincia=45,nfi=4,cut.dt='h >= 8')
-# Display first few rows
- head(dendromet_ifn4p45)
-# Check units of metrics
- attr(dendromet_ifn4p45,'units')
- }
+## donttest{
+### Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
+## dendromet_ifn4p45 <- dendroMetrics(provincia=45,nfi=4,cut.dt='h >= 8')
+### Display first few rows
+## head(dendromet_ifn4p45)
+### Check units of metrics
+## attr(dendromet_ifn4p45,'units')
+## }
     
 }
