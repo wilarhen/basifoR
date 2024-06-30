@@ -1,4 +1,4 @@
-readNFI <- structure(function#Read NFI data
+readNFI <- structure(function#Read SNFI data from path
 ### This function can read compressed data (\code{.zip}) of the
 ### Spanish National Forest Inventory (SNFI). It can process either
 ### \code{URLs} to data stored in the SNFI web page
@@ -101,11 +101,7 @@ readNFI <- structure(function#Read NFI data
     class(dset) <- append('readNFI',class(dset))
     return(dset)
 ### \code{data.frame}. A data base  of the NFI.
-}, ex = function(){
-    ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
-    read_ifn4p45 <- readNFI(ifn4p45)[1:100,]
-    head(read_ifn4p45)
-    
+}, ex = function(){    
     ## Retrieval of a data base from the second stage of the second SNFI:
     
     ## donttest{

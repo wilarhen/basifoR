@@ -1,7 +1,7 @@
 \name{fetchNFI}
 \alias{fetchNFI}
 \title{Fetch SNFI Data }
-\description{This function fetches and decompresses data sets from the Spanish
+\description{This function can download and decompress data sets from the Spanish
 National Forest Inventory (SNFI) stored in \code{.zip} files,
 whether they are local or remote (URL-based).}
 \usage{fetchNFI(url., dir = tempdir(), 
@@ -25,24 +25,18 @@ argument.}
 \value{\code{character}. Returns the path to the fetched and decompressed
 NFI data (.mdb, .DBF, or .accdb) stored in a temporary file.}
 
-\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>}
+\author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (<https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <a_cristo@pvs.uva.es> [aut] (<https://orcid.org/0000-0001-5354-3760>), Felipe Bravo <fbravo@pvs.uva.es> [aut] (<https://orcid.org/0000-0001-7348-6695>)}
 
 
 
 
 \examples{
-    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    tfmad <- fetchNFI(madridNFI)
-    tfmad
+## Process SNFI data for Toledo stored locally
+# Path to Toledo data file in 'basifoR' package
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-## Internet resources will gracefully fail with an informative message
-## if the resource is not available or has changed (without causing a
-## check warning or error):
+# Decompress SNFI data from the specified file path or URL
+fetch_ifn4p45 <- fetchNFI(ifn4p45)
+print(read_ifn4p45)
     
-    path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-    url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-
-    tfmad <- fetchNFI(url2, timeOut=timeout(1))
-
-
 }

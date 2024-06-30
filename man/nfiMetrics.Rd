@@ -3,8 +3,8 @@
 \title{Tree metrics from NFI data}
 \description{This function recursively implements \code{\link{dbhMetric}} on
 data bases of the Spanish National Forest Inventory (NFI) to
-derive a variety of tree metrics. Use \code{\link{metrics2Vol}} to
-recursively derive the metrics plus over bark volumes.}
+derive a variety of tree metrics.  To compute all in-package
+metrics, run function \code{\link{dendroMetrics}}.}
 \usage{nfiMetrics(nfi, var = c("d", 
     "h", "ba", "n", "Hd"), 
     levels = c("esta", 
@@ -46,17 +46,25 @@ the basal area \code{ba} (\code{'m2 tree-1'}), the number of trees
 by hectare \code{n} (\code{dimensionless}), and the tree dominant
 height \code{Hd} (\code{'m'}).}
 
-\author{Wilson Lara <wilarhen@gmail.com>, Cristobal Ordonez <a_cristo@pvs.uva.es>, Felipe Bravo <fbravo@pvs.uva.es>}
+\author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (<https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <a_cristo@pvs.uva.es> [aut] (<https://orcid.org/0000-0001-5354-3760>), Felipe Bravo <fbravo@pvs.uva.es> [aut] (<https://orcid.org/0000-0001-7348-6695>)}
 
 
 
 
 \examples{
-## seconf NFI
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-rmad <- readNFI(madridNFI)[1:10,]
-mmad <- nfiMetrics(rmad)
-head(rmad,3)
-## see metric units
-attr(rmad,'units')
+## Process SNFI data for Toledo stored locally
+# Path to Toledo data file in 'basifoR' package
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
+
+# Decompress SNFI data from the specified file path or URL
+fetch_ifn4p45 <- fetchNFI(ifn4p45)
+
+# Read and process the data (first 100 rows)
+get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100,]
+
+# Compute some metrics
+metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
+
+# see metric units
+    attr(metrics_ifn4p45,'units')
 }
