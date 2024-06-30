@@ -101,9 +101,9 @@ readNFI <- structure(function#Read NFI data
     return(dset)
 ### \code{data.frame}. A data base  of the NFI.
 }, ex = function(){
-    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- readNFI(madridNFI)[1:100,]
-    head(rmad)
+    ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
+    read_ifn4p45 <- readNFI(ifn4p45)[1:100,]
+    head(read_ifn4p45)
 
     ## Retrieval of a data base from the second stage of the second SNFI:
     

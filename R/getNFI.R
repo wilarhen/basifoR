@@ -12,23 +12,24 @@ getNFI <- structure(function#get NFI data
 ) {
     if(is.null(provincia))
         return(provincia)
-    if(!is.na(find_provincia_or_codigo(provincia))){
+    if(!is.na(find_provincia_or_codigo(provincia)) &&
+       !is_decompressed(provincia)){
         nfi <- paste0('nfi',nfi.nr)
         provincia <- do.call(nfi, list(prov = provincia))}
     read <- readNFI(provincia, ...)
     return(read)
 ### \code{data.frame}. This function returns a database of the NFI.
 }, ex = function(){
-    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- readNFI(madridNFI)[1:100,]
-    head(rmad)
+    ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
+    read_ifn4p45 <- readNFI(ifn4p45)[1:100,]
+    head(read_ifn4p45)
 
     ## This will download a database from "http://www.miteco.gob.es"
-    ## corresponding to the Spanish province of 'Madrid' from the
+    ## corresponding to the Spanish province of 'Toledo' from the
     ## second stage of the NFI:
     
     ## \donttest{
-    ## rnfi <- getNFI(provincia = 28, nfi.nr = 2)[1:100,]
+    ## rnfi <- getNFI(provincia = 45, nfi.nr = 2)[1:100,]
     ## str(rnfi,3)
     ## }
 

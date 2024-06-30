@@ -102,24 +102,24 @@ dendroMetrics <- structure(function#Summarize dendrometrics
 ### \code{\link{metrics2Vol}}, or a summary of the variables, see
 ### Details section.
 }, ex = function(){
-    ## SNFI Data from the province of Madrid
-    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- fetchNFI(madridNFI)#[1:100,]
-    mmad <- nfiMetrics(rmad)
-    vmad <- metrics2Vol(mmad)
-    dmad <- dendroMetrics(vmad, cut.dt = 'h > 8')
-    head(dmad)
+    ## Locally stored SNFI Data for the Spanish province of Toledo
+    ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
+    read_ifn4p45 <- fetchNFI(ifn4p45)#[1:100,]
+    metrics_ifn4p45 <- nfiMetrics(read_ifn4p45)
+    vol_ifn4p45 <- metrics2Vol(metrics_ifn4p45)
+    dendromet_ifn4p45 <- dendroMetrics(vol_ifn4p45, cut.dt = 'h > 8')
+    head(dendromet_ifn4p45)
     ## see metric units
-    attr(dmad,'units')
+    attr(dendromet_ifn4p45,'units')
 
     ## Retrieval of SNFI data in 'www.miteco.gob.es' and computation
     ## of the corresponding dendrometrics summary:
     
     ## \donttest{
-    ## prov6_ifn2 <- dendroMetrics(provincia = 6,
-    ##                             nfi = 2, cut.dt = 'h >= 11')
-    ## head(prov6_ifn2)
-    ## attr(prov6_ifn2, 'units')
+    ## dendromet_ifn4p45 <- dendroMetrics(provincia = 45,
+    ##                             nfi = 4, cut.dt = 'h >= 8')
+    ## head(dendromet_ifn4p45)
+    ## attr(dendromet_ifn4p45, 'units')
     ## }
     
 })

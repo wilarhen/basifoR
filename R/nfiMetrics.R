@@ -101,10 +101,10 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
 ### height \code{Hd} (\code{'m'}).
 }, ex = function(){
     ## seconf NFI
-    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- readNFI(madridNFI)[1:10,]
-    mmad <- nfiMetrics(rmad)
-    head(rmad,3)
+    ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
+    read_ifn4p45 <- readNFI(ifn4p45)[1:10,]
+    metrics_ifn4p45 <- nfiMetrics(read_ifn4p45)
+    head(metrics_ifn4p45,3)
     ## see metric units
-    attr(rmad,'units')
+    attr(read_ifn4p45,'units')
 })

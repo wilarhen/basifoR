@@ -46,8 +46,8 @@ fetchNFI <- structure(function#Fetch SNFI Data
 ### \code{character}. Returns the path to the fetched and decompressed
 ### NFI data (.mdb, .DBF, or .accdb) stored in a temporary file.
 }, ex = function(){
-    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    tfmad <- fetchNFI(madridNFI)
+    ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
+    tfmad <- fetchNFI(ifn4p45)
     tfmad
 
 ## Internet resources will gracefully fail with an informative message

@@ -11,7 +11,7 @@
     else
     { packageStartupMessage(
           "Package 'basifoR' version ", version) }
-    packageStartupMessage("Type 'citation(\"basifoR\")' for citing this R package in publications.")
+    packageStartupMessage("Type 'citation(\"basifoR\")' for citing this R package in publications\n")
     invisible()
 }
 
@@ -28,6 +28,7 @@
         utm1 = "+proj=utm +zone=utm.z +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0",
         longlat = '+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs',
         fapp = 'mcmapply',
+        dt.ext = c('mdb','DBF', 'accdb'),
         units = units.,
         units1 = units..)
 toset <- !(names(op.FC) %in% names(op))
@@ -127,8 +128,8 @@ find_provincia_or_codigo <- function(input) {
   if (length(result) == 0) {
     result <- NA
   }
-    if(is.na(result))
-    cat(paste0("Warning: provincia or codigo '", input, "' was not found!\n"))
+    ## if(is.na(result))
+    ## cat(paste0("Warning: provincia or codigo '", input, "' was not found!\n"))
   return(result)
 }
 
@@ -183,6 +184,9 @@ inspect_links <- function(url, pattern = NULL, ...) {
   }
   return(links)
 }
+
+is_decompressed <- function(x)
+    grepl(paste0(getOption('dt.ext'), collapse = '|'), x)
 
 miteco_urls_from_paths <- function(paths = c('path21', 'path22')) 
     mapply(function(x)
@@ -253,7 +257,7 @@ nfi4 <- function(prov){
 ## Function to download ifn4 data using a province code
     if(is.null(prov))
         return(invisible(NULL))
-    ## u <- 'https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html'
+    ## u <- 'https://www.mitueco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html'
 u <- miteco_urls_from_paths('path41')
 all_links. <- inspect_links(u,'tablas|sig', ignore.case = TRUE) #%>% print()
 all_links <- inspect_links(u, "fn4.*\\.zip") #%>% print()

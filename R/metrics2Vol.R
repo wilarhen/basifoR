@@ -133,10 +133,10 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
 ###  \code{\link{nfiMetrics}}. The expanded data contains additional
 ###  columns with the variables used to compute the volumes.
 }, ex = function(){
-    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- readNFI(madridNFI)[1:10,]
-    vmad <- metrics2Vol(rmad)
-    head(vmad)
+    ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
+    read_ifn4p45 <- readNFI(ifn4p45)[1:10,]
+    vol_ifn4p45 <- metrics2Vol(read_ifn4p45)
+    head(vol_ifn4p45)
     ## see metric units
-    attr(vmad,'units')
+    attr(vol_ifn4p45,'units')
 })
