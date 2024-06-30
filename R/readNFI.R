@@ -95,16 +95,20 @@ readNFI <- structure(function#Read SNF data from path
     attributes(dset) <- c(attributes(dset), list(pr. = pr.))
     class(dset) <- append('readNFI',class(dset))
     return(dset)
-### \code{data.frame}. A data base  of the NFI.
+### \code{data.frame} with numeric columns converted from factors back
+### to numeric, while preserving the format of character columns.
 }, ex = function(){    
     ## donttest{
     ### Retrieval of a database from the second stage of the SNF using a URL resource
-    ##
-    ## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-    ## ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path = path)
-    ## read_ifn2 <- readNFI(ifn_url)
-    ## str(read_ifn2,3)
-    ## }
+    
+    ## ifn2_path <-
+    ## '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+    ## ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path
+    ## = ifn2_path)
+    
+    ##read_ifn2 <- readNFI(ifn_url)
+
+    ##str(fetch_ifn2,3) }
     
     
 })

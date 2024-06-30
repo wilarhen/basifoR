@@ -19,7 +19,8 @@ to \code{'PCMayores'} (3rd NFI) or
   \item{\dots}{Additional arguments for \code{\link{fetchNFI}}.}
 }
 
-\value{\code{data.frame}. A data base  of the NFI.}
+\value{\code{data.frame} with numeric columns converted from factors back
+to numeric, while preserving the format of character columns.}
 
 \author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (<https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <a_cristo@pvs.uva.es> [aut] (<https://orcid.org/0000-0001-5354-3760>), Felipe Bravo <fbravo@pvs.uva.es> [aut] (<https://orcid.org/0000-0001-7348-6695>)}
 
@@ -29,12 +30,15 @@ to \code{'PCMayores'} (3rd NFI) or
 \examples{
 ## donttest{
 ### Retrieval of a database from the second stage of the SNF using a URL resource
-##
-## ifn2_path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-## ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path = path)
-## read_ifn2 <- readNFI(ifn_url)
-## str(read_ifn2,3)
-## }
+
+## ifn2_path <-
+## '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+## ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path
+## = ifn2_path)
+
+##read_ifn2 <- readNFI(ifn_url)
+
+##str(fetch_ifn2,3) }
 
 
 }

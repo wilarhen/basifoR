@@ -1,4 +1,4 @@
-getNFI <- structure(function#Read SNF data from Spanish province
+getNFI <- structure(function#Get SNF data from Spanish province
 ### This function processes Spanish provinces to download and process
 ### data sets from the 2nd to the 4th stages of the Spanish National
 ### Forest Inventory (SNF) from the SNF website
@@ -18,7 +18,8 @@ getNFI <- structure(function#Read SNF data from Spanish province
         provincia <- do.call(nfi, list(prov = provincia))}
     read <- readNFI(provincia, ...)
     return(read)
-### \code{data.frame}. This function returns a database of the NFI.
+### \code{data.frame} with numeric columns converted from factors back
+### to numeric, while preserving the format of character columns.
 }, ex = function(){
     ## Process SNF data for Toledo stored locally
     # Path to Toledo data file in 'basifoR' package
@@ -37,7 +38,7 @@ getNFI <- structure(function#Read SNF data from Spanish province
     ## Specify province name/number to read the data:
     
     ## donttest{
-    ### Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
+    ### Compute dendrometrics for Toledo (code 45) for NFI 4
     ## dendromet_ifn4p45 <- getNFI(provincia=45,nfi=4)
     ### Display first few rows
     ## str(dendromet_ifn4p45)
