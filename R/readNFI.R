@@ -1,38 +1,33 @@
 readNFI <- structure(function#Read SNFI data from path
-### This function can read compressed data (\code{.zip}) of the
-### Spanish National Forest Inventory (SNFI). It can process either
-### \code{URLs} to data stored in the SNFI web page
-### (\code{"http://www.miteco.gob.es"}) or paths to files locally
-### stored.
-                     ##details<< Compressed data having file
-                     ##extensions other than \code{.dbf} or
-                     ##\code{.mdb} are not supported. Most data bases
-                     ##in \code{2nd} and \code{3rd} stages of the
-                     ##SNFI can be imported directly from
-                     ##\code{http://www.miteco.gob.es} using
-                     ##appropriate \code{URLs}. Data sets from 2nd
-                     ##SNFI are imported using
-                     ##\code{\link{read.dbf}}. Data from latter
-                     ##stages are imported using either
-                     ##\code{\link{RODBC}} (Windows) or
-                     ##\code{\link{mdb.get}} (unix-alike
-                     ##systems). On Windows, a driver for Office
-                     ##2010 can be installed via the installer
-                     ##\code{'AccessDatabaseEngine.exe'} available
-                     ##from Microsoft. In the
-                     ##case of unix-alike systems, the linux
-                     ##dependence \code{mdbtools} must be installed.
-(
-    nfi,  ##<<\code{character}.  \code{URL/path} to a compressed file
-          ##of the SNFI (\code{.zip}) having data of either .dbf,
-          ##.mdb, or .accdb, file extensions, or to a decompressed
-          ##file with these supported extensions.
-    dt.nm = 'PCMayores', ##<< \code{character}. Name of a data set
-                         ##stored in the imported NFI data. Default
-                         ##reads \code{'PCMayores'} (3rd NFI) or
+### This function can read compressed data (\code{.zip}) from the 
+### Spanish National Forest Inventory (SNFI). It can process either 
+### \code{URLs} to data stored on the SNFI web page 
+### (\code{"http://www.miteco.gob.es"}) or paths to locally stored files.
+### To read SNFI using codes of Spanish provinces, use \code{\link{getNFI}}.
+                     ## details<< Compressed data files with
+                     ## extensions other than \code{.dbf} \code{.mdb}
+                     ## (Linux only), or \code{.accdb} are not
+                     ## supported.  Most databases in the 2nd and 3rd
+                     ## stages of the SNFI can be imported directly
+                     ## from \code{http://www.miteco.gob.es} using
+                     ## appropriate URLs.  Data sets from the 2nd
+                     ## stage of SNFI are imported using
+                     ## \code{\link{read.dbf}}. Data from later stages
+                     ## are imported using either \code{\link{RODBC}}
+                     ## (Windows) or \code{\link{mdb.get}} (Unix-like
+                     ## systems).  On Windows, install the Office
+                     ## driver via \code{'AccessDatabaseEngine.exe'}
+                     ## from Microsoft.  On Unix-like systems, install
+                     ## the \code{mdbtools} dependency.
+(                                                                                                                                                       
+    nfi,  ##<< \code{character}. URL or local path to a compressed
+          ##file (\code{.zip}) containing SNFI data, or to a
+          ##decompressed file with these supported extensions.
+    dt.nm = 'PCMayores', ##<< \code{character}. Name of a dataset
+                         ##stored in the imported NFI data. Defaults
+                         ##to \code{'PCMayores'} (3rd NFI) or
                          ##\code{'PIESMA'} (2nd NFI).
-    ... ##<< Additional arguments in \code{\link{fetchNFI}}.
-    
+    ... ##<< Additional arguments for \code{\link{fetchNFI}}.
 ) {
     imp <- nfi
     if(length(imp)!=0 && file_exten(imp) == 'zip')
