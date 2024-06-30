@@ -1,8 +1,8 @@
 nfiMetrics <- structure(function#Tree metrics from NFI data
 ### This function recursively implements \code{\link{dbhMetric}} on
 ### data bases of the Spanish National Forest Inventory (NFI) to
-### derive a variety of tree metrics. Use \code{\link{dendroMetrics}}
-### to compute all in-package metrics (dendrometrics).
+### derive a variety of tree metrics.  To compute all in-package
+### metrics, run function \code{\link{dendroMetrics}}.
 (
     nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to a
           ##compressed file of the NFI (.zip) having data of either
@@ -104,11 +104,11 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
 # Path to Toledo data file in 'basifoR' package
 ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-# Download and decompress SNFI data
-read_ifn4p45 <- fetchNFI(ifn4p45)
+# Decompress SNFI data from the specified file path or URL
+fetch_ifn4p45 <- fetchNFI(ifn4p45)
 
 # Read and process the data (first 100 rows)
-get_ifn4p45 <- getNFI(read_ifn4p45)[1:100,]
+get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100,]
 
 # Compute some metrics
 metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)

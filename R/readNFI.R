@@ -1,26 +1,27 @@
 readNFI <- structure(function#Read NFI data
-### This function can retrieve data sets of the Spanish National
-### Forest Inventory (SNFI). It can process either \code{URLs} to data
-### stored in the SNFI web page (\code{"http://www.miteco.gob.es"}) or
-### paths to files locally stored.
-                      ##details<< Compressed data having file
-                      ##extensions other than \code{.dbf} or
-                      ##\code{.mdb} are not supported. Most data bases
-                      ##in \code{2nd} and \code{3rd} stages of the
-                      ##SNFI can be imported directly from
-                      ##\code{http://www.miteco.gob.es} using
-                      ##appropriate \code{URLs}. Data sets from 2nd
-                      ##SNFI are imported using
-                      ##\code{\link{read.dbf}}. Data from latter
-                      ##stages are imported using either
-                      ##\code{\link{RODBC}} (Windows) or
-                      ##\code{\link{mdb.get}} (unix-alike
-                      ##systems). On Windows, a driver for Office
-                      ##2010 can be installed via the installer
-                      ##\code{'AccessDatabaseEngine.exe'} available
-                      ##from Microsoft. In the
-                      ##case of unix-alike systems, the linux
-                      ##dependence \code{mdbtools} must be installed.
+### This function can read compressed data (\code{.zip}) of the
+### Spanish National Forest Inventory (SNFI). It can process either
+### \code{URLs} to data stored in the SNFI web page
+### (\code{"http://www.miteco.gob.es"}) or paths to files locally
+### stored.
+                     ##details<< Compressed data having file
+                     ##extensions other than \code{.dbf} or
+                     ##\code{.mdb} are not supported. Most data bases
+                     ##in \code{2nd} and \code{3rd} stages of the
+                     ##SNFI can be imported directly from
+                     ##\code{http://www.miteco.gob.es} using
+                     ##appropriate \code{URLs}. Data sets from 2nd
+                     ##SNFI are imported using
+                     ##\code{\link{read.dbf}}. Data from latter
+                     ##stages are imported using either
+                     ##\code{\link{RODBC}} (Windows) or
+                     ##\code{\link{mdb.get}} (unix-alike
+                     ##systems). On Windows, a driver for Office
+                     ##2010 can be installed via the installer
+                     ##\code{'AccessDatabaseEngine.exe'} available
+                     ##from Microsoft. In the
+                     ##case of unix-alike systems, the linux
+                     ##dependence \code{mdbtools} must be installed.
 (
     nfi,  ##<<\code{character}.  \code{URL/path} to a compressed file
           ##of the SNFI (\code{.zip}) having data of either .dbf,
@@ -39,7 +40,7 @@ readNFI <- structure(function#Read NFI data
     if(is.null (imp))
         return(imp)
     fwin <- function(x, dt.nm){
-        # ife <- RODBC::odbcConnectAccess(x) 
+                                        # ife <- RODBC::odbcConnectAccess(x) 
         ife <-RODBC::odbcConnectAccess2007(x, rows_at_time = 1)
         on.exit(odbcClose(ife))
         ifc <- Map(function(x)
@@ -59,14 +60,14 @@ readNFI <- structure(function#Read NFI data
     ## is_mdb <- all(grepl('.mdb',imp))
     is_mdb <- all(grepl('\\.mdb$|\\.accdb$',imp))
     is_win <- Sys.info()['sysname']%in%'Windows'
-    # is_i386 <- grepl('i386',R.Version()['system'])
+                                        # is_i386 <- grepl('i386',R.Version()['system'])
     if(is_mdb){
-      if(is_win){
-        # if(is_win & !is_i386){
-        #     print('Access driver needed: change to R i386!')
-        #     return(NULL)
-        # }
-        # if(is_win & is_i386){
+        if(is_win){
+                                        # if(is_win & !is_i386){
+                                        #     print('Access driver needed: change to R i386!')
+                                        #     return(NULL)
+                                        # }
+                                        # if(is_win & is_i386){
             fnim <- 'fwin'
         } else {
             fnim <- 'fmdb'
@@ -97,14 +98,14 @@ readNFI <- structure(function#Read NFI data
         pr. <- unique(dset$'PROVINCIA')
     dset <- convert_factors_to_numeric(dset)
     attributes(dset) <- c(attributes(dset), list(pr. = pr.))
-        class(dset) <- append('readNFI',class(dset))
+    class(dset) <- append('readNFI',class(dset))
     return(dset)
 ### \code{data.frame}. A data base  of the NFI.
 }, ex = function(){
     ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
     read_ifn4p45 <- readNFI(ifn4p45)[1:100,]
     head(read_ifn4p45)
-
+    
     ## Retrieval of a data base from the second stage of the second SNFI:
     
     ## donttest{
@@ -113,6 +114,6 @@ readNFI <- structure(function#Read NFI data
     ## rnfi <- readNFI(url2)
     ## head(rnfi,3)
     ## }
-
-
+    
+    
 })

@@ -106,16 +106,19 @@ dendroMetrics <- structure(function#Summarize dendrometrics
 # Path to Toledo data file in 'basifoR' package
 ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-# Download and decompress SNFI data
-read_ifn4p45 <- fetchNFI(ifn4p45)
+# Decompress SNFI data from the specified file path or URL
+fetch_ifn4p45 <- fetchNFI(ifn4p45)
 
 # Read and process the data (first 100 rows)
-get_ifn4p45 <- getNFI(read_ifn4p45)[1:100,]
+get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100,]
 
+get_ifn4p45 <- readNFI(read_ifn4p45)[1:100,]
+
+    
 # Compute some metrics
 metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
 
-# Calculate volume metrics
+# Calculate volume metrics 
 vol_ifn4p45 <- metrics2Vol(metrics_ifn4p45)
 
 # Compute all metrics (dendrometrics) for trees with height > 8

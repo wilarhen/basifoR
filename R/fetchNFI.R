@@ -50,8 +50,8 @@ fetchNFI <- structure(function#Fetch SNFI Data
 # Path to Toledo data file in 'basifoR' package
 ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-# Download and decompress SNFI data
-read_ifn4p45 <- fetchNFI(ifn4p45)
+# Decompress SNFI data from the specified file path or URL
+fetch_ifn4p45 <- fetchNFI(ifn4p45)
 print(read_ifn4p45)
     
 })
