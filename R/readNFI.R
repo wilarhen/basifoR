@@ -106,9 +106,9 @@ readNFI <- structure(function#Read SNF data from path
     ## ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path
     ## = ifn2_path)
     
-    ##read_ifn2 <- readNFI(ifn_url)
+    ##read_ifn2 <- readNFI(ifn2_url)
 
-    ##str(fetch_ifn2,3) }
+    ##str(read_ifn2) }
     
     
 })
