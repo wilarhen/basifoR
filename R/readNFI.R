@@ -41,7 +41,8 @@ readNFI <- structure(function#Read NFI data
     if(is.null (imp))
         return(imp)
     fwin <- function(x, dt.nm){
-        ife <- RODBC::odbcConnectAccess(x) 
+        # ife <- RODBC::odbcConnectAccess(x) 
+        ife <-RODBC::odbcConnectAccess2007(x)
         on.exit(odbcClose(ife))
         ifc <- Map(function(x)
             sqlFetch(ife, sqtable = x), dt.nm)
@@ -62,11 +63,12 @@ readNFI <- structure(function#Read NFI data
     is_win <- Sys.info()['sysname']%in%'Windows'
     is_i386 <- grepl('i386',R.Version()['system'])
     if(is_mdb){
-        if(is_win & !is_i386){
-            print('Access driver needed: change to R i386!')
-            return(NULL)
-        }
-        if(is_win & is_i386){
+      if(is_win){
+        # if(is_win & !is_i386){
+        #     print('Access driver needed: change to R i386!')
+        #     return(NULL)
+        # }
+        # if(is_win & is_i386){
             fnim <- 'fwin'
         } else {
             fnim <- 'fmdb'
