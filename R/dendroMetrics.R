@@ -61,7 +61,6 @@ dendroMetrics <- structure(function#Summarize dendrometrics
         return(nfi)
     }
     summ.vr <- flev(nfi, summ.vr)
-    ## return(summ.vr)
     var <- getOption('units1')[getOption('units1')%in%names(nfi)]
     frm. <- names(attr(nfi, 'units'))
     to. <- names(var)
@@ -105,7 +104,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
 }, ex = function(){
     ## SNFI Data from the province of Madrid
     madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- readNFI(madridNFI)[1:100,]
+    rmad <- fetchNFI(madridNFI)#[1:100,]
     mmad <- nfiMetrics(rmad)
     vmad <- metrics2Vol(mmad)
     dmad <- dendroMetrics(vmad, cut.dt = 'h > 8')
@@ -114,7 +113,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     attr(dmad,'units')
 
     ## Retrieval of SNFI data in 'www.miteco.gob.es' and computation
-    ## of the corresponding dendrometric summary:
+    ## of the corresponding dendrometrics summary:
     
     ## \donttest{
     ## prov6_ifn2 <- dendroMetrics(provincia = 6,

@@ -2,9 +2,11 @@
 
 ## Major changes
 
-*New getNFI() can download data from the 2nd to the 4th stages of the
- spanish national inventory using names/codes of Provincias as main
- argument
+*The package is now installable on 64-bit Windows systems
+
+*The new getNFI() function can download data from the 2nd to the 4th stages of the Spanish National Inventory using the names or codes of provinces as the main argument, eliminating the need for locally specified URLs
+
+*readNFI() now supports the RODBC::odbcConnectAccess2007 function
 
 ## Minor improvements
 

@@ -15,12 +15,10 @@ readNFI <- structure(function#Read NFI data
                       ##stages are imported using either
                       ##\code{\link{RODBC}} (Windows) or
                       ##\code{\link{mdb.get}} (unix-alike
-                      ##systems). Data from 4th SNFI must be read from
-                      ##local paths.  On Windows, a driver for Office
+                      ##systems). On Windows, a driver for Office
                       ##2010 can be installed via the installer
                       ##\code{'AccessDatabaseEngine.exe'} available
-                      ##from Microsoft, and the package must be
-                      ##implemented using a 32-bit R version. In the
+                      ##from Microsoft. In the
                       ##case of unix-alike systems, the linux
                       ##dependence \code{mdbtools} must be installed.
 (
@@ -42,7 +40,7 @@ readNFI <- structure(function#Read NFI data
         return(imp)
     fwin <- function(x, dt.nm){
         # ife <- RODBC::odbcConnectAccess(x) 
-        ife <-RODBC::odbcConnectAccess2007(x)
+        ife <-RODBC::odbcConnectAccess2007(x, rows_at_time = 1)
         on.exit(odbcClose(ife))
         ifc <- Map(function(x)
             sqlFetch(ife, sqtable = x), dt.nm)
@@ -61,7 +59,7 @@ readNFI <- structure(function#Read NFI data
     ## is_mdb <- all(grepl('.mdb',imp))
     is_mdb <- all(grepl('\\.mdb$|\\.accdb$',imp))
     is_win <- Sys.info()['sysname']%in%'Windows'
-    is_i386 <- grepl('i386',R.Version()['system'])
+    # is_i386 <- grepl('i386',R.Version()['system'])
     if(is_mdb){
       if(is_win){
         # if(is_win & !is_i386){
