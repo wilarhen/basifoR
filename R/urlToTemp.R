@@ -13,7 +13,7 @@ urlToTemp <- structure(function#Temporary NFI data
                           ##\code{timeout(60)}
     ... ##<< Additional arguments used in \code{\link{fetchNFI}}.
 ) {
-    .Defunct("fetchNFI")
+    .Deprecated("fetchNFI")
     NewFunc <- fetchNFI(url. = url., timeOut = timeOut, ...)
     return(NewFunc)
     ## if(is.null(url.))

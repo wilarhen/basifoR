@@ -8,6 +8,8 @@
 
 *readNFI() now supports the RODBC::odbcConnectAccess2007 function
 
+*urlToTemp() is deprecated and will be made defunct. Use the replacement function fetchNFI()
+
 ## Minor improvements
 
 *readNFI() converts numeric columns that are formatted as factors back
