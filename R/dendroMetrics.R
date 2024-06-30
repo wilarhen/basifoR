@@ -102,24 +102,41 @@ dendroMetrics <- structure(function#Summarize dendrometrics
 ### \code{\link{metrics2Vol}}, or a summary of the variables, see
 ### Details section.
 }, ex = function(){
-    ## Locally stored SNFI Data for the Spanish province of Toledo
-    ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
-    read_ifn4p45 <- fetchNFI(ifn4p45)#[1:100,]
-    metrics_ifn4p45 <- nfiMetrics(read_ifn4p45)
-    vol_ifn4p45 <- metrics2Vol(metrics_ifn4p45)
-    dendromet_ifn4p45 <- dendroMetrics(vol_ifn4p45, cut.dt = 'h > 8')
-    head(dendromet_ifn4p45)
-    ## see metric units
-    attr(dendromet_ifn4p45,'units')
+## Process SNFI data for Toledo stored locally
+# Path to Toledo data file in 'basifoR' package
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-    ## Retrieval of SNFI data in 'www.miteco.gob.es' and computation
-    ## of the corresponding dendrometrics summary:
-    
-    ## \donttest{
-    ## dendromet_ifn4p45 <- dendroMetrics(provincia = 45,
-    ##                             nfi = 4, cut.dt = 'h >= 8')
-    ## head(dendromet_ifn4p45)
-    ## attr(dendromet_ifn4p45, 'units')
-    ## }
+# Download and decompress SNFI data
+read_ifn4p45 <- fetchNFI(ifn4p45)
+
+# Read and process the data (first 100 rows)
+get_ifn4p45 <- getNFI(read_ifn4p45)[1:100,]
+
+# Compute some metrics
+metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
+
+# Calculate volume metrics
+vol_ifn4p45 <- metrics2Vol(metrics_ifn4p45)
+
+# Compute all metrics (dendrometrics) for trees with height > 8
+dendromet_ifn4p45 <- dendroMetrics(vol_ifn4p45, cut.dt='h > 8')
+
+# Display structure of dendrometric data
+str(dendromet_ifn4p45)
+
+# Check units of metrics
+attr(dendromet_ifn4p45,'units')
+
+## Alternatively, download data from 'www.miteco.gob.es'
+## Specify province name/number to compute dendrometrics:
+
+## \donttest{
+## Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
+## dendromet_ifn4p45 <- dendroMetrics(provincia=45,nfi=4,cut.dt='h >= 8')
+## Display first few rows
+## head(dendromet_ifn4p45)
+## Check units of metrics
+## attr(dendromet_ifn4p45,'units')
+## }
     
 })

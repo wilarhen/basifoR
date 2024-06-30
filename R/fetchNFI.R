@@ -1,5 +1,5 @@
 fetchNFI <- structure(function#Fetch SNFI Data 
-### This function fetches and decompresses data sets from the Spanish
+### This function can download and decompress data sets from the Spanish
 ### National Forest Inventory (SNFI) stored in \code{.zip} files,
 ### whether they are local or remote (URL-based).
                       ##details<< The data should be in files with
@@ -46,18 +46,12 @@ fetchNFI <- structure(function#Fetch SNFI Data
 ### \code{character}. Returns the path to the fetched and decompressed
 ### NFI data (.mdb, .DBF, or .accdb) stored in a temporary file.
 }, ex = function(){
-    ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
-    tfmad <- fetchNFI(ifn4p45)
-    tfmad
+## Process SNFI data for Toledo stored locally
+# Path to Toledo data file in 'basifoR' package
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-## Internet resources will gracefully fail with an informative message
-## if the resource is not available or has changed (without causing a
-## check warning or error):
+# Download and decompress SNFI data
+read_ifn4p45 <- fetchNFI(ifn4p45)
+print(read_ifn4p45)
     
-    path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-    url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-
-    tfmad <- fetchNFI(url2, timeOut=timeout(1))
-
-
 })

@@ -20,19 +20,29 @@ getNFI <- structure(function#get NFI data
     return(read)
 ### \code{data.frame}. This function returns a database of the NFI.
 }, ex = function(){
-    ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
-    read_ifn4p45 <- readNFI(ifn4p45)[1:100,]
-    head(read_ifn4p45)
+## Process SNFI data for Toledo stored locally
+# Path to Toledo data file in 'basifoR' package
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-    ## This will download a database from "http://www.miteco.gob.es"
-    ## corresponding to the Spanish province of 'Toledo' from the
-    ## second stage of the NFI:
+# Download and decompress SNFI data
+read_ifn4p45 <- fetchNFI(ifn4p45)
+
+# Read and process the data (first 100 rows)
+get_ifn4p45 <- getNFI(read_ifn4p45)[1:100,]
+
+# Display structure of the data
+str(get_ifn4p45)
     
-    ## \donttest{
-    ## rnfi <- getNFI(provincia = 45, nfi.nr = 2)[1:100,]
-    ## str(rnfi,3)
-    ## }
+## Alternatively, download data from 'www.miteco.gob.es'
+## Specify province name/number to read the data:
 
+## \donttest{
+## Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
+## dendromet_ifn4p45 <- getNFI(provincia=45,nfi=4)
+## Display first few rows
+## str(dendromet_ifn4p45)
+## }
 
+    
 })
 
