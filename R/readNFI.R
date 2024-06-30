@@ -97,7 +97,7 @@ readNFI <- structure(function#Read SNFI data from path
     return(dset)
 ### \code{data.frame}. A data base  of the NFI.
 }, ex = function(){    
-    ## Retrieval of a data base from the second stage of the second SNFI:
+    ## Retrieval of a data base from the second stage of the SNFI
     
     ## donttest{
     ## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
