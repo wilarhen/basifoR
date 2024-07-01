@@ -193,11 +193,9 @@ return(TRUE)
 
 insert_ifn_ifn4 <- function(input_string) {
   # Define the pattern to match "ifn4" followed by "_" or "-"
-  pattern <- "ifn4(?=[_-])"
-  
+  pattern <- "nacionales/ifn4(?=[_-])"
   # Use gregexpr to find all matches
   match_positions <- gregexpr(pattern, input_string, perl = TRUE)
-  
   # Check if there is exactly one match
   if (length(match_positions[[1]]) == 1 && match_positions[[1]][1] != -1) {
     # Find the position of the match
@@ -212,7 +210,6 @@ insert_ifn_ifn4 <- function(input_string) {
   }
       return(result_string)
 }
-
 
 inspect_links <- function(url, pattern = NULL, ...) {
 # Function to inspect links
@@ -294,7 +291,7 @@ if(length(parsed.) == 0){
 }
 return(parsed.)}
 
-nfi4 <- function(prov){
+nfi4 <- function(prov, complain = TRUE){
 ## Function to download ifn4 data using a province code
     if(is.null(prov))
         return(invisible(NULL))
@@ -308,7 +305,8 @@ prov. <- prov
 if(!is.character(prov))
 prov <- find_provincia_or_codigo(prov)
 parsed. <- parsed[grepl(prov, parsed, ignore.case = TRUE)]
-if(length(parsed.) == 0){
+    if(length(parsed.) == 0){
+        if(complain)
     cat(paste0("Warning: Data for codigo '", prov., "' was not found!\n"))
     return(invisible(NULL))
 }
