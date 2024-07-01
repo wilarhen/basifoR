@@ -1,5 +1,23 @@
 ## Internal utility functions used by basifoR
 
+# Function to test response from a URL
+test_url_response <- function(url) {
+  # Send GET request
+  response <- GET(url)
+  
+  # Check the status code
+  status_code <- status_code(response)
+  ## print(paste("Status Code:", status_code))
+return(status_code)  
+  ## # Check the content type
+  ## content_type <- headers(response)$`content-type`
+  ## print(paste("Content Type:", content_type))
+  
+  ## # Check the content of the response
+  ## content <- content(response, as = "text", encoding = "UTF-8")
+  ## print(paste("Content:", substr(content, 1, 500)))  # Print the first 500 characters
+}
+
 .onAttach <- function(lib, pkg)
 {
   version <- read.dcf(file.path(lib, pkg, "DESCRIPTION"), "Version")
@@ -173,6 +191,29 @@ gracefully_fail <- function(remote_file, timeOut = timeout(50)) {
 return(TRUE)
 }
 
+insert_ifn_ifn4 <- function(input_string) {
+  # Define the pattern to match "ifn4" followed by "_" or "-"
+  pattern <- "ifn4(?=[_-])"
+  
+  # Use gregexpr to find all matches
+  match_positions <- gregexpr(pattern, input_string, perl = TRUE)
+  
+  # Check if there is exactly one match
+  if (length(match_positions[[1]]) == 1 && match_positions[[1]][1] != -1) {
+    # Find the position of the match
+    start_pos <- match_positions[[1]][1]
+    # Insert "ifn/ifn4" before the match
+    result_string <- paste0(substr(input_string, 1, start_pos - 1), 
+                            "ifn/ifn4/", 
+                            substr(input_string, start_pos, nchar(input_string)))
+  } else {
+    # If the pattern is not found exactly once, return the original string
+    result_string <- input_string
+  }
+      return(result_string)
+}
+
+
 inspect_links <- function(url, pattern = NULL, ...) {
 # Function to inspect links
     webpage <- rvest::read_html(url)
@@ -271,6 +312,8 @@ if(length(parsed.) == 0){
     cat(paste0("Warning: Data for codigo '", prov., "' was not found!\n"))
     return(invisible(NULL))
 }
+## to solve some wrong urls addind ifn/ifn4    
+parsed. <- insert_ifn_ifn4(parsed.)
 return(parsed.)}
 
 units. <- c('d','h','ba','n','Hd','v')
