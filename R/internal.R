@@ -1,5 +1,22 @@
 ## Internal utility functions used by basifoR
 
+# Function to replace a row based on two indices
+replace_provincia <- function(df, row1, row2) {
+    if(is.character(row1))
+        row1 <- find_provincia_or_codigo(row1)
+    if(is.character(row2))
+        row1 <- find_provincia_or_codigo(row2)
+  # Check if row indices are within the data frame bounds
+  if (any(row1 > nrow(df) | row2 > nrow(df))) {
+    stop("Row indices are out of bounds")
+  }
+  
+  # Replace the row corresponding to row1 with the row corresponding to row2
+  df[row1, ] <- df[row2, ]
+  
+  return(df)
+}
+
 # Function to test response from a URL
 test_url_response <- function(url) {
   # Send GET request
