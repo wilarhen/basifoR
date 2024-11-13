@@ -149,6 +149,25 @@ file_exten <- function(texts)
     sapply(texts, function(x) sub(".*\\.(.*)", "\\1", x),
            USE.NAMES = FALSE)
 
+
+# Define the function with wildcard support
+find_code <- function(df, input_value) {
+    if (is.numeric(input_value)) {  # Check if input is numeric
+    result <- df$provincia_1[grepl(paste0('^',input_value,'$'), df$codigo,ignore.case = TRUE)]
+  }else{
+  # Use grepl for partial matching (case-insensitive search)
+  result <- df$codigo[
+    grepl(input_value, df$provincia, ignore.case = FALSE) | 
+    grepl(input_value, df$codigo2,
+          fixed = TRUE,ignore.case = FALSE) | 
+    grepl(input_value, df$provincia_1, ignore.case = FALSE)
+  ]
+  }
+  # Return the result
+  return(result)
+}
+
+
 find_provincia_or_codigo <- function(input) { #
 # Function to find provincia if input is numeric, or codigo/codigo2 if
 # input is character (case insensitive)
