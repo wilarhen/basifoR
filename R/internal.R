@@ -1,5 +1,12 @@
 ## Internal utility functions used by basifoR
 
+accentless <- function( s ) {
+  chartr(
+    "áéóūáéíóúÁÉÍÓÚýÝàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛãõÃÕñÑäëïöüÄËÏÖÜÿçÇ",
+    "aeouaeiouAEIOUyYaeiouAEIOUaeiouAEIOUaoAOnNaeiouAEIOUycC",
+    s );
+}
+
 # Function to replace a row based on two indices
 replace_provincia <- function(df, row1, row2) {
     if(is.character(row1))
@@ -142,7 +149,7 @@ file_exten <- function(texts)
     sapply(texts, function(x) sub(".*\\.(.*)", "\\1", x),
            USE.NAMES = FALSE)
 
-find_provincia_or_codigo <- function(input) {
+find_provincia_or_codigo <- function(input) { #
 # Function to find provincia if input is numeric, or codigo/codigo2 if
 # input is character (case insensitive)
     ## to comment:
@@ -233,7 +240,6 @@ inspect_links <- function(url, pattern = NULL, ...) {
     webpage <- rvest::read_html(url)
     links <- rvest::html_nodes(webpage, 'a')
     links <- rvest::html_attr(links, "href")
-  ## links <- webpage %>% html_nodes("a") %>% html_attr("href")
   if (!is.null(pattern)) {
     links <- links[grepl(pattern, links, perl = TRUE, ...)]
   }
