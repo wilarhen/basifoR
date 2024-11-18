@@ -1,4 +1,4 @@
-## Internal utility functions used by basifoR
+## Testing functions in basifoR
 
 accentless <- function( s ) {
   chartr(
@@ -6,6 +6,40 @@ accentless <- function( s ) {
     "aeouaeiouAEIOUyYaeiouAEIOUaeiouAEIOUaoAOnNaeiouAEIOUycC",
     s );
 }
+
+check_extension_in_zip <- function(url, extension){
+  temp_file <- tempfile(fileext=".zip")
+  suppressWarnings(
+    tryCatch({
+      download.file(url, temp_file, mode="wb", quiet=TRUE)
+      zip_contents <- unzip(temp_file, list=TRUE)$Name
+      ## has_extension <- any(grepl(paste0("\\", extension, "$"), zip_contents, ignore.case=TRUE))
+      has_extension <- any(grepl(extension, zip_contents, ignore.case=TRUE))
+      unlink(temp_file)
+      return(has_extension)
+    }, error=function(e){
+      ## message("An error occurred:", e$message)
+      return(FALSE)
+    })
+  )
+}
+
+## check_extension_in_zip <- function(url, extension){
+##   temp_file <- tempfile(fileext=".zip")
+##   tryCatch({
+##     curl_download(url, temp_file)
+##     zip_contents <- unzip(temp_file, list=TRUE)$Name
+##     has_extension <- any(grepl(paste0("\\", extension, "$"), zip_contents, ignore.case=TRUE))
+##     unlink(temp_file)
+##     return(has_extension)
+##   }, error=function(e){
+##     message("An error occurred: ", e$message)
+##     return(FALSE)
+##   })
+## }
+
+#----------------------------------------------------------------
+## Internal utility functions used by basifoR
 
 # Function to replace a row based on two indices
 replace_provincia <- function(df, row1, row2) {
