@@ -1,11 +1,97 @@
 ## Testing functions in basifoR
 
-accentless <- function( s ) {
-  chartr(
-    "áéóūáéíóúÁÉÍÓÚýÝàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛãõÃÕñÑäëïöüÄËÏÖÜÿçÇ",
-    "aeouaeiouAEIOUyYaeiouAEIOUaeiouAEIOUaoAOnNaeiouAEIOUycC",
-    s );
+nfi4 <- function(prov, complain = TRUE){
+## Function to download ifn4 data using a province code
+    ## dt <- read.csv('procods_Cristobal.csv')
+prov. <- prov
+    prov <- find_code(dt, prov)
+if(length(prov) == 0){
+        if(complain)
+    warning(paste0("Spanish province '", prov., "' not found!\n"))
+    ## cat(paste0("Warning: Spanish province '", prov., "' not found!\n"))
+    return(invisible(NULL))
 }
+    
+u <- miteco_urls_from_paths('path41')
+    all_links. <- unlist(Map(function(x)
+        inspect_links(x, prov, ignore.case = TRUE), u))
+    pattern <- "[iI]fn4[_\\-p]?"
+  exclude <- "[tT]ablas|[sS]ig"
+  matches <- grep(pattern, all_links., value = TRUE) # Find strings matching 'ifn4'
+  all_links <- matches[!grepl(exclude, matches)]    # Exclude unwanted patterns
+parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
+if(length(parsed) == 0){
+        if(complain)
+    warning(paste0("URL for spanish province '", prov, "' not found!\n"))
+    ## cat(paste0("Warning: URL for spanish province '", prov, "' not found!\n"))
+    return(invisible(NULL))
+}
+return(parsed)}
+
+
+## # Define the function
+## find_ifn4 <- function(strings) {
+##   # Regular expression
+##  # Matches 'ifn4' optionally followed by '_', '-', or 'p'
+##     pattern <- "[iI]fn4[_\\-p]?"
+##  # Exclude strings containing 'tables' or 'Sig'
+##   exclude <- "[tT]ablas|[sS]ig"
+##   # Filter strings
+##   matches <- grep(pattern, strings, value = TRUE) # Find strings matching 'ifn4'
+##   result <- matches[!grepl(exclude, matches)]    # Exclude unwanted patterns
+
+##   return(result)
+## }
+
+
+## parsedURL <- function(x, path.='path41', dt = procods){
+##     parsedURL <- Map(function(x)
+##         fparsed(x, path.= path., dt = dt),x)
+##     names(parsedURL) <- x
+## return(parsedURL)}
+
+
+## fparsed <- function(code., path. = 'path41', dt){
+## dt <- read.csv('procods_Cristobal.csv')
+##     u <- miteco_urls_from_paths(path.)
+##     prov <- find_code(dt, code.)
+## ## all_links. <- inspect_links(u, prov, ignore.case = TRUE) #%>% print()
+##     all_links. <- unlist(Map(function(x)
+##         inspect_links(x, prov, ignore.case = TRUE), u))
+## parsed <- mapply(function(x)
+##     httr::modify_url(getOption('server'), path = x),
+##     all_links., USE.NAMES = FALSE)
+##     if(length(parsed) == 0)
+##         parsed = NULL
+## return(parsed)
+## }
+
+# Define the function with wildcard support
+find_code <- function(df, input_value) {
+    if (is.numeric(input_value)) {  # Check if input is numeric
+    result <- df$provincia_1[grepl(paste0('^',input_value,'$'), df$codigo,ignore.case = TRUE)]
+  }else{
+  # Use grepl for partial matching (case-insensitive search)
+  result <- df$codigo[
+    grepl(input_value, df$provincia, ignore.case = FALSE) | 
+    grepl(input_value, df$codigo2,
+          fixed = TRUE,ignore.case = FALSE) | 
+    grepl(input_value, df$provincia_1, ignore.case = FALSE)
+    ][1L]
+      result <- df$provincia_1[grepl(paste0('^',result,'$'), df$codigo,ignore.case = TRUE)]
+
+  }
+  # Return the result
+  return(result)
+}
+
+
+## accentless <- function( s ) {
+##   chartr(
+##     "áéóūáéíóúÁÉÍÓÚýÝàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛãõÃÕñÑäëïöüÄËÏÖÜÿçÇ",
+##     "aeouaeiouAEIOUyYaeiouAEIOUaeiouAEIOUaoAOnNaeiouAEIOUycC",
+##     s );
+## }
 
 check_extension_in_zip <- function(url, extension){
   temp_file <- tempfile(fileext=".zip")
@@ -13,8 +99,9 @@ check_extension_in_zip <- function(url, extension){
     tryCatch({
       download.file(url, temp_file, mode="wb", quiet=TRUE)
       zip_contents <- unzip(temp_file, list=TRUE)$Name
-      ## has_extension <- any(grepl(paste0("\\", extension, "$"), zip_contents, ignore.case=TRUE))
-      has_extension <- any(grepl(extension, zip_contents, ignore.case=TRUE))
+      ## has_extension <- any(grepl(extension, zip_contents, ignore.case=TRUE))
+      has_extension <- grepl(extension, zip_contents, ignore.case=TRUE)
+      has_extension <- url[has_extension]
       unlink(temp_file)
       return(has_extension)
     }, error=function(e){
@@ -184,22 +271,6 @@ file_exten <- function(texts)
            USE.NAMES = FALSE)
 
 
-# Define the function with wildcard support
-find_code <- function(df, input_value) {
-    if (is.numeric(input_value)) {  # Check if input is numeric
-    result <- df$provincia_1[grepl(paste0('^',input_value,'$'), df$codigo,ignore.case = TRUE)]
-  }else{
-  # Use grepl for partial matching (case-insensitive search)
-  result <- df$codigo[
-    grepl(input_value, df$provincia, ignore.case = FALSE) | 
-    grepl(input_value, df$codigo2,
-          fixed = TRUE,ignore.case = FALSE) | 
-    grepl(input_value, df$provincia_1, ignore.case = FALSE)
-  ]
-  }
-  # Return the result
-  return(result)
-}
 
 
 find_provincia_or_codigo <- function(input) { #
@@ -367,28 +438,28 @@ if(length(parsed.) == 0){
 }
 return(parsed.)}
 
-nfi4 <- function(prov, complain = TRUE){
-## Function to download ifn4 data using a province code
-    if(is.null(prov))
-        return(invisible(NULL))
-    ## u <- 'https://www.mitueco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html'
-u <- miteco_urls_from_paths('path41')
-all_links. <- inspect_links(u,'tablas|sig', ignore.case = TRUE) #%>% print()
-all_links <- inspect_links(u, "fn4.*\\.zip") #%>% print()
-all_links <- all_links[!all_links%in%all_links.]
-parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
-prov. <- prov
-if(!is.character(prov))
-prov <- find_provincia_or_codigo(prov)
-parsed. <- parsed[grepl(prov, parsed, ignore.case = TRUE)]
-    if(length(parsed.) == 0){
-        if(complain)
-    cat(paste0("Warning: Data for codigo '", prov., "' was not found!\n"))
-    return(invisible(NULL))
-}
-## to solve some wrong urls addind ifn/ifn4    
-parsed. <- insert_ifn_ifn4(parsed.)
-return(parsed.)}
+## nfi4 <- function(prov, complain = TRUE){
+## ## Function to download ifn4 data using a province code
+##     if(is.null(prov))
+##         return(invisible(NULL))
+##     ## u <- 'https://www.mitueco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html'
+## u <- miteco_urls_from_paths('path41')
+## all_links. <- inspect_links(u,'tablas|sig', ignore.case = TRUE) #%>% print()
+## all_links <- inspect_links(u, "fn4.*\\.zip") #%>% print()
+## all_links <- all_links[!all_links%in%all_links.]
+## parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
+## prov. <- prov
+## if(!is.character(prov))
+## prov <- find_provincia_or_codigo(prov)
+## parsed. <- parsed[grepl(prov, parsed, ignore.case = TRUE)]
+##     if(length(parsed.) == 0){
+##         if(complain)
+##     cat(paste0("Warning: Data for codigo '", prov., "' was not found!\n"))
+##     return(invisible(NULL))
+## }
+## ## to solve some wrong urls addind ifn/ifn4    
+## parsed. <- insert_ifn_ifn4(parsed.)
+## return(parsed.)}
 
 units. <- c('d','h','ba','n','Hd','v')
 names(units.) <- c('mm','m','m2','','m','dm3')
