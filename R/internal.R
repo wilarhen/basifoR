@@ -73,7 +73,9 @@ find_code <- function(df, input_value) {
   result <- df$codigo[
     grepl(input_value, df$provincia, ignore.case = FALSE) | 
     grepl(input_value, df$codigo2,
-          fixed = TRUE,ignore.case = FALSE) | 
+          ## fixed = TRUE,ignore.case = FALSE) | 
+          ignore.case = FALSE) |
+    grepl(input_value, df$provincia_0, ignore.case = FALSE) |
     grepl(input_value, df$provincia_1, ignore.case = FALSE)
     ][1L]
       result <- df$provincia_1[grepl(paste0('^',result,'$'), df$codigo,ignore.case = TRUE)]
