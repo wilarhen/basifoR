@@ -3,15 +3,13 @@
 nfi4 <- function(prov, complain = TRUE){
 ## Function to download ifn4 data using a province code
     ## dt <- read.csv('procods_Cristobal.csv')
+    dt <- procods
 prov. <- prov
     prov <- find_code(dt, prov)
 if(length(prov) == 0){
         if(complain)
     warning(paste0("Spanish province '", prov., "' not found!\n"))
-    ## cat(paste0("Warning: Spanish province '", prov., "' not found!\n"))
-    return(invisible(NULL))
-}
-    
+    return(invisible(NULL))}
 u <- miteco_urls_from_paths('path41')
     all_links. <- unlist(Map(function(x)
         inspect_links(x, prov, ignore.case = TRUE), u))
