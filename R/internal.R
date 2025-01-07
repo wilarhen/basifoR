@@ -5,7 +5,7 @@ nfi4 <- function(prov, complain = TRUE){
     ## dt <- read.csv('procods_Cristobal.csv')
     dt <- procods
 prov. <- prov
-    prov <- find_code(dt, prov)
+    prov <- find_code(prov, dt)
 if(length(prov) == 0){
         if(complain)
     warning(paste0("Spanish province '", prov., "' not found!\n"))
@@ -25,6 +25,47 @@ if(length(parsed) == 0){
     return(invisible(NULL))
 }
 return(parsed)}
+
+# Define the function with wildcard support
+find_code <- function(df, input_value) {
+    if (is.numeric(input_value)) {  # Check if input is numeric
+    result <- df$provincia_1[grepl(paste0('^',input_value,'$'), df$codigo,ignore.case = TRUE)]
+  }else{
+  # Use grepl for partial matching (case-insensitive search)
+  result <- df$codigo[
+    grepl(input_value, df$provincia, ignore.case = FALSE) | 
+    grepl(input_value, df$codigo2,
+          ## fixed = TRUE,ignore.case = FALSE) | 
+          ignore.case = FALSE) |
+    grepl(input_value, df$provincia_0, ignore.case = FALSE) |
+    grepl(input_value, df$provincia_1, ignore.case = FALSE)
+    ][1L]
+      result <- df$provincia_1[grepl(paste0('^',result,'$'), df$codigo,ignore.case = TRUE)]
+
+  }
+  # Return the result
+  return(result)
+}
+
+find_code_ <- function(input_value, df) {
+    if (is.numeric(input_value)) {  # Check if input is numeric
+    result <- df$provincia_1[grepl(paste0('^',input_value,'$'), df$codigo,ignore.case = TRUE)]
+  }else{
+  # Use grepl for partial matching (case-insensitive search)
+  result <- df$codigo[
+    grepl(input_value, df$provincia, ignore.case = FALSE) | 
+    grepl(input_value, df$codigo2,
+          ## fixed = TRUE,ignore.case = FALSE) | 
+          ignore.case = FALSE) |
+    grepl(input_value, df$provincia_0, ignore.case = FALSE) |
+    grepl(input_value, df$provincia_1, ignore.case = FALSE)
+    ][1L]
+      result <- df$provincia_1[grepl(paste0('^',result,'$'), df$codigo,ignore.case = TRUE)]
+
+  }
+  # Return the result
+  return(result)
+}
 
 
 ## # Define the function
@@ -64,34 +105,14 @@ return(parsed)}
 ## return(parsed)
 ## }
 
-# Define the function with wildcard support
-find_code <- function(df, input_value) {
-    if (is.numeric(input_value)) {  # Check if input is numeric
-    result <- df$provincia_1[grepl(paste0('^',input_value,'$'), df$codigo,ignore.case = TRUE)]
-  }else{
-  # Use grepl for partial matching (case-insensitive search)
-  result <- df$codigo[
-    grepl(input_value, df$provincia, ignore.case = FALSE) | 
-    grepl(input_value, df$codigo2,
-          ## fixed = TRUE,ignore.case = FALSE) | 
-          ignore.case = FALSE) |
-    grepl(input_value, df$provincia_0, ignore.case = FALSE) |
-    grepl(input_value, df$provincia_1, ignore.case = FALSE)
-    ][1L]
-      result <- df$provincia_1[grepl(paste0('^',result,'$'), df$codigo,ignore.case = TRUE)]
-
-  }
-  # Return the result
-  return(result)
-}
-
-
 ## accentless <- function( s ) {
 ##   chartr(
 ##     "áéóūáéíóúÁÉÍÓÚýÝàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛãõÃÕñÑäëïöüÄËÏÖÜÿçÇ",
 ##     "aeouaeiouAEIOUyYaeiouAEIOUaeiouAEIOUaoAOnNaeiouAEIOUycC",
 ##     s );
 ## }
+
+##-----------------------------------------------------------------
 
 check_extension_in_zip <- function(url, extension){
   temp_file <- tempfile(fileext=".zip")
