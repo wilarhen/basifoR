@@ -12,10 +12,9 @@ getNFI <- structure(function#Get SNF data from Spanish province
 ) {
     if(is.null(provincia))
         return(provincia)
-    if(!is.na(find_provincia_or_codigo(provincia)) &&
-       !is_decompressed(provincia)){
         nfi <- paste0('nfi',nfi.nr)
-        provincia <- do.call(nfi, list(prov = provincia))}
+    provincia <- do.call(nfi, list(prov = provincia))
+## }
     read <- readNFI(provincia, ...)
     return(read)
 ### \code{data.frame} with numeric columns converted from factors back
