@@ -7,7 +7,7 @@ getNFI <- structure(function#Get SNF data from Spanish province
     provincia,  ##<< Either a \code{character} or \code{numeric}
                 ##specifying the code of a Spanish province.
     nfi.nr = 4, ##<< A \code{numeric} value indicating the stage of
-                ##the NFI. Default is set to 4.
+                ##the SNF. Default is set to the forth stage of the SNF.
     ... ##<< Additional arguments used in \code{\link{readNFI}}.
 ) {
     if(is.null(provincia))
