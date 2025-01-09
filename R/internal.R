@@ -28,25 +28,25 @@ if(length(parsed) == 0){
 }
 return(parsed)}
 
-# Define the function with wildcard support
-find_code <- function(df, input_value) {
-    if (is.numeric(input_value)) {  # Check if input is numeric
-    result <- df$provincia_1[grepl(paste0('^',input_value,'$'), df$codigo,ignore.case = TRUE)]
-  }else{
-  # Use grepl for partial matching (case-insensitive search)
-  result <- df$codigo[
-    grepl(input_value, df$provincia, ignore.case = FALSE) | 
-    grepl(input_value, df$codigo2,
-          ## fixed = TRUE,ignore.case = FALSE) | 
-          ignore.case = FALSE) |
-    grepl(input_value, df$provincia_0, ignore.case = FALSE) |
-    grepl(input_value, df$provincia_1, ignore.case = FALSE)
-    ][1L]
-      result <- df$provincia_1[grepl(paste0('^',result,'$'), df$codigo,ignore.case = TRUE)]
-  }
-  # Return the result
-  return(result)
-}
+## # Define the function with wildcard support
+## find_code <- function(df, input_value) {
+##     if (is.numeric(input_value)) {  # Check if input is numeric
+##     result <- df$provincia_1[grepl(paste0('^',input_value,'$'), df$codigo,ignore.case = TRUE)]
+##   }else{
+##   # Use grepl for partial matching (case-insensitive search)
+##   result <- df$codigo[
+##     grepl(input_value, df$provincia, ignore.case = FALSE) | 
+##     grepl(input_value, df$codigo2,
+##           ## fixed = TRUE,ignore.case = FALSE) | 
+##           ignore.case = FALSE) |
+##     grepl(input_value, df$provincia_0, ignore.case = FALSE) |
+##     grepl(input_value, df$provincia_1, ignore.case = FALSE)
+##     ][1L]
+##       result <- df$provincia_1[grepl(paste0('^',result,'$'), df$codigo,ignore.case = TRUE)]
+##   }
+##   # Return the result
+##   return(result)
+## }
 
 find_code_ <- function(input_value, is.ifn4 = TRUE, df) {
   result <- df$codigo[

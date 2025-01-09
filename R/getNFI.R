@@ -1,7 +1,7 @@
-getNFI <- structure(function#Get SNF data from Spanish province
-### This function processes Spanish provinces to download and process
-### data sets from the 2nd to the 4th stages of the Spanish National
-### Forest Inventory (SNF) from the SNF website
+getNFI <- structure(function#Get SNF data for a Spanish province
+### This function processes codes of Spanish provinces to download and
+### process data sets from the 2nd to the 4th stages of the Spanish
+### National Forest Inventory (SNF) from the SNF website
 ### ("http://www.miteco.gob.es").
 (
     provincia,  ##<< Either a \code{character} or \code{numeric}
