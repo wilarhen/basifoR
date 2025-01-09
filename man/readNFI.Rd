@@ -28,11 +28,13 @@ to numeric, while preserving the format of character columns.}
 
 
 \examples{
- \donttest{
-# Retrieval of a database from the second stage of the SNF using a URL resource
+\donttest{
+#Retrieval of a database from the second stage of the SNF using a URL resource
 
- ifn2_path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
- ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path = ifn2_path)
+ifn2_path <-
+'/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path
+= ifn2_path)
 
 read_ifn2 <- readNFI(ifn2_url)
 

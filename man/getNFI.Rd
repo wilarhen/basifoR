@@ -1,9 +1,9 @@
 \name{getNFI}
 \alias{getNFI}
-\title{Get SNF data from Spanish province}
-\description{This function processes Spanish provinces to download and process
-data sets from the 2nd to the 4th stages of the Spanish National
-Forest Inventory (SNF) from the SNF website
+\title{Get SNF data for a Spanish province}
+\description{This function processes codes of Spanish provinces to download and
+process data sets from the 2nd to the 4th stages of the Spanish
+National Forest Inventory (SNF) from the SNF website
 ("http://www.miteco.gob.es").}
 \usage{getNFI(provincia, nfi.nr = 4, 
     ...)}
@@ -11,7 +11,7 @@ Forest Inventory (SNF) from the SNF website
   \item{provincia}{Either a \code{character} or \code{numeric}
 specifying the code of a Spanish province.}
   \item{nfi.nr}{A \code{numeric} value indicating the stage of
-the NFI. Default is set to 4.}
+the SNF. Default is set to the forth stage of the SNF.}
   \item{\dots}{Additional arguments used in \code{\link{readNFI}}.}
 }
 
@@ -40,11 +40,10 @@ str(get_ifn4p45)
 ## Alternatively, download data from 'www.miteco.gob.es'
 ## Specify province name/number to read the data:
 
- \donttest{
-# Compute dendrometrics for Toledo (code 45) for NFI 4
- dendromet_ifn4p45 <- getNFI(provincia=45,nfi=4)
-
-# Display first few rows
- str(dendromet_ifn4p45)
- }
+\donttest{
+#Compute dendrometrics for Toledo (code 45) for NFI 4
+dendromet_ifn4p45 <- getNFI(provincia=45,nfi=4)
+#Display first few rows
+str(dendromet_ifn4p45)
+}
 }
