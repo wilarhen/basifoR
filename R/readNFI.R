@@ -13,7 +13,7 @@ readNFI <- structure(function#Read NFI data
                       ##SNFI are imported using
                       ##\code{\link[foreign]{read.dbf}}. Data from latter
                       ##stages are imported using either
-                      ##\code{\link[RODBC]{odbcConnectAccess}} (Windows) or
+                      ##\code{\link[RODBC]{odbcConnect}} (Windows) or
                       ##\code{\link[Hmisc]{mdb.get}} (unix-alike
                       ##systems). Data from 4th SNFI must be read from
                       ##local paths.  On Windows, a driver for Office
