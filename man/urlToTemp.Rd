@@ -9,7 +9,7 @@ decompress \code{.zip} files with data sets of the SNFI. }
 SNFI (.zip) having data of either .dbf or .mdb file
 extensions..}
   \item{timeOut}{\code{request}. Maximum request time,
-see \code{\link{timeout}}. Default
+see \code{\link[httr]{timeout}}. Default
 \code{timeout(60)}}
 }
 \details{The data sets are decompressed in a
