@@ -21,7 +21,7 @@ Authors@R:
 	     email = "fbravo@pvs.uva.es",
 	     comment = c(ORCID = "0000-0001-7348-6695")))
 Maintainer: Wilson Lara <wilarhen@gmail.com>
-Description: Data sets of the Spanish National Forest Inventory <https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/> are processed to compute tree metrics and statistics. Function metrics2Vol() controls most of the routines.
+Description: Data sets of the Spanish National Forest Inventory <https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible.html> are processed to compute tree metrics and statistics. Function metrics2Vol() controls most of the routines.
 License: GPL-3
 Depends: R (>= 2.10),RODBC
 Imports: curl,foreign,Hmisc,httr,measurements,stats,utils
