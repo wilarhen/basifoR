@@ -2,21 +2,21 @@
 \alias{urlToTemp}
 \title{Temporary NFI data }
 \description{This function is implemented by other routines of the package to
-decompress \code{.zip} files with data sets of the SNFI. }
-\usage{urlToTemp(url., timeOut = timeout(60))}
+decompress \code{.zip} files with data sets of the SNF. }
+\usage{urlToTemp(url., timeOut = timeout(60), 
+    ...)}
 \arguments{
   \item{url.}{\code{character}.  URL/path to a compressed file of the
-SNFI (.zip) having data of either .dbf or .mdb file
+SNF (.zip) having data of either .dbf or .mdb file
 extensions..}
   \item{timeOut}{\code{request}. Maximum request time,
-see \code{\link[httr]{timeout}}. Default
+see \code{\link{timeout}}. Default
 \code{timeout(60)}}
+  \item{\dots}{Additional arguments used in \code{\link{fetchNFI}}.}
 }
-\details{The data sets are decompressed in a
-temporary file of the local
-machine. Compressed data containing file
-extensions other than \code{.mdb} or
-\code{.dbf} are not supported.}
+\details{This function is deprecated and
+will be made defunct; use the replacement
+function \code{\link{fetchNFI}}.}
 \value{\code{character}. Path to the NFI data (.mdb or .dbf) stored in a
 temporary file}
 
@@ -26,18 +26,13 @@ temporary file}
 
 
 \examples{
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-tfmad <- urlToTemp(madridNFI)
-tfmad
+## Process SNF data for Toledo stored locally
+# Path to Toledo data file in 'basifoR' package
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-## Internet resources fail gracefully with an informative message if
-## the resource is not available or has changed (and not give a check
-## warning nor error):
-
-path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-
-tfmad <- urlToTemp(url2, timeOut=timeout(1))
+# Decompress SNF data from the specified file path or URL
+fetch_ifn4p45 <- fetchNFI(ifn4p45)
+print(fetch_ifn4p45)
 
 
 }
