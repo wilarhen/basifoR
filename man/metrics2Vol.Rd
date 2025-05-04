@@ -2,9 +2,9 @@
 \alias{metrics2Vol}
 \title{Tree volumes in NFI data}
 \description{This function computes over bark volumes (\code{'m3'}) processing
-tree metrics from databases of the SNF data and using volume
-equations established in 2nd NFI, see Details section. To compute
-all in-package metrics, run function \code{\link{dendroMetrics}}.}
+tree metrics from databases of the SNFI data and using volume
+equations established in 2nd NFI, see Details section. To derive
+dendrometric summaries use \code{\link{dendroMetrics}}.}
 \usage{metrics2Vol(nfi, cub.met = "freq", 
     keep.var = FALSE, 
     ...)}
@@ -25,7 +25,7 @@ compute the volumes. Default \code{FALSE}.}
 \code{\link{metrics2Vol}} or \code{\link{nfiMetrics}} or
 \code{\link{readNFI}}.}
 }
-\details{The quations from the second SNF
+\details{The quations from the second SNFI
 used have the forms \code{'v ~ par1 + par2
 * (d^2) * h'}, and \code{'v ~ par1 *
 (d^par2) * (h^par3)'}. These equations
@@ -51,22 +51,10 @@ columns with the variables used to compute the volumes.}
 
 
 \examples{
-## Process SNF data for Toledo stored locally
-# Path to Toledo data file in 'basifoR' package
-ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
-
-# Decompress SNF data from the specified file path or URL
-fetch_ifn4p45 <- fetchNFI(ifn4p45)
-
-# Read and process the data (first 100 rows)
-get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100,]
-
-# Compute some metrics
-metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
-
-# Calculate volume metrics 
-vol_ifn4p45 <- metrics2Vol(metrics_ifn4p45)
-
+madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
+rmad <- readNFI(madridNFI)[1:10,]
+vmad <- metrics2Vol(rmad)
+head(vmad)
 ## see metric units
-    attr(vol_ifn4p45,'units')
+attr(vmad,'units')
 }
