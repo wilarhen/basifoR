@@ -24,7 +24,7 @@ getNFI <- structure(function#Get SNF data for a Spanish province
     read <- fetchNFI(provincia, ...)
     return(read)
 ### \code{data.frame} with numeric columns converted from factors back
-### to numeric, while preserving the format of character columns.
+### to gnumeric, while preserving the format of character columns.
 }, ex = function(){
     ## Process SNF data for Toledo stored locally
     # Path to Toledo data file in 'basifoR' package
