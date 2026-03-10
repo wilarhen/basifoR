@@ -48,7 +48,31 @@ return(parsed)}
 ##   return(result)
 ## }
 
-find_code_ <- function(input_value, is.ifn4 = TRUE, df) {
+## find_code_ <- function(input_value, is.ifn4 = TRUE, df) {
+##   result <- df$codigo[
+##     grepl(input_value, df$codigo) | 
+##     grepl(input_value, df$provincia) | 
+##     grepl(input_value, df$codigo2) |
+##     grepl(input_value, df$provincia_0) |
+##     grepl(input_value, df$provincia_1)
+##     ][1L]
+##   if(is.ifn4){
+##       result <- df$provincia_1[
+##                        grepl(paste0('^',result,'$'), df$codigo,
+##                              ignore.case = TRUE)]}
+##   if(length(result) == 0)
+##       result <- NA
+##       if(is.na(result)){
+##           warning(paste0("Spanish province '", input_value, "' not found!\n"),
+##                   call. = FALSE)
+##         return(invisible(NULL))}
+##   ## }
+##   # Return the result
+##   return(result)
+## }
+
+
+find_code_ <- function(input_value, is.ifn4 = TRUE, df, complain = TRUE) {
   result <- df$codigo[
     grepl(input_value, df$codigo) | 
     grepl(input_value, df$provincia) | 
@@ -62,7 +86,7 @@ find_code_ <- function(input_value, is.ifn4 = TRUE, df) {
                              ignore.case = TRUE)]}
   if(length(result) == 0)
       result <- NA
-      if(is.na(result)){
+      if(is.na(result) & complain){
           warning(paste0("Spanish province '", input_value, "' not found!\n"),
                   call. = FALSE)
         return(invisible(NULL))}
@@ -70,7 +94,6 @@ find_code_ <- function(input_value, is.ifn4 = TRUE, df) {
   # Return the result
   return(result)
 }
-
 
 ## # Define the function
 ## find_ifn4 <- function(strings) {
