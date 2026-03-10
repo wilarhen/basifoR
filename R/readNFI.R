@@ -23,6 +23,7 @@ readNFI <- structure(function#Read SNF data from path
     nfi,  ##<< \code{character}. URL or local path to a compressed
           ##file (\code{.zip}) containing SNF data, or to a
           ##decompressed file with these supported extensions.
+    nfi.nr = 4,
     dt.nm = 'PCMayores', ##<< \code{character}. Name of a dataset
                          ##stored in the imported NFI data. Defaults
                          ##to \code{'PCMayores'} (3rd NFI) or
@@ -30,6 +31,43 @@ readNFI <- structure(function#Read SNF data from path
     ... ##<< Additional arguments for \code{\link{fetchNFI}}.
 ) {
     imp <- nfi
+
+
+find_code__ <- function(input_value, df) {
+  result <- df$codigo[
+    grepl(input_value, df$codigo) | 
+    grepl(input_value, df$provincia) | 
+    grepl(input_value, df$codigo2) |
+    grepl(input_value, df$provincia_0) |
+    grepl(input_value, df$provincia_1)
+    ][1L]
+  ## if(is.ifn4){
+  ##     result <- df$provincia_1[
+  ##                      grepl(paste0('^',result,'$'), df$codigo,
+  ##                            ignore.case = TRUE)]}
+  if(length(result) == 0)
+      result <- NA
+      ## if(is.na(result) & complain){
+      ##     warning(paste0("Spanish province '", input_value, "' not found!\n"),
+      ##             call. = FALSE)
+      ##   return(invisible(NULL))}
+  ## }
+  # Return the result
+  return(result)
+}
+
+    is.ifn4 <- nfi.nr == 4 
+    if(!is.na(find_code_(imp, is.ifn4 = is.ifn4, df = procods, complain = FALSE)) && !file_exten(imp) == 'zip'){
+    nfi. <- paste0('nfi',nfi.nr)
+    ## isifn4  <- nfi.nr == 4
+    ## if(is.na(find_code_(provincia, is.ifn4 = isifn4, df = procods, complain = FALSE))){
+    ##     return(provincia)
+    ## }else{
+    imp <- do.call(nfi., list(prov = imp))
+        imp <- fetchNFI(imp, ...)
+        
+    }
+    
     if(length(imp)!=0 && file_exten(imp) == 'zip')
         imp <- fetchNFI(nfi, ...)
     if(is.null (imp))

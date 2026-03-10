@@ -20,7 +20,8 @@ getNFI <- structure(function#Get SNF data for a Spanish province
     ## }else{
     provincia <- do.call(nfi, list(prov = provincia))
 ## }}}
-    read <- readNFI(provincia, ...)
+    ## read <- readNFI(provincia, ...)
+    read <- fetchNFI(provincia, ...)
     return(read)
 ### \code{data.frame} with numeric columns converted from factors back
 ### to numeric, while preserving the format of character columns.
