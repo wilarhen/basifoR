@@ -33,12 +33,14 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
 
 ) {
         ## if(is.null(nfi)|is.character(nfi)|is.numeric(nfi)){
-        ##     nfi. <- nfi
+            nfi. <- nfi
         ## ## nfi <- readNFI(nfi, ...)
         ## nfi <- getNFI(nfi, ...)
         if(is.null(nfi.))
             return(nfi)
             ## }
+            if(!inherits(nfi., "data.frame"))
+                nfi <- readNFI(nfi, ...)
             
     fc <- function(dt, cl.){
         nt. <- paste(cl., collapse = '|')
