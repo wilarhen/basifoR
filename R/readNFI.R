@@ -3,7 +3,6 @@ readNFI <- structure(function#Read SNF data from path
 ### Spanish National Forest Inventory (SNF). It can process either 
 ### \code{URLs} to data stored on the SNF web page 
 ### (\code{"http://www.miteco.gob.es"}) or paths to locally stored files.
-### To read SNF using codes of Spanish provinces, use \code{\link{getNFI}}.
                      ## details<< Compressed data files with
                      ## extensions other than \code{.dbf} \code{.mdb}
                      ## (Linux only), or \code{.accdb} are not
