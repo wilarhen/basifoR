@@ -51,7 +51,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
         if(is.null(nfi.))
             return(nfi)
     ## }
-return(resm)
+
     frm. <- attr(nfi, 'units')
     if(is.null(summ.vr)){
         nfi <- subset(nfi,
