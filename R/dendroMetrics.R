@@ -45,12 +45,13 @@ dendroMetrics <- structure(function#Summarize dendrometrics
     ... ##<< Additional arguments in \code{\link{metrics2Vol}} or
         ##\code{\link{nfiMetrics}} or \code{\link{readNFI}}.
 ) {
-    if(is.null(nfi) | is.character(nfi) | is.numeric(nfi) | inherits(nfi, 'readNFI')){
+    ## if(is.null(nfi) | is.character(nfi) | is.numeric(nfi) | inherits(nfi, 'readNFI')){
         nfi. <- nfi
         nfi <- metrics2Vol(nfi, ...)
         if(is.null(nfi.))
             return(nfi)
-    }
+    ## }
+return(resm)
     frm. <- attr(nfi, 'units')
     if(is.null(summ.vr)){
         nfi <- subset(nfi,
@@ -84,6 +85,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
 
     resm <- Map(function(x)
         fsum(x), x= msp)
+
     resm <- Reduce('rbind',resm)
     resm <- data.frame(resm)
     resm <- subset(resm,

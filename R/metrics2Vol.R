@@ -31,7 +31,7 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     keep.var = FALSE, ##<< \code{logical}. Keep the variables used to
                       ##compute the volumes. Default \code{FALSE}.
     ... ##<< Depending on \code{'nfi'}, additional arguments in
-        ##\code{\link{metrics2Vol}} or \code{\link{nfiMetrics}} or
+        ##\code{\link{nfiMetrics}} or
         ##\code{\link{readNFI}}.
 ) {
     if(is.null(nfi) | is.character(nfi) | is.numeric(nfi) | inherits(nfi, 'readNFI')){
