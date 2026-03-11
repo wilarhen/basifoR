@@ -40,7 +40,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
             return(nfi)
             ## }
             
-            if(!inherits(nfi., "data.frame"))
+            if(!inherits(nfi., "readNFI"))
                 nfi <- readNFI(nfi, ...)
                 
     fc <- function(dt, cl.){

@@ -57,7 +57,8 @@ find_code__ <- function(input_value, df) {
 }
 
     is.ifn4 <- nfi.nr == 4 
-    if(!is.na(find_code_(imp, is.ifn4 = is.ifn4, df = procods, complain = FALSE)) && !file_exten(imp) == 'zip'){
+    ## if(!is.na(find_code_(imp, is.ifn4 = is.ifn4, df = procods, complain = FALSE)) && !file_exten(imp) == 'zip'){
+    if(!is.na(find_code__(imp, is.ifn4 = is.ifn4, df = procods)) && !file_exten(imp) == 'zip'){
     nfi. <- paste0('nfi',nfi.nr)
     ## isifn4  <- nfi.nr == 4
     ## if(is.na(find_code_(provincia, is.ifn4 = isifn4, df = procods, complain = FALSE))){
