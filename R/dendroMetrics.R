@@ -47,9 +47,10 @@ dendroMetrics <- structure(function#Summarize dendrometrics
 ) {
     ## if(is.null(nfi) | is.character(nfi) | is.numeric(nfi) | inherits(nfi, 'readNFI')){
         nfi. <- nfi
-        nfi <- metrics2Vol(nfi, ...)
         if(is.null(nfi.))
             return(nfi)
+       if(!inherits(nfi., "metrics2Vol"))
+        nfi <- metrics2Vol(nfi, ...)
     ## }
 
     frm. <- attr(nfi, 'units')
