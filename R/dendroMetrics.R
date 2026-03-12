@@ -49,7 +49,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
         nfi. <- nfi
         if(is.null(nfi.))
             return(nfi)
-       if(!inherits(nfi., "metrics2Vol"))
+       if(!inherits(nfi., "metrics2vol"))
         nfi <- metrics2Vol(nfi, ...)
     ## }
 
