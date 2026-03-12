@@ -126,6 +126,7 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     attr(mmd, 'units') <- c(attr(nfi, 'units'), vun) 
     mmd <- conv_units(mmd, var = c('d','h','v'), un = c('cm','m','m3'))        
     rownames(mmd) <- NULL
+    class(mmd) <- append('metrics2vol',class(mmd))
     return(mmd)
 ### \code{data.frame}. Depending on \code{keep.var}, short or expanded
 ###  data set.  Short data sets contain the volumes \code{v}
