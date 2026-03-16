@@ -67,7 +67,6 @@ find_code__ <- function(input_value, is.ifn4, df) {
         imp <- fetchNFI(imp, ...)
         
     }
-    
     if(length(imp)!=0 && file_exten(imp) == 'zip')
         imp <- fetchNFI(nfi, ...)
     if(is.null (imp))
@@ -116,7 +115,7 @@ find_code__ <- function(input_value, is.ifn4, df) {
         dt.nm. <- unique(c(dt.nm,'PCDatosMap')) 
     }
     if(may2. & dt.nm%in%'PCMayores')
-        dt.nm. <- 'PIESMA'
+        dt.nm. <- 'PIESMA'    
     dset <- tryCatch(do.call(fnim, list(imp, dt.nm.)),
                      error = function(e) NULL)
     if(is.null(dset))
