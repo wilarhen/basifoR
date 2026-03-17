@@ -32,133 +32,73 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         ... ##<< Additional arguments in \code{\link{readNFI}}.
 
 ) {
-    ##     ## if(is.null(nfi)|is.character(nfi)|is.numeric(nfi)){
-    ##         nfi. <- nfi
-    ##     ## ## nfi <- readNFI(nfi, ...)
-    ##     ## nfi <- getNFI(nfi, ...)
-    ##     if(is.null(nfi.))
-    ##         return(nfi)
-    ##         ## }
+        ## if(is.null(nfi)|is.character(nfi)|is.numeric(nfi)){
+            nfi. <- nfi
+        ## ## nfi <- readNFI(nfi, ...)
+        ## nfi <- getNFI(nfi, ...)
+        if(is.null(nfi.))
+            return(nfi)
+            ## }
             
-    ##         if(!inherits(nfi., "readNFI"))
-    ##             nfi <- readNFI(nfi, ...)
+            if(!inherits(nfi., "readNFI"))
+                nfi <- readNFI(nfi, ...)
                 
-    ## fc <- function(dt, cl.){
-    ##     nt. <- paste(cl., collapse = '|')
-    ##     nt.. <- grep(nt., names(dt),
-    ##                  ignore.case = TRUE)
-    ##     cl.nm <- sort(names(dt)[nt..],
-    ##                   decreasing = TRUE)
-    ##     return(cl.nm)}
+    fc <- function(dt, cl.){
+        nt. <- paste(cl., collapse = '|')
+        nt.. <- grep(nt., names(dt),
+                     ignore.case = TRUE)
+        cl.nm <- sort(names(dt)[nt..],
+                      decreasing = TRUE)
+        return(cl.nm)}
 
-    ##     ## var.. <- getOption('units')
-    ##     ## mn.un <- names(var..[var..%in%var])
+        ## var.. <- getOption('units')
+        ## mn.un <- names(var..[var..%in%var])
 
-    ##     var. <- var[!var%in%'Hd']
-    ## fdn <- function(dbh, var){
-    ##     if(var%in%c('d','n','ba'))
-    ##         dm <- apply(dbh[,fc(dbh,c('Dn','Diamet'))],1,
-    ##                     function(x)dbhMetric(x,var))
-    ##     if(var%in%'h'){
-    ##         ht <- fc(dbh,c('altura','Ht'))
-    ##         ## dbh[,ht] <- as.numeric(as.character(dbh[,ht]))
-    ##         ## dm <- conv_unit(dbh[,ht],
-    ##         ##                 from = 'm', to = 'dm')}
-    ##         dm <- as.numeric(as.character(dbh[,ht]))}
-    ##     ## if(var%in%'pr'){
-    ##     ##     dm <- rep(attr(dbh,'pr.'), nrow(dbh))
-    ##     ## }
-    ##     return(dm)}
+        var. <- var[!var%in%'Hd']
+    fdn <- function(dbh, var){
+        if(var%in%c('d','n','ba'))
+            dm <- apply(dbh[,fc(dbh,c('Dn','Diamet'))],1,
+                        function(x)dbhMetric(x,var))
+        if(var%in%'h'){
+            ht <- fc(dbh,c('altura','Ht'))
+            ## dbh[,ht] <- as.numeric(as.character(dbh[,ht]))
+            ## dm <- conv_unit(dbh[,ht],
+            ##                 from = 'm', to = 'dm')}
+            dm <- as.numeric(as.character(dbh[,ht]))}
+        ## if(var%in%'pr'){
+        ##     dm <- rep(attr(dbh,'pr.'), nrow(dbh))
+        ## }
+        return(dm)}
     
-    ##     dmt <- mapply(function(y)
-    ##         fdn(nfi,y), y = var.)
-    ##     if(!is.null(attr(nfi,'pr.')))
-    ##     dmt <- cbind(pr = attr(nfi,'pr.'), dmt)
+        dmt <- mapply(function(y)
+            fdn(nfi,y), y = var.)
+        if(!is.null(attr(nfi,'pr.')))
+        dmt <- cbind(pr = attr(nfi,'pr.'), dmt)
     
         
-    ## ## nma <- names(nfi)
-    ##     ## app <- paste(levels, collapse = '|')
-    ##     ## gap <- grepl(app,nma, ignore.case = TRUE)
-    ##     ## nms <- nma[gap]
-    ##     nms <- flev(nfi, levels)
-    ##     nm.. <- c(nms, colnames(dmt))
-    ##     dmt <- data.frame(nfi[,nms], dmt)
-    ##     names(dmt) <- nm..
+    ## nma <- names(nfi)
+        ## app <- paste(levels, collapse = '|')
+        ## gap <- grepl(app,nma, ignore.case = TRUE)
+        ## nms <- nma[gap]
+        nms <- flev(nfi, levels)
+        nm.. <- c(nms, colnames(dmt))
+        dmt <- data.frame(nfi[,nms], dmt)
+        names(dmt) <- nm..
         
-    ##     if('Hd'%in%var){
-    ##         needed <- c('h','d','n')
-    ##         nd <- paste(needed, collapse = '?,')
-    ##         if(!all(needed%in%var))
-    ##             stop(paste0('Hd: missing variables: var = c(',nd,'?, ...)'))
-    ##         spl <- split(dmt, dmt[,nms], drop = TRUE)
-    ##         dmhe <- Map(function(y)
-    ##             cbind(y, Hd = tryCatch(domheight(y$'h',y$'d',y$'n'),
-    ##                                    error = function(e) NA)), spl)
-    ##         dmt <- do.call('rbind', dmhe) 
-    ##         rownames(dmt) <- NULL}
+        if('Hd'%in%var){
+            needed <- c('h','d','n')
+            nd <- paste(needed, collapse = '?,')
+            if(!all(needed%in%var))
+                stop(paste0('Hd: missing variables: var = c(',nd,'?, ...)'))
+            spl <- split(dmt, dmt[,nms], drop = TRUE)
+            dmhe <- Map(function(y)
+                cbind(y, Hd = tryCatch(domheight(y$'h',y$'d',y$'n'),
+                                       error = function(e) NA)), spl)
+            dmt <- do.call('rbind', dmhe) 
+            rownames(dmt) <- NULL}
 
-    ##     dmt <- conv_units(dmt)
+        dmt <- conv_units(dmt)
         
-    ## return(dmt)
-## nfiMetrics_fast <- function(nfi, levels, var = c("d", "h", "ba", "n", "Hd"), ...) {
-
-  nfi. <- nfi
-  if (is.null(nfi.))
-    return(nfi)
-
-  if (!inherits(nfi., "readNFI"))
-    nfi <- readNFI(nfi, ...)
-
-  fc <- function(dt, cl.) {
-    nt. <- paste(cl., collapse = "|")
-    nt.. <- grep(nt., names(dt), ignore.case = TRUE)
-    cl.nm <- sort(names(dt)[nt..], decreasing = TRUE)
-    return(cl.nm)
-  }
-
-  dn_cols <- fc(nfi, c("Dn", "Diamet"))
-  ht_cols <- fc(nfi, c("altura", "Ht"))
-
-  var. <- var[!var %in% "Hd"]
-
-  fdn <- function(dbh, var, dn_cols, ht_cols) {
-    if (var %in% c("d","n","ba"))
-      dm <- apply(dbh[, dn_cols, drop = FALSE], 1,
-                  function(x) dbhMetric(x, var))
-    if (var %in% "h")
-      dm <- as.numeric(as.character(dbh[, ht_cols]))
-    return(dm)
-  }
-
-  dmt <- mapply(function(y)
-    fdn(nfi, y, dn_cols, ht_cols), y = var.)
-
-  if (!is.null(attr(nfi, "pr.")))
-    dmt <- cbind(pr = attr(nfi, "pr."), dmt)
-
-  nms <- flev(nfi, levels)
-  nm.. <- c(nms, colnames(dmt))
-  dmt <- data.frame(nfi[, nms, drop = FALSE], dmt)
-  names(dmt) <- nm..
-
-  if ("Hd" %in% var) {
-    needed <- c("h","d","n")
-    nd <- paste(needed, collapse = "?,")
-    if (!all(needed %in% var))
-      stop(paste0("Hd: missing variables: var = c(", nd, "?)"))
-
-    spl <- split(dmt, dmt[, nms], drop = TRUE)
-    dmhe <- Map(function(y)
-      cbind(y, Hd = tryCatch(domheight(y$h, y$d, y$n),
-                             error = function(e) NA)), spl)
-    dmt <- do.call("rbind", dmhe)
-    rownames(dmt) <- NULL
-  }
-
-  dmt <- conv_units(dmt)
-  return(dmt)
-    
-
 ### \code{data.frame} containing columns which match the strings in
 ### \code{levels}, plus the variables defined in \code{var}, including
 ### the province \code{pr} (\code{dimensionless}), the diameter
