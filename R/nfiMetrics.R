@@ -51,9 +51,6 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                       decreasing = TRUE)
         return(cl.nm)}
 
-        ## var.. <- getOption('units')
-        ## mn.un <- names(var..[var..%in%var])
-
         var. <- var[!var%in%'Hd']
     fdn <- function(dbh, var){
         if(var%in%c('d','n','ba'))
@@ -61,25 +58,13 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                         function(x)dbhMetric(x,var))
         if(var%in%'h'){
             ht <- fc(dbh,c('altura','Ht'))
-            ## dbh[,ht] <- as.numeric(as.character(dbh[,ht]))
-            ## dm <- conv_unit(dbh[,ht],
-            ##                 from = 'm', to = 'dm')}
             dm <- as.numeric(as.character(dbh[,ht]))}
-        ## if(var%in%'pr'){
-        ##     dm <- rep(attr(dbh,'pr.'), nrow(dbh))
-        ## }
         return(dm)}
     
         dmt <- mapply(function(y)
             fdn(nfi,y), y = var.)
         if(!is.null(attr(nfi,'pr.')))
         dmt <- cbind(pr = attr(nfi,'pr.'), dmt)
-    
-        
-    ## nma <- names(nfi)
-        ## app <- paste(levels, collapse = '|')
-        ## gap <- grepl(app,nma, ignore.case = TRUE)
-        ## nms <- nma[gap]
         nms <- flev(nfi, levels)
         nm.. <- c(nms, colnames(dmt))
         dmt <- data.frame(nfi[,nms], dmt)
@@ -98,7 +83,6 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
             rownames(dmt) <- NULL}
 
         dmt <- conv_units(dmt)
-        
 ### \code{data.frame} containing columns which match the strings in
 ### \code{levels}, plus the variables defined in \code{var}, including
 ### the province \code{pr} (\code{dimensionless}), the diameter
