@@ -40,6 +40,7 @@ find_code__ <- function(input_value, is.ifn4, df) {
     grepl(input_value, df$provincia_0) |
     grepl(input_value, df$provincia_1)
     ][1L]
+  
   if(is.ifn4){
       result <- df$provincia_1[
                        grepl(paste0('^',result,'$'), df$codigo,
@@ -55,21 +56,40 @@ find_code__ <- function(input_value, is.ifn4, df) {
   return(result)
 }
 
-    is.ifn4 <- nfi.nr == 4 
-    ## if(!is.na(find_code_(imp, is.ifn4 = is.ifn4, df = procods, complain = FALSE)) && !file_exten(imp) == 'zip'){
-    if(!is.na(find_code__(imp, is.ifn4 = is.ifn4, df = procods)) && !file_exten(imp) == 'zip'){
-    nfi. <- paste0('nfi',nfi.nr)
-    ## isifn4  <- nfi.nr == 4
-    ## if(is.na(find_code_(provincia, is.ifn4 = isifn4, df = procods, complain = FALSE))){
-    ##     return(provincia)
-    ## }else{
-    imp <- do.call(nfi., list(prov = imp))
-        imp <- fetchNFI(imp, ...)
+    ## is.ifn4 <- nfi.nr == 4 
+    ## if(!is.na(find_code__(imp, is.ifn4 = is.ifn4, df = procods)) && !file_exten(imp) == 'zip'){
+    ## nfi. <- paste0('nfi',nfi.nr)
+    ## imp <- do.call(nfi., list(prov = imp))
+    ##     imp <- fetchNFI(imp, ...)
         
+    ## }
+    ## if(length(imp)!=0 && file_exten(imp) == 'zip')
+    ##     imp <- fetchNFI(nfi, ...)
+
+    is.ifn4 <- nfi.nr == 4
+
+    is_zip_path <- function(x) {
+        is.character(x) &&
+            length(x) == 1L &&
+            !is.na(x) &&
+            tolower(tools::file_ext(x)) == "zip"
     }
-    if(length(imp)!=0 && file_exten(imp) == 'zip')
-        imp <- fetchNFI(nfi, ...)
-    if(is.null (imp))
+
+    code_match <- NA_character_
+    if (is.character(imp) && length(imp) == 1L) {
+        code_match <- find_code__(imp, is.ifn4 = is.ifn4, df = procods)
+    }
+
+    if (!is.na(code_match) && !is_zip_path(imp)) {
+        nfi. <- paste0("nfi", nfi.nr)
+        imp <- do.call(nfi., list(prov = imp))
+        imp <- fetchNFI(imp, ...)
+    } else if (is_zip_path(imp)) {
+        imp <- fetchNFI(imp, ...)
+    }
+
+
+  if(is.null (imp))
         return(imp)
     fwin <- function(x, dt.nm){
                                         # ife <- RODBC::odbcConnectAccess(x) 
