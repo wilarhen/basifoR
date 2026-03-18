@@ -86,13 +86,12 @@ find_code__ <- function(input_value, is.ifn4, df) {
         imp <- fetchNFI(imp, ...)
     } else if (is_zip_path(imp)) {
         imp <- fetchNFI(imp, ...)
+        nfi.nr  <- get_ifn_nr(imp)
     }
-
 
   if(is.null (imp))
         return(imp)
     fwin <- function(x, dt.nm){
-                                        # ife <- RODBC::odbcConnectAccess(x) 
         ife <-RODBC::odbcConnectAccess2007(x, rows_at_time = 1)
         on.exit(odbcClose(ife))
         ifc <- Map(function(x)
@@ -112,14 +111,9 @@ find_code__ <- function(input_value, is.ifn4, df) {
     ## is_mdb <- all(grepl('.mdb',imp))
     is_mdb <- all(grepl('\\.mdb$|\\.accdb$',imp))
     is_win <- Sys.info()['sysname']%in%'Windows'
-                                        # is_i386 <- grepl('i386',R.Version()['system'])
+
     if(is_mdb){
         if(is_win){
-                                        # if(is_win & !is_i386){
-                                        #     print('Access driver needed: change to R i386!')
-                                        #     return(NULL)
-                                        # }
-                                        # if(is_win & is_i386){
             fnim <- 'fwin'
         } else {
             fnim <- 'fmdb'
@@ -150,7 +144,8 @@ find_code__ <- function(input_value, is.ifn4, df) {
         pr. <- unique(dset$'PROVINCIA')
     dset <- convert_factors_to_numeric(dset)
     attributes(dset) <- c(attributes(dset), list(pr. = pr.))
-attr(dset, "nfi.nr") <- nfi.nr
+    attr(dset, "nfi.nr") <- nfi.nr
+    dset <- data.frame(nfi.nr = nfi.nr, dset)
     class(dset) <- append('readNFI',class(dset))
     return(dset)
 ### \code{data.frame} with numeric columns converted from factors back

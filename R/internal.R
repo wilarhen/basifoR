@@ -202,6 +202,22 @@ dendroMetrics_ <- structure(function
     out
 })
 
+get_ifn_nr <- function(x) {
+  nm <- basename(x)
+  
+  if (all(grepl("\\.DBF", nm, ignore.case = TRUE))) {
+    return(2L)
+  }
+  
+  m <- regexpr("ifn([0-9]+)", nm, ignore.case = TRUE, perl = TRUE)
+  
+  if (any(m > 0)) {
+    hit <- regmatches(nm, m)[m > 0][1]
+    return(as.integer(sub("(?i)ifn([0-9]+).*", "\\1", hit, perl = TRUE)))
+  }
+  
+  NA_integer_
+}
 ## dendroMetrics_ <- structure(function
 ## ### Summarize dendrometrics
 ## ### This function can summarize dendrometric data of the Spanish
