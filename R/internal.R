@@ -9,82 +9,152 @@ dendroMetrics_ <- structure(function
     ...
 ) {
 
-    dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
+dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
+    nfi. <- nfi
+    if (is.null(nfi.))
+        return(nfi)
 
-        nfi. <- nfi
+    if (!inherits(nfi., "metrics2vol"))
+        nfi <- metrics2Vol(nfi, ...)
 
-        if (is.null(nfi.))
-            return(nfi)
+    names(nfi) <- tolower(names(nfi))
+    frm. <- attr(nfi, "units")
 
-        if (!inherits(nfi., "metrics2vol"))
-            nfi <- metrics2Vol(nfi, ...)
-
-            nfi_nr <- attr(nfi, "nfi.nr")
-
-        names(nfi) <- tolower(names(nfi))
-        
-        frm. <- attr(nfi, "units")
-
-        if (is.null(summ.vr)) {
-            nfi <- subset(nfi, eval(parse(text = cut.dt)))
-            nfi$nfi.nr <- nfi_nr
-            attributes(nfi) <- c(attributes(nfi), list(units = frm.))
-
-            if (report)
-                write.csv(nfi, file = "report.csv", row.names = FALSE)
-
-            return(nfi)
-        }
-
-        summ.vr <- flev(nfi, summ.vr)
-        var <- getOption("units1")[getOption("units1") %in% names(nfi)]
-        to. <- names(var)
-        var. <- var[var != "n"]
-
-        nfi <- conv_units(nfi, var = var, un = to.)
-        msp <- split(nfi, nfi[summ.vr])
-        msp <- Filter("nrow", msp)
-
-        fsum <- function(dt) {
-            dt[, var.] <- dt[, var.] * dt[, "n"]
-
-            summ <- apply(dt[, var, drop = FALSE], 2, sum, na.rm = TRUE)
-
-            keep_avg <- intersect(c("d", "h", "Hd"), names(summ))
-            if (length(keep_avg))
-                summ[keep_avg] <- summ[keep_avg] / summ["n"]
-
-            if (all(c("ba", "n") %in% names(summ)))
-                summ["dg"] <- sqrt((4E4 * summ["ba"] / summ["n"]) / pi)
-
-            summ <- summ[order(names(summ))]
-            summ <- sapply(summ, function(x) round(x, 3))
-            summ <- t(as.matrix(summ))
-
-            fcs. <- names(dt)[!names(dt) %in% var]
-            fcs <- dt[1, fcs., drop = FALSE]
-
-            cbind(fcs, summ)
-        }
-
-        resm <- lapply(msp, fsum)
-        resm <- Reduce("rbind", resm)
-        resm <- data.frame(resm)
-        resm$nfi.nr <- nfi_nr
-
-        resm <- subset(resm, eval(parse(text = cut.dt)))
-        rownames(resm) <- NULL
+    if (is.null(summ.vr)) {
+        nfi <- subset(nfi, eval(parse(text = cut.dt)))
+        attributes(nfi) <- c(attributes(nfi), list(units = frm.))
 
         if (report)
-            write.csv(resm, file = "report.csv", row.names = FALSE)
+            write.csv(nfi, file = "report.csv", row.names = FALSE)
 
-        dgcm <- "dg"
-        names(dgcm) <- "cm"
-        attr. <- c(attr(nfi, "units"), dgcm)
-        attributes(resm) <- c(attributes(resm), list(units = attr.))
-
-        resm
+        return(nfi)
     }
+
+    summ.vr <- flev(nfi, summ.vr)
+    var <- getOption("units1")[getOption("units1") %in% names(nfi)]
+    to. <- names(var)
+    var. <- var[var != "n"]
+
+    nfi <- conv_units(nfi, var = var, un = to.)
+    msp <- split(nfi, nfi[summ.vr])
+    msp <- Filter("nrow", msp)
+
+    fsum <- function(dt) {
+        dt[, var.] <- dt[, var.] * dt[, "n"]
+
+        summ <- apply(dt[, var, drop = FALSE], 2, sum, na.rm = TRUE)
+
+        keep_avg <- intersect(c("d", "h", "Hd"), names(summ))
+        if (length(keep_avg))
+            summ[keep_avg] <- summ[keep_avg] / summ["n"]
+
+        if (all(c("ba", "n") %in% names(summ)))
+            summ["dg"] <- sqrt((4E4 * summ["ba"] / summ["n"]) / pi)
+
+        summ <- summ[order(names(summ))]
+        summ <- sapply(summ, function(x) round(x, 3))
+        summ <- t(as.matrix(summ))
+
+        fcs. <- names(dt)[!names(dt) %in% var]
+        fcs <- dt[1, fcs., drop = FALSE]
+
+        cbind(fcs, summ)
+    }
+
+    resm <- lapply(msp, fsum)
+    resm <- Reduce("rbind", resm)
+    resm <- data.frame(resm)
+
+    resm <- subset(resm, eval(parse(text = cut.dt)))
+    rownames(resm) <- NULL
+
+    if (report)
+        write.csv(resm, file = "report.csv", row.names = FALSE)
+
+    dgcm <- "dg"
+    names(dgcm) <- "cm"
+    attr. <- c(attr(nfi, "units"), dgcm)
+    attributes(resm) <- c(attributes(resm), list(units = attr.))
+
+    resm
+}
+    
+    ## dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
+
+    ##     nfi. <- nfi
+
+    ##     if (is.null(nfi.))
+    ##         return(nfi)
+
+    ##     if (!inherits(nfi., "metrics2vol"))
+    ##         nfi <- metrics2Vol(nfi, ...)
+
+    ##         nfi_nr <- attr(nfi, "nfi.nr")
+
+    ##     names(nfi) <- tolower(names(nfi))
+        
+    ##     frm. <- attr(nfi, "units")
+
+    ##     if (is.null(summ.vr)) {
+    ##         nfi <- subset(nfi, eval(parse(text = cut.dt)))
+    ##         nfi$nfi.nr <- nfi_nr
+    ##         attributes(nfi) <- c(attributes(nfi), list(units = frm.))
+
+    ##         if (report)
+    ##             write.csv(nfi, file = "report.csv", row.names = FALSE)
+
+    ##         return(nfi)
+    ##     }
+
+    ##     summ.vr <- flev(nfi, summ.vr)
+    ##     var <- getOption("units1")[getOption("units1") %in% names(nfi)]
+    ##     to. <- names(var)
+    ##     var. <- var[var != "n"]
+
+    ##     nfi <- conv_units(nfi, var = var, un = to.)
+    ##     msp <- split(nfi, nfi[summ.vr])
+    ##     msp <- Filter("nrow", msp)
+
+    ##     fsum <- function(dt) {
+    ##         dt[, var.] <- dt[, var.] * dt[, "n"]
+
+    ##         summ <- apply(dt[, var, drop = FALSE], 2, sum, na.rm = TRUE)
+
+    ##         keep_avg <- intersect(c("d", "h", "Hd"), names(summ))
+    ##         if (length(keep_avg))
+    ##             summ[keep_avg] <- summ[keep_avg] / summ["n"]
+
+    ##         if (all(c("ba", "n") %in% names(summ)))
+    ##             summ["dg"] <- sqrt((4E4 * summ["ba"] / summ["n"]) / pi)
+
+    ##         summ <- summ[order(names(summ))]
+    ##         summ <- sapply(summ, function(x) round(x, 3))
+    ##         summ <- t(as.matrix(summ))
+
+    ##         fcs. <- names(dt)[!names(dt) %in% var]
+    ##         fcs <- dt[1, fcs., drop = FALSE]
+
+    ##         cbind(fcs, summ)
+    ##     }
+
+    ##     resm <- lapply(msp, fsum)
+    ##     resm <- Reduce("rbind", resm)
+    ##     resm <- data.frame(resm)
+    ##     resm$nfi.nr <- nfi_nr
+
+    ##     resm <- subset(resm, eval(parse(text = cut.dt)))
+    ##     rownames(resm) <- NULL
+
+    ##     if (report)
+    ##         write.csv(resm, file = "report.csv", row.names = FALSE)
+
+    ##     dgcm <- "dg"
+    ##     names(dgcm) <- "cm"
+    ##     attr. <- c(attr(nfi, "units"), dgcm)
+    ##     attributes(resm) <- c(attributes(resm), list(units = attr.))
+
+    ##     resm
+    ## }
 
     dots0 <- list(...)
 
