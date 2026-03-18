@@ -47,24 +47,8 @@ find_code__ <- function(input_value, is.ifn4, df) {
                              ignore.case = TRUE)]}
   if(length(result) == 0)
       result <- NA
-      ## if(is.na(result) & complain){
-      ##     warning(paste0("Spanish province '", input_value, "' not found!\n"),
-      ##             call. = FALSE)
-      ##   return(invisible(NULL))}
-  ## }
-  # Return the result
   return(result)
 }
-
-    ## is.ifn4 <- nfi.nr == 4 
-    ## if(!is.na(find_code__(imp, is.ifn4 = is.ifn4, df = procods)) && !file_exten(imp) == 'zip'){
-    ## nfi. <- paste0('nfi',nfi.nr)
-    ## imp <- do.call(nfi., list(prov = imp))
-    ##     imp <- fetchNFI(imp, ...)
-        
-    ## }
-    ## if(length(imp)!=0 && file_exten(imp) == 'zip')
-    ##     imp <- fetchNFI(nfi, ...)
 
     is.ifn4 <- nfi.nr == 4
 
@@ -78,6 +62,7 @@ find_code__ <- function(input_value, is.ifn4, df) {
     code_match <- NA_character_
     if (is.character(imp) && length(imp) == 1L) {
         code_match <- find_code__(imp, is.ifn4 = is.ifn4, df = procods)
+        pr. <- find_code__(imp, FALSE, df = procods)
     }
 
     if (!is.na(code_match) && !is_zip_path(imp)) {
