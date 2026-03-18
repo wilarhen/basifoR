@@ -78,7 +78,8 @@ match_cols <- function(want, nm_all) {
     unique(out)
 }
 
-id_cols <- match_cols(c("nfi.nr", "provincia"), nm_all)
+## id_cols <- match_cols(c("nfi.nr", "provincia"), nm_all)
+id_cols <- match_cols(c("nfi.nr", "pr"), nm_all)
 
 nms_raw <- flev(nfi, levels)
 nms_raw <- nms_raw[!is.na(nms_raw)]

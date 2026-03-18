@@ -127,6 +127,13 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     attr(mmd, 'units') <- c(attr(nfi, 'units'), vun) 
     mmd <- conv_units(mmd, var = c('d','h','v'), un = c('cm','m','m3'))        
     rownames(mmd) <- NULL
+
+n <- names(mmd)
+first <- c("nfi.nr","pr", "estadillo","especie")
+i <- match(first, tolower(n))
+i <- i[!is.na(i)]
+mmd <- mmd[, c(n[i], n[-i]), drop = FALSE]
+    
     attr(mmd, "nfi.nr") <- nfi_nr
     class(mmd) <- append('metrics2vol',class(mmd))
     return(mmd)
