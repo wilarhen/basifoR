@@ -39,6 +39,7 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
         nfi <- nfiMetrics(nfi, ...)
     if(is.null(nfi.))
         return(nfi)}
+    nfi_nr <- attr(nfi, "nfi.nr")
     spec. <- names(nfi)[grepl('spec', names(nfi), ignore.case = TRUE)]
     var <- c('pr','h','d')
     needed <- c('Especie/ESPECIE', var)
@@ -127,6 +128,7 @@ metrics2Vol <- structure(function#Tree volumes in NFI data
     mmd <- conv_units(mmd, var = c('d','h','v'), un = c('cm','m','m3'))        
     rownames(mmd) <- NULL
     class(mmd) <- append('metrics2vol',class(mmd))
+    attr(mmd, "nfi.nr") <- nfi_nr
     return(mmd)
 ### \code{data.frame}. Depending on \code{keep.var}, short or expanded
 ###  data set.  Short data sets contain the volumes \code{v}

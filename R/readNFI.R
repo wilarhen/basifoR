@@ -150,7 +150,7 @@ find_code__ <- function(input_value, is.ifn4, df) {
         pr. <- unique(dset$'PROVINCIA')
     dset <- convert_factors_to_numeric(dset)
     attributes(dset) <- c(attributes(dset), list(pr. = pr.))
-attr(out, "nfi.nr") <- nfi.nr
+attr(dset, "nfi.nr") <- nfi.nr
     class(dset) <- append('readNFI',class(dset))
     return(dset)
 ### \code{data.frame} with numeric columns converted from factors back
