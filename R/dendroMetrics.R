@@ -53,7 +53,7 @@ dendroMetrics <- structure(function#Summarize dendrometrics
         nfi <- metrics2Vol(nfi, ...)
     ## }
 
-    frm. <- attr(nfi, 'units')
+    ## frm. <- attr(nfi, 'units')
     if(is.null(summ.vr)){
         nfi <- subset(nfi,
                       eval(parse(text = cut.dt)))

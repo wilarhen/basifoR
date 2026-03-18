@@ -19,12 +19,15 @@ dendroMetrics_ <- structure(function
         if (!inherits(nfi., "metrics2vol"))
             nfi <- metrics2Vol(nfi, ...)
 
+            nfi_nr <- attr(nfi, "nfi.nr")
+
         names(nfi) <- tolower(names(nfi))
         
         frm. <- attr(nfi, "units")
 
         if (is.null(summ.vr)) {
             nfi <- subset(nfi, eval(parse(text = cut.dt)))
+            nfi$nfi.nr <- nfi_nr
             attributes(nfi) <- c(attributes(nfi), list(units = frm.))
 
             if (report)
@@ -67,6 +70,7 @@ dendroMetrics_ <- structure(function
         resm <- lapply(msp, fsum)
         resm <- Reduce("rbind", resm)
         resm <- data.frame(resm)
+        resm$nfi.nr <- nfi_nr
 
         resm <- subset(resm, eval(parse(text = cut.dt)))
         rownames(resm) <- NULL

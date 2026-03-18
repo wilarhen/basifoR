@@ -82,9 +82,9 @@ nfi_nr <- attr(nfi, "nfi.nr")
                                        error = function(e) NA)), spl)
             dmt <- do.call('rbind', dmhe) 
             rownames(dmt) <- NULL}
+        attr(dmt, "nfi.nr") <- nfi_nr
 
         dmt <- conv_units(dmt)
-        attr(dmt, "nfi.nr") <- nfi_nr
 ### \code{data.frame} containing columns which match the strings in
 ### \code{levels}, plus the variables defined in \code{var}, including
 ### the province \code{pr} (\code{dimensionless}), the diameter
