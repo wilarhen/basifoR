@@ -66,11 +66,33 @@ nfi_nr <- attr(nfi, "nfi.nr")
             fdn(nfi,y), y = var.)
         if(!is.null(attr(nfi,'pr.')))
         dmt <- cbind(pr = attr(nfi,'pr.'), dmt)
-        nms <- flev(nfi, levels)
-        nm.. <- c(nms, colnames(dmt))
-        dmt <- data.frame(nfi[,nms], dmt)
-        names(dmt) <- nm..
-        
+        ## nms <- flev(nfi, levels)
+        ## nm.. <- c(nms, colnames(dmt))
+        ## dmt <- data.frame(nfi[,nms], dmt)
+        ## names(dmt) <- nm..
+
+nm_all <- names(nfi)
+
+match_cols <- function(want, nm_all) {
+    out <- nm_all[tolower(nm_all) %in% tolower(want)]
+    unique(out)
+}
+
+id_cols <- match_cols(c("nfi.nr", "provincia"), nm_all)
+
+nms_raw <- flev(nfi, levels)
+nms_raw <- nms_raw[!is.na(nms_raw)]
+nms <- match_cols(nms_raw, nm_all)
+
+keep_cols <- unique(c(id_cols, nms))
+keep_cols <- keep_cols[keep_cols %in% nm_all]
+
+if(length(keep_cols) == 0) {
+    dmt <- data.frame(dmt, check.names = FALSE)
+} else {
+    dmt <- data.frame(nfi[, keep_cols, drop = FALSE], dmt, check.names = FALSE)
+}
+
         if('Hd'%in%var){
             needed <- c('h','d','n')
             nd <- paste(needed, collapse = '?,')

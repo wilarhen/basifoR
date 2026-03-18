@@ -34,11 +34,11 @@ readNFI <- structure(function#Read SNF data from path
 
 find_code__ <- function(input_value, is.ifn4, df) {
   result <- df$codigo[
-    grepl(input_value, df$codigo) | 
-    grepl(input_value, df$provincia) | 
-    grepl(input_value, df$codigo2) |
-    grepl(input_value, df$provincia_0) |
-    grepl(input_value, df$provincia_1)
+    grepl(input_value, ignore.case = TRUE, df$codigo) | 
+    grepl(input_value, ignore.case = TRUE, df$provincia) | 
+    grepl(input_value, ignore.case = TRUE, df$codigo2) |
+    grepl(input_value, ignore.case = TRUE, df$provincia_0) |
+    grepl(input_value, ignore.case = TRUE, df$provincia_1)
     ][1L]
   
   if(is.ifn4){
@@ -130,7 +130,10 @@ find_code__ <- function(input_value, is.ifn4, df) {
     dset <- convert_factors_to_numeric(dset)
     attributes(dset) <- c(attributes(dset), list(pr. = pr.))
     attr(dset, "nfi.nr") <- nfi.nr
-    dset <- data.frame(nfi.nr = nfi.nr, dset)
+    if('provincia'%in%tolower(names(dset))){
+        dset <- data.frame(nfi.nr = nfi.nr, dset)
+    } else{
+    dset <- data.frame(nfi.nr = nfi.nr, provincia = pr., dset)}
     class(dset) <- append('readNFI',class(dset))
     return(dset)
 ### \code{data.frame} with numeric columns converted from factors back
