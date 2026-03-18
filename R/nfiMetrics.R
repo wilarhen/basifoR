@@ -42,6 +42,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
             
             if(!inherits(nfi., "readNFI"))
                 nfi <- readNFI(nfi, ...)
+nfi_nr <- attr(nfi, "nfi.nr")
                 
     fc <- function(dt, cl.){
         nt. <- paste(cl., collapse = '|')
@@ -83,6 +84,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
             rownames(dmt) <- NULL}
 
         dmt <- conv_units(dmt)
+        attr(dmt, "nfi.nr") <- nfi_nr
 ### \code{data.frame} containing columns which match the strings in
 ### \code{levels}, plus the variables defined in \code{var}, including
 ### the province \code{pr} (\code{dimensionless}), the diameter
