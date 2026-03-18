@@ -19,6 +19,8 @@ dendroMetrics_ <- structure(function
         if (!inherits(nfi., "metrics2vol"))
             nfi <- metrics2Vol(nfi, ...)
 
+        names(nfi) <- tolower(names(nfi))
+        
         frm. <- attr(nfi, "units")
 
         if (is.null(summ.vr)) {
