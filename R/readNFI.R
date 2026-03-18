@@ -132,8 +132,9 @@ find_code__ <- function(input_value, is.ifn4, df) {
     attr(dset, "nfi.nr") <- nfi.nr
     if('provincia'%in%tolower(names(dset))){
         dset <- data.frame(nfi.nr = nfi.nr, dset)
+        names(dset)[tolower(names(dset)) == "provincia"] <- "pr"
     } else{
-    dset <- data.frame(nfi.nr = nfi.nr, provincia = pr., dset)}
+    dset <- data.frame(nfi.nr = nfi.nr, pr = pr., dset)}
     class(dset) <- append('readNFI',class(dset))
     return(dset)
 ### \code{data.frame} with numeric columns converted from factors back
