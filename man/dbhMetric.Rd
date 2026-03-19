@@ -34,9 +34,15 @@ factors.}
 
 
 \examples{
-dbhMetric(300, "ba")
-dbhMetric(130, "n")
+    dbhMetric(300, "ba")
+    dbhMetric(130, "n")
 
-dsg <- concentric_design_3()
+dsg <- new_concentric_design(
+    radii_m = c(4, 8, 12),
+    min_dbh_cm = c(5, 15, 30),
+    name = "3-subplot design"
+)
+trees_per_ha(dsg, 18)
 dbhMetric(130, "n", design = dsg)
+    
 }

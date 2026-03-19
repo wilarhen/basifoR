@@ -107,7 +107,6 @@ trees_per_ha.concentric_design <- structure(function#Trees per hectare for conce
 
 }, ex = function() {
     trees_per_ha(snfi_design(), 13)
-    trees_per_ha(concentric_design_3(), 18)
 })
 
 ## =========================================================
@@ -173,6 +172,12 @@ dbhMetric <- structure(function#DBH and height metrics
     dbhMetric(300, "ba")
     dbhMetric(130, "n")
 
-    dsg <- concentric_design_3()
-    dbhMetric(130, "n", design = dsg)
+dsg <- new_concentric_design(
+    radii_m = c(4, 8, 12),
+    min_dbh_cm = c(5, 15, 30),
+    name = "3-subplot design"
+)
+trees_per_ha(dsg, 18)
+dbhMetric(130, "n", design = dsg)
+    
 })

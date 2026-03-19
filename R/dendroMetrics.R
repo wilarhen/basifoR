@@ -1,12 +1,12 @@
 dendroMetrics <- structure(function#Summarize dendrometrics
-## This function summarizes dendrometric data from the Spanish
-## National Forest Inventory (SNF). It primarily accepts a province
-## name or number, a local compressed SNF file, or a URL to a
-## compressed SNF file hosted by \code{www.miteco.gob.es}. It can
-## also process data frames previously returned by
-## \code{\link{readNFI}}, \code{\link{nfiMetrics}}, or
-## \code{\link{metrics2Vol}}. Dendrometric variables in the output
-## are transformed into stand units, see Details section.
+### This function summarizes dendrometric data from the Spanish
+### National Forest Inventory (SNF). It primarily accepts a province
+### name or number, a local compressed SNF file, or a URL to a
+### compressed SNF file hosted by \code{www.miteco.gob.es}. It can
+### also process data frames previously returned by
+### \code{\link{readNFI}}, \code{\link{nfiMetrics}}, or
+### \code{\link{metrics2Vol}}. Dendrometric variables in the output
+### are transformed into stand units, see Details section.
                           ##details<< Dendrometric variables are
                           ## summarized according to the levels of
                           ## argument \code{summ.vr}. Summary outputs
