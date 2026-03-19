@@ -108,6 +108,10 @@ if(length(keep_cols) == 0) {
         attr(dmt, "nfi.nr") <- nfi_nr
 
         dmt <- conv_units(dmt)
+
+    class(dmt) <- append('metrics2vol',class(dmt))
+    return(dmt)
+
 ### \code{data.frame} containing columns which match the strings in
 ### \code{levels}, plus the variables defined in \code{var}, including
 ### the province \code{pr} (\code{dimensionless}), the diameter

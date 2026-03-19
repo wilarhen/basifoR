@@ -1,7 +1,14 @@
 \name{dendroMetrics}
 \alias{dendroMetrics}
 \title{Summarize dendrometrics}
-
+\description{This function summarizes dendrometric data from the Spanish
+National Forest Inventory (SNF). It primarily accepts a province
+name or number, a local compressed SNF file, or a URL to a
+compressed SNF file hosted by \code{www.miteco.gob.es}. It can
+also process data frames previously returned by
+\code{\link{readNFI}}, \code{\link{nfiMetrics}}, or
+\code{\link{metrics2Vol}}. Dendrometric variables in the output
+are transformed into stand units, see Details section.}
 \usage{dendroMetrics(nfi, summ.vr = "Estadillo", 
     cut.dt = "d == d", 
     report = FALSE, mc.cores = getOption("mc.cores", 
