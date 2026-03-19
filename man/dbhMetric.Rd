@@ -1,35 +1,42 @@
 \name{dbhMetric}
 \alias{dbhMetric}
-\title{dbhMetric}
+\title{DBH and height metrics}
+\description{Format tree diameters at breast height and tree heights into common
+inventory metrics. Depending on \code{met}, the function returns
+mean diameter, basal area, trees per hectare, or height in
+decimetres.
 
+The sampling \code{design} is used only when \code{met = "n"}. For
+\code{met = "d"}, \code{"ba"}, and \code{"h"}, the result does not
+depend on \code{design}. This behavior matches the older internal
+implementation in which the SNFI \code{design} thresholds and plot radii
+were hard-coded inside a local function used only for expansion
+factors.}
 \usage{dbhMetric(dbh, met = "d", 
     design = snfi_design())}
 \arguments{
-  \item{dbh}{\code{numeric}. Either diameters at breast height
-<< (\code{mm}) or tree heights (\code{m}). Vectors are
-<< averaged. Zero values are formatted to \code{NA}.}
-  \item{met}{\code{character}. Any of four metrics: mean diameter
-<< at breast height (\code{'d'}), basal area
-<< (\code{'ba'}), number of trees (\code{'n'}), or tree
-<< height (\code{'h'}). Default \code{'d'}.}
+  \item{dbh}{\code{numeric}. Diameter at breast height in
+<< \code{mm}, or tree height in \code{m} when
+<< \code{met = "h"}. Vectors are averaged after
+<< replacing zeros with \code{NA}.}
+  \item{met}{\code{character(1)}. Metric to compute:
+<< mean diameter at breast height (\code{"d"}),
+<< basal area (\code{"ba"}), trees per hectare
+<< (\code{"n"}), or height (\code{"h"}).}
   \item{design}{design }
 }
 
 
 
-\author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (ORCID: <https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <a_cristo@pvs.uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-5354-3760>), Felipe Bravo <fbravo@pvs.uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-7348-6695>)}
+\author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (ORCID: <https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <angelcristobal.ordonez@uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-5354-3760>), Aitor Vázquez-Veloso <aitor.vazquez.veloso@uva.es> [aut] (ORCID: <https://orcid.org/0000-0003-0227-506X>), Felipe Bravo <felipe.bravo@uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-7348-6695>)}
 
 
 
 
 \examples{
+dbhMetric(300, "ba")
+dbhMetric(130, "n")
 
-## default SNFI design
-dbhMetric(300, "ba")   # basal area for 300 mm DBH
-dbhMetric(130, "n")    # trees per ha under SNFI design
-
-## custom concentric design
 dsg <- concentric_design_3()
 dbhMetric(130, "n", design = dsg)
-
 }
