@@ -58,13 +58,14 @@ find_code__ <- function(input_value, is.ifn4, df) {
             !is.na(x) &&
             tolower(tools::file_ext(x)) == "zip"
     }
-
-    code_match <- NA_character_
-    if (is.character(imp) && length(imp) == 1L) {
+    
+    ## code_match <- NA_character_
+    ## if (is.character(imp) && length(imp) == 1L) {
         code_match <- find_code__(imp, is.ifn4 = is.ifn4, df = procods)
         pr. <- find_code__(imp, FALSE, df = procods)
-    }
+    ## }
 
+    
     if (!is.na(code_match) && !is_zip_path(imp)) {
         nfi. <- paste0("nfi", nfi.nr)
         imp <- do.call(nfi., list(prov = imp))
