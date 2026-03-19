@@ -57,19 +57,6 @@ snfi_design <- structure(function#Spanish National Forest Inventory design
     snfi_design()
 })
 
-concentric_design_3 <- structure(function#Example three-subplot concentric design
-### Return an example concentric design with three subplot radii. This
-### helper mainly serves examples and tests.
-() {
-    new_concentric_design(
-        radii_m = c(4, 8, 12),
-        min_dbh_cm = c(5, 15, 30),
-        name = "3-subplot design"
-    )
-}, ex = function() {
-    concentric_design_3()
-})
-
 print.concentric_design <- structure(function#Print a concentric plot design
 ### Display the main components of a \code{"concentric_design"} object:
 ### design name, subplot radii, minimum diameters, and expansion factors.
