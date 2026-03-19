@@ -16,9 +16,9 @@ the SNF. Default is set to the forth stage of the SNF.}
 }
 
 \value{\code{data.frame} with numeric columns converted from factors back
-to numeric, while preserving the format of character columns.}
+to gnumeric, while preserving the format of character columns.}
 
-\author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (<https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <a_cristo@pvs.uva.es> [aut] (<https://orcid.org/0000-0001-5354-3760>), Felipe Bravo <fbravo@pvs.uva.es> [aut] (<https://orcid.org/0000-0001-7348-6695>)}
+\author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (ORCID: <https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <a_cristo@pvs.uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-5354-3760>), Felipe Bravo <fbravo@pvs.uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-7348-6695>)}
 
 
 
@@ -40,10 +40,10 @@ str(get_ifn4p45)
 ## Alternatively, download data from 'www.miteco.gob.es'
 ## Specify province name/number to read the data:
 
-\donttest{
-#Compute dendrometrics for Toledo (code 45) for NFI 4
-dendromet_ifn4p45 <- getNFI(provincia=45,nfi=4)
-#Display first few rows
-str(dendromet_ifn4p45)
-}
+## donttest{
+### Compute dendrometrics for Toledo (code 45) for NFI 4
+## dendromet_ifn4p45 <- getNFI(provincia=45,nfi=4)
+### Display first few rows
+## str(dendromet_ifn4p45)
+## }
 }
