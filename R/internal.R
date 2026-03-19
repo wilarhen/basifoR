@@ -1,199 +1,70 @@
-dendroMetrics_ <- structure(function
-(
-    nfi,
-    summ.vr = "Estadillo",
-    cut.dt = "d == d",
-    report = FALSE,
-    mc.cores = getOption("mc.cores", 1L),
-    .parallel = TRUE,
-    ...
-) {
+find_code__ <- function(input_value, is.ifn4, df) {
+    x <- trimws(as.character(input_value))
 
-dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
-    nfi. <- nfi
-    if (is.null(nfi.))
-        return(nfi)
-
-    if (!inherits(nfi., "metrics2vol"))
-        nfi <- metrics2Vol(nfi, ...)
-
-    names(nfi) <- tolower(names(nfi))
-    frm. <- attr(nfi, "units")
-
-    if (is.null(summ.vr)) {
-        nfi <- subset(nfi, eval(parse(text = cut.dt)))
-        attributes(nfi) <- c(attributes(nfi), list(units = frm.))
-
-        if (report)
-            write.csv(nfi, file = "report.csv", row.names = FALSE)
-
-        return(nfi)
+    norm <- function(z) {
+        z <- as.character(z)
+        z <- iconv(z, from = "", to = "ASCII//TRANSLIT")
+        tolower(trimws(z))
     }
 
-    summ.vr <- flev(nfi, summ.vr)
-    var <- getOption("units1")[getOption("units1") %in% names(nfi)]
-    to. <- names(var)
-    var. <- var[var != "n"]
+    x_norm <- norm(x)
 
-    nfi <- conv_units(nfi, var = var, un = to.)
-    msp <- split(nfi, nfi[summ.vr])
-    msp <- Filter("nrow", msp)
+    is_num <- grepl("^[0-9]+$", x_norm)
 
-    fsum <- function(dt) {
-        dt[, var.] <- dt[, var.] * dt[, "n"]
+    if (is_num) {
+        hit <- which(
+            norm(df$codigo)  == x_norm |
+            norm(df$codigo2) == x_norm
+        )[1L]
+    } else {
+        hit <- which(
+            norm(df$provincia)   == x_norm |
+            norm(df$provincia_0) == x_norm |
+            norm(df$provincia_1) == x_norm |
+            norm(df$codigo)      == x_norm |
+            norm(df$codigo2)     == x_norm
+        )[1L]
 
-        summ <- apply(dt[, var, drop = FALSE], 2, sum, na.rm = TRUE)
-
-        keep_avg <- intersect(c("d", "h", "Hd"), names(summ))
-        if (length(keep_avg))
-            summ[keep_avg] <- summ[keep_avg] / summ["n"]
-
-        if (all(c("ba", "n") %in% names(summ)))
-            summ["dg"] <- sqrt((4E4 * summ["ba"] / summ["n"]) / pi)
-
-        summ <- summ[order(names(summ))]
-        summ <- sapply(summ, function(x) round(x, 3))
-        summ <- t(as.matrix(summ))
-
-        fcs. <- names(dt)[!names(dt) %in% var]
-        fcs <- dt[1, fcs., drop = FALSE]
-
-        cbind(fcs, summ)
+        if (is.na(hit)) {
+            hit <- which(
+                grepl(x_norm, norm(df$provincia),   fixed = TRUE) |
+                grepl(x_norm, norm(df$provincia_0), fixed = TRUE) |
+                grepl(x_norm, norm(df$provincia_1), fixed = TRUE)
+            )[1L]
+        }
     }
 
-    resm <- lapply(msp, fsum)
-    resm <- Reduce("rbind", resm)
-    resm <- data.frame(resm)
+    if (is.na(hit))
+        return(NA_character_)
 
-    resm <- subset(resm, eval(parse(text = cut.dt)))
-    rownames(resm) <- NULL
+    if (is.ifn4) {
+        out <- df$provincia_1[hit]
+    } else {
+        out <- df$codigo[hit]
+    }
 
-    if (report)
-        write.csv(resm, file = "report.csv", row.names = FALSE)
-
-    dgcm <- "dg"
-    names(dgcm) <- "cm"
-    attr. <- c(attr(nfi, "units"), dgcm)
-    attributes(resm) <- c(attributes(resm), list(units = attr.))
-
-    resm
+    as.character(out)
 }
 
-    dots0 <- list(...)
+## find_code__ <- function(input_value, is.ifn4, df) {
+##   result <- df$codigo[
+##     grepl(input_value, ignore.case = TRUE, df$codigo) | 
+##     grepl(input_value, ignore.case = TRUE, df$provincia) | 
+##     grepl(input_value, ignore.case = TRUE, df$codigo2) |
+##     grepl(input_value, ignore.case = TRUE, df$provincia_0) |
+##     grepl(input_value, ignore.case = TRUE, df$provincia_1)
+##     ][1L]
+  
+##   if(is.ifn4){
+##       result <- df$provincia_1[
+##                        grepl(paste0('^',result,'$'), df$codigo,
+##                              ignore.case = TRUE)]}
+##   if(length(result) == 0)
+##       result <- NA
+##   return(result)
+## }
 
-    nfi.nr <- dots0[["nfi.nr"]]
 
-    n_inputs <- max(
-        if (is.data.frame(nfi)) 1L else length(nfi),
-        length(nfi.nr),
-        1L
-    )
-
-    recycle_arg <- function(x, n, arg) {
-        if (is.null(x))
-            return(vector("list", n))
-        if (is.data.frame(x))
-            return(rep(list(x), n))
-        if (length(x) == 1L)
-            return(rep(as.list(x), n))
-        if (length(x) != n)
-            stop("'", arg, "' must have length 1 or length ", n, ".")
-        as.list(x)
-    }
-
-    nfi_list <- recycle_arg(nfi, n_inputs, "nfi")
-    nfi.nr_list <- recycle_arg(nfi.nr, n_inputs, "nfi.nr")
-
-    jobs <- Map(function(nfi_i, nfi.nr_i) {
-        dots_i <- dots0
-        if (!is.null(nfi.nr_i))
-            dots_i[["nfi.nr"]] <- nfi.nr_i
-        list(nfi = nfi_i, dots = dots_i)
-    }, nfi_list, nfi.nr_list)
-
-    run_job <- function(job) {
-        do.call(
-            dendro_one,
-            c(
-                list(
-                    nfi = job$nfi,
-                    summ.vr = summ.vr,
-                    cut.dt = cut.dt,
-                    report = FALSE
-                ),
-                job$dots
-            )
-        )
-    }
-
-    if (length(jobs) == 1L) {
-        out <- do.call(
-            dendro_one,
-            c(
-                list(
-                    nfi = jobs[[1]]$nfi,
-                    summ.vr = summ.vr,
-                    cut.dt = cut.dt,
-                    report = report
-                ),
-                jobs[[1]]$dots
-            )
-        )
-        return(out)
-    }
-
-    mc.cores <- as.integer(mc.cores)
-    if (is.na(mc.cores) || mc.cores < 1L)
-        mc.cores <- 1L
-
-    if (!.parallel || mc.cores == 1L) {
-
-        res_list <- lapply(jobs, run_job)
-
-    } else if (.Platform$OS.type == "windows") {
-
-        cl <- parallel::makeCluster(mc.cores)
-        on.exit(parallel::stopCluster(cl), add = TRUE)
-
-        parallel::clusterExport(
-            cl = cl,
-            varlist = c("jobs", "run_job", "dendro_one", "summ.vr", "cut.dt"),
-            envir = environment()
-        )
-
-        res_list <- parallel::parLapply(cl = cl, X = jobs, fun = run_job)
-
-    } else {
-
-        res_list <- parallel::mclapply(
-            X = jobs,
-            FUN = run_job,
-            mc.cores = mc.cores
-        )
-    }
-
-    res_list <- Filter(Negate(is.null), res_list)
-
-    if (!length(res_list))
-        return(NULL)
-
-    out <- Reduce(function(a, b) {
-        if (is.null(a)) return(b)
-        if (is.null(b)) return(a)
-        rbind(a, b)
-    }, res_list)
-
-    out <- data.frame(out)
-    rownames(out) <- NULL
-
-    if (length(res_list) && !is.null(attr(res_list[[1]], "units")))
-        attr(out, "units") <- attr(res_list[[1]], "units")
-
-    if (report)
-        write.csv(out, file = "report.csv", row.names = FALSE)
-
-    out
-})
 
 get_ifn_nr <- function(x) {
   nm <- basename(x)

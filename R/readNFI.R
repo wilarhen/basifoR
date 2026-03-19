@@ -32,23 +32,23 @@ readNFI <- structure(function#Read SNF data from path
     imp <- nfi
 
 
-find_code__ <- function(input_value, is.ifn4, df) {
-  result <- df$codigo[
-    grepl(input_value, ignore.case = TRUE, df$codigo) | 
-    grepl(input_value, ignore.case = TRUE, df$provincia) | 
-    grepl(input_value, ignore.case = TRUE, df$codigo2) |
-    grepl(input_value, ignore.case = TRUE, df$provincia_0) |
-    grepl(input_value, ignore.case = TRUE, df$provincia_1)
-    ][1L]
+## find_code__ <- function(input_value, is.ifn4, df) {
+##   result <- df$codigo[
+##     grepl(input_value, ignore.case = TRUE, df$codigo) | 
+##     grepl(input_value, ignore.case = TRUE, df$provincia) | 
+##     grepl(input_value, ignore.case = TRUE, df$codigo2) |
+##     grepl(input_value, ignore.case = TRUE, df$provincia_0) |
+##     grepl(input_value, ignore.case = TRUE, df$provincia_1)
+##     ][1L]
   
-  if(is.ifn4){
-      result <- df$provincia_1[
-                       grepl(paste0('^',result,'$'), df$codigo,
-                             ignore.case = TRUE)]}
-  if(length(result) == 0)
-      result <- NA
-  return(result)
-}
+##   if(is.ifn4){
+##       result <- df$provincia_1[
+##                        grepl(paste0('^',result,'$'), df$codigo,
+##                              ignore.case = TRUE)]}
+##   if(length(result) == 0)
+##       result <- NA
+##   return(result)
+## }
 
     is.ifn4 <- nfi.nr == 4
 

@@ -193,7 +193,23 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
         list(nfi = nfi_i, dots = dots_i)
     }, nfi_list, nfi.nr_list)
 
-    run_job <- function(job) {
+    ## run_job <- function(job) {
+    ##     do.call(
+    ##         dendro_one,
+    ##         c(
+    ##             list(
+    ##                 nfi = job$nfi,
+    ##                 summ.vr = summ.vr,
+    ##                 cut.dt = cut.dt,
+    ##                 report = FALSE
+    ##             ),
+    ##             job$dots
+    ##         )
+    ##     )
+    ## }
+
+run_job <- function(job) {
+    tryCatch(
         do.call(
             dendro_one,
             c(
@@ -205,8 +221,19 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
                 ),
                 job$dots
             )
-        )
-    }
+        ),
+        error = function(e) {
+            structure(
+                list(
+                    message = conditionMessage(e),
+                    nfi = job$nfi,
+                    nfi.nr = job$dots[["nfi.nr"]]
+                ),
+                class = "dendroMetrics_error"
+            )
+        }
+    )
+}
 
     if (length(jobs) == 1L) {
         out <- do.call(
@@ -253,6 +280,23 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
             mc.cores = mc.cores
         )
     }
+
+errs <- vapply(res_list, inherits, logical(1), what = "dendroMetrics_error")
+
+if (any(errs)) {
+    msg <- vapply(res_list[errs], function(x) {
+        paste0(
+            "dendroMetrics failed for nfi = ",
+            paste(x$nfi, collapse = ", "),
+            ", nfi.nr = ",
+            paste(x$nfi.nr, collapse = ", "),
+            ": ",
+            x$message
+        )
+    }, character(1))
+
+    stop(paste(msg, collapse = "\n"), call. = FALSE)
+}
 
     res_list <- Filter(Negate(is.null), res_list)
 
