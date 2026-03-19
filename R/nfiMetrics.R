@@ -109,7 +109,7 @@ if(length(keep_cols) == 0) {
 
         dmt <- conv_units(dmt)
 
-    class(dmt) <- append('metrics2vol',class(dmt))
+    class(dmt) <- append('nfiMetrics',class(dmt))
     return(dmt)
 
 ### \code{data.frame} containing columns which match the strings in
