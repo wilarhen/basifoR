@@ -1,3 +1,434 @@
+metrics2Vol_ <- structure(function #Tree volumes in NFI data
+### This function computes volume variables from SNFI tree metrics.
+### It first tries the coefficient table
+### \code{SNFI43_all_volume_coefficients} together with the functions
+### in \code{snfi_volume_equations.r}. If a requested output cannot be
+### computed because required inputs are missing, the function reports
+### which output is not provided and falls back to the legacy
+### \code{parEqVcc} route for \code{v}.
+(
+    nfi,
+    cub.met = "freq",
+    parametro = c("VCC"),
+    keep.var = FALSE,
+    ...
+) {
+
+    nfi. <- nfi
+    if (is.null(nfi.))
+        return(nfi)
+
+    if (!inherits(nfi., "nfiMetrics"))
+        nfi <- nfiMetrics(nfi, ...)
+
+    nfi_nr <- attr(nfi, "nfi.nr")
+
+    nm0 <- names(nfi)
+    nm  <- tolower(nm0)
+
+    pick_col <- function(candidates, required = TRUE) {
+        ii <- match(tolower(candidates), nm)
+        ii <- ii[!is.na(ii)]
+        if (length(ii) == 0L) {
+            if (required)
+                return(NULL)
+            return(NULL)
+        }
+        nm0[ii[1L]]
+    }
+
+    fc <- function(dt, cl.) {
+        nt. <- paste(cl., collapse = "|")
+        nt.. <- grep(nt., names(dt), ignore.case = TRUE)
+        cl.nm <- sort(names(dt)[nt..], decreasing = TRUE)
+        cl.nm
+    }
+
+    ## col_spec      <- pick_col(c("especie", "specie", "codigo_especie", "spec"))
+    ## col_pr        <- pick_col(c("pr", "codigo_provincia"))
+    ## col_estadillo <- pick_col(c("estadillo", "fc", "f.c."))
+    ## col_d         <- pick_col(c("d"))
+    ## col_h         <- pick_col(c("h"), required = FALSE)
+    ## col_dnm       <- pick_col(c("dnm", "d.n.m.", "d_nm"), required = FALSE)
+
+    col_spec <- pick_col(c("Especie"))
+col_pr   <- pick_col(c("pr"))
+col_d    <- pick_col(c("d"))
+col_h    <- pick_col(c("h"), required = FALSE)
+col_dnm  <- pick_col(c("D.n.m.", "dnm", "d_nm", "Hd"), required = FALSE)
+
+    needed_legacy <- c("pr", "d", "h")
+    spec_legacy   <- names(nfi)[grepl("spec", names(nfi), ignore.case = TRUE) |
+                                grepl("espec", names(nfi), ignore.case = TRUE)]
+
+    var.. <- getOption("units")
+    var.. <- var..[var.. %in% names(nfi)]
+    attr_un <- attr(nfi, "units")
+    if (!is.null(attr_un))
+        names(var..)[var.. %in% attr_un] <- names(attr_un)
+
+    nfi_orig <- nfi
+
+    if (!is.null(col_d))
+        nfi <- conv_units(nfi, var = col_d, un = "mm")
+    if (!is.null(col_h))
+        nfi <- conv_units(nfi, var = col_h, un = "m")
+    if (!is.null(col_dnm))
+        nfi <- conv_units(nfi, var = col_dnm, un = "mm")
+
+    needed_for_param <- function(param, modelo = NULL) {
+        param <- toupper(param)
+
+        if (param == "VCC")
+            return(c("d", "h"))
+
+        if (param == "VSC")
+            return(c("vcc"))
+
+        if (param == "VLE") {
+            if (!is.null(modelo) && modelo == 10)
+                return(c("vcc"))
+            return(c("d"))
+        }
+
+        if (param == "IAVC") {
+            if (!is.null(modelo) && modelo == 8)
+                return(c("vcc"))
+            if (!is.null(modelo) && modelo == 13)
+                return(c("d", "dnm"))
+            if (!is.null(modelo) && modelo == 25)
+                return(c("d", "h"))
+            return(c("d"))
+        }
+
+        character(0)
+    }
+
+    has_inputs <- function(req, available) {
+        all(req %in% available)
+    }
+
+    available_std <- c()
+    if (!is.null(col_d))         available_std <- c(available_std, "d")
+    if (!is.null(col_h))         available_std <- c(available_std, "h")
+    if (!is.null(col_dnm))       available_std <- c(available_std, "dnm")
+    if (!is.null(col_pr))        available_std <- c(available_std, "pr")
+    ## if (!is.null(col_estadillo)) available_std <- c(available_std, "estadillo")
+    if (!is.null(col_spec))      available_std <- c(available_std, "especie")
+
+    parametro <- unique(toupper(parametro))
+
+    out <- nfi
+    warn_msg <- character(0)
+
+    can_use_new <- !is.null(col_pr) &&
+                   ## !is.null(col_estadillo) &&
+                   !is.null(col_spec) &&
+                   exists("SNFI43_all_volume_coefficients", inherits = TRUE)
+
+    if (can_use_new) {
+
+        coef_tab <- SNFI43_all_volume_coefficients
+        names(coef_tab) <- tolower(names(coef_tab))
+
+        coef_tab$parametro <- toupper(coef_tab$parametro)
+
+        get_fun_for_param <- function(param) {
+            switch(toupper(param),
+                   "VCC"  = get0("get_snfi_vcc",  mode = "function", inherits = TRUE),
+                   "VSC"  = get0("get_snfi_vsc",  mode = "function", inherits = TRUE),
+                   "IAVC" = get0("get_snfi_iavc", mode = "function", inherits = TRUE),
+                   "VLE"  = get0("get_snfi_vle",  mode = "function", inherits = TRUE),
+                   NULL)
+        }
+
+        ## match_coef_rows <- function(pr, estadillo, especie) {
+
+        ##     x <- coef_tab[
+        ##         coef_tab$nfi.nr == nfi_nr &
+        ##         coef_tab$codigo_provincia == pr &
+        ##         coef_tab$f.c. == estadillo, #
+        ##         ,
+        ##         drop = FALSE
+        ##     ]
+
+match_coef_rows <- function(pr, especie) {
+    x <- coef_tab[
+        coef_tab$nfi.nr == nfi_nr &
+        coef_tab$pr == pr &
+        coef_tab$especie == especie,
+        ,
+        drop = FALSE
+    ]
+        
+            if (nrow(x) == 0L)
+                return(x)
+
+            ## sp_num <- suppressWarnings(as.numeric(as.character(especie)))
+            ## if (!is.na(sp_num)) {
+            ##     y <- x[x$codigo_especie == sp_num, , drop = FALSE]
+            ##     if (nrow(y) > 0L)
+            ##         return(y)
+            ## }
+
+            y <- x[tolower(x$especie) == tolower(as.character(especie)), , drop = FALSE]
+            if (nrow(y) > 0L)
+                return(y)
+
+            x[0, , drop = FALSE]
+        }
+
+        for (param in parametro) {
+
+            new_col <- tolower(param)
+            out[[new_col]] <- NA_real_
+
+            for (i in seq_len(nrow(out))) {
+
+                pars_i <- match_coef_rows(
+                    pr        = out[[col_pr]][i],
+                    ## estadillo = out[[col_estadillo]][i],
+                    especie   = out[[col_spec]][i]
+                )
+
+                if (nrow(pars_i) == 0L)
+                    next
+
+                pars_p <- pars_i[pars_i$parametro == param, , drop = FALSE]
+                if (nrow(pars_p) == 0L)
+                    next
+
+                pars_p <- pars_p[1L, , drop = FALSE]
+                modelo <- as.numeric(pars_p$modelo[1])
+
+                req <- needed_for_param(param, modelo = modelo)
+                req_avail <- req
+                if ("vcc" %in% req_avail && !("vcc" %in% names(out)))
+                    req_avail <- req_avail
+
+                basic_ok <- has_inputs(setdiff(req_avail, "vcc"), available_std)
+
+                if (!basic_ok) {
+                    miss <- setdiff(setdiff(req, "vcc"), available_std)
+                    warn_msg <- c(
+                        warn_msg,
+                        paste0(param,
+                               " not provided by SNFI43 coefficients for some rows: missing ",
+                               paste(miss, collapse = ", "),
+                               ". Falling back to legacy method when possible.")
+                    )
+                    next
+                }
+
+                fun <- get_fun_for_param(param)
+                if (is.null(fun)) {
+                    warn_msg <- c(
+                        warn_msg,
+                        paste0(param,
+                               " not provided: equation function not found.")
+                    )
+                    next
+                }
+
+                dbh_mm <- if (!is.null(col_d))   as.numeric(out[[col_d]][i])   else NULL
+                h_m    <- if (!is.null(col_h))   as.numeric(out[[col_h]][i])   else NULL
+                dnm_mm <- if (!is.null(col_dnm)) as.numeric(out[[col_dnm]][i]) else NULL
+                vcc_dm3 <- if ("vcc" %in% names(out)) as.numeric(out[["vcc"]][i]) * 1000 else NULL
+
+                val <- tryCatch(
+                    {
+                        if (param == "VCC") {
+                            fun(dbh_mm = dbh_mm, h_m = h_m, pars = pars_p)
+                        } else if (param == "VSC") {
+                            if (is.null(vcc_dm3) || is.na(vcc_dm3)) {
+                                warn_msg <- c(
+                                    warn_msg,
+                                    "VSC not provided for some rows: missing vcc. Falling back to legacy method when possible."
+                                )
+                                NA_real_
+                            } else {
+                                fun(vcc = vcc_dm3, pars = pars_p)
+                            }
+                        } else if (param == "IAVC") {
+                            if (modelo == 8 && (is.null(vcc_dm3) || is.na(vcc_dm3))) {
+                                warn_msg <- c(
+                                    warn_msg,
+                                    "IAVC not provided for some rows: model 8 requires vcc."
+                                )
+                                NA_real_
+                            } else {
+                                fun(dbh_mm = dbh_mm, dnm_mm = dnm_mm, h_t = h_m,
+                                    vcc = vcc_dm3, pars = pars_p)
+                            }
+                        } else if (param == "VLE") {
+                            if (modelo == 10 && (is.null(vcc_dm3) || is.na(vcc_dm3))) {
+                                warn_msg <- c(
+                                    warn_msg,
+                                    "VLE not provided for some rows: model 10 requires vcc."
+                                )
+                                NA_real_
+                            } else {
+                                fun(dbh_mm = dbh_mm, vcc = vcc_dm3, pars = pars_p)
+                            }
+                        } else {
+                            NA_real_
+                        }
+                    },
+                    error = function(e) NA_real_
+                )
+
+                out[[new_col]][i] <- as.numeric(val) / 1000
+            }
+        }
+    } else {
+        warn_msg <- c(
+            warn_msg,
+            "SNFI43 coefficients not used: missing one or more matching variables among pr, estadillo and especie, or coefficient table not available."
+        )
+    }
+
+    need_legacy_v <- FALSE
+
+    if ("VCC" %in% parametro) {
+        if (!("vcc" %in% names(out)) || all(is.na(out$vcc)))
+            need_legacy_v <- TRUE
+    }
+
+    if ("v" %in% tolower(parametro))
+        need_legacy_v <- TRUE
+
+    if (need_legacy_v || length(parametro) == 0L) {
+
+        if (!all(length(spec_legacy) != 0 & needed_legacy %in% tolower(names(nfi_orig)))) {
+            warn_msg <- c(
+                warn_msg,
+                "v not provided by legacy method: missing species, pr, d and/or h."
+            )
+        } else {
+
+            nfi_leg <- nfi_orig
+            nfi_leg <- conv_units(nfi_leg, var = c("d", "h"), un = c("mm", "dm"))
+
+            mds <- c(
+                "1"  = "v ~ par1 + par2 * (d^2) * h",
+                "11" = "v ~ par1 * (d^par2) * (h^par3)"
+            )
+
+            fmdV <- function(mdb2, ntm = c("pr", "spec")) {
+                merge(mdb2, parEqVcc,
+                      by.x = fc(mdb2, ntm),
+                      by.y = fc(parEqVcc, ntm),
+                      all.x = TRUE)
+            }
+
+            feV <- function(vt, md) {
+                fvarin <- function(fun, ind = TRUE) {
+                    fun <- formula(fun)
+                    allv <- all.vars(fun, functions = FALSE)
+                    yvar <- all.vars(update(fun, . ~ 1), functions = FALSE)
+                    inds <- allv[!allv %in% yvar]
+                    if (!ind)
+                        inds <- yvar
+                    inds
+                }
+                fev <- function(fun, md) {
+                    e <- list2env(as.list(md))
+                    eval(parse(text = fun), e)
+                }
+                ind <- fvarin(md)
+                dep <- fvarin(md, FALSE)
+                sbs <- paste(dep, "~", sep = "|")
+                md. <- gsub(sbs, "", md)
+                md. <- gsub(" ", "", md.)
+                vt. <- vt[, ind, drop = FALSE]
+                vl <- apply(vt., 1, function(x) fev(md., x))
+                vl <- cbind(vt, vl)
+                names(vl) <- c(names(vt), dep)
+                vl
+            }
+
+            vt <- fmdV(nfi_leg)
+            spm <- split(vt, vt[, "Modelo"])
+            nms. <- names(spm)
+            mds. <- mds[nms.]
+            mmod <- Map(function(x, y) feV(x, y), x = spm, y = mds.)
+            mmd <- do.call("rbind", mmod)
+
+            if (nrow(mmd) > 0L) {
+                ffreq <- function(df) {
+                    tm <- data.frame(table(df$fc))
+                    tm <- subset(tm, get("Freq") %in% max(get("Freq")))
+                    as.character(tm$Var1)[1]
+                }
+
+                cub.met.use <- cub.met
+                if (cub.met.use %in% "freq")
+                    cub.met.use <- ffreq(mmd)
+
+                mmd <- subset(mmd, fc %in% as.factor(cub.met.use))
+
+                vv <- mmd[, c(intersect(names(out), names(mmd)), "v"), drop = FALSE]
+                vv <- conv_units(vv, var = "v", un = "m3")
+
+                idx <- match(
+                    apply(out[, intersect(c(col_pr, col_d), names(out)), drop = FALSE], 1, paste, collapse = "_"),
+                    apply(vv[, intersect(c(col_pr, col_d), names(vv)), drop = FALSE], 1, paste, collapse = "_")
+                )
+
+                out$v <- NA_real_
+                ok <- !is.na(idx)
+                out$v[ok] <- vv$v[idx[ok]]
+
+                if ("VCC" %in% parametro) {
+                    if (!("vcc" %in% names(out)))
+                        out$vcc <- out$v
+                    else
+                        out$vcc[is.na(out$vcc)] <- out$v[is.na(out$vcc)]
+                }
+            }
+        }
+    }
+
+    if (!keep.var) {
+        drop_cols <- intersect(
+            c("modelo", "par1", "par2", "par3", "fc", "parametro",
+              "codigo_provincia", "nombre_provincia", "codigo_especie",
+              "f.c.", "a", "b", "c", "d", "p", "q", "r", "r2", "par_esp"),
+            names(out)
+        )
+        if (length(drop_cols))
+            out <- out[, !names(out) %in% drop_cols, drop = FALSE]
+    }
+
+    vun <- getOption("units")[getOption("units") == "v"]
+    if (length(vun) == 0L)
+        vun <- "m3"
+
+    new_vols <- intersect(c("v", "vcc", "vsc", "iavc", "vle"), names(out))
+    if (length(new_vols)) {
+        un_new <- setNames(rep("m3", length(new_vols)), new_vols)
+        attr(out, "units") <- c(attr(nfi_orig, "units"), un_new)
+    } else {
+        attr(out, "units") <- attr(nfi_orig, "units")
+    }
+
+    rownames(out) <- NULL
+
+    n <- names(out)
+    first <- c("nfi.nr", "pr", "estadillo", "especie")
+    i <- match(first, tolower(n))
+    i <- i[!is.na(i)]
+    out <- out[, c(n[i], n[-i]), drop = FALSE]
+
+    attr(out, "nfi.nr") <- nfi_nr
+    class(out) <- append("metrics2vol", class(out))
+
+    if (length(warn_msg))
+        warning(paste(unique(warn_msg), collapse = "\n"), call. = FALSE)
+
+    out
+})
+
 find_code__ <- function(input_value, is.ifn4, df) {
     x <- trimws(as.character(input_value))
 
