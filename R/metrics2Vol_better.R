@@ -172,7 +172,8 @@ if (is.null(nfi_nr) || length(nfi_nr) != 1L || is.na(nfi_nr))
              paste(bad_param, collapse = ", "),
              call. = FALSE)
 
-    out <- nfi
+    out <- nfi_orig
+    ## out <- nfi
     keep_param <- unique(c(if (keep.legacy) "V", parametro))
     requested_outputs <- unique(vapply(
         keep_param,
@@ -461,14 +462,20 @@ if (need_legacy && can_compute_legacy) {
         param_order <- intersect(param_order, setdiff(names(method_registry), "V"))
 
         for (i in seq_len(nrow(out))) {
-            ctx <- list(
-                pr = nfi_orig[[col_pr]][i],
-                especie = nfi_orig[[col_spec]][i],
-                d_mm = if (!is.null(col_d)) suppressWarnings(as.numeric(out[[col_d]][i])) else NULL,
-                h_m = if (!is.null(col_h)) suppressWarnings(as.numeric(out[[col_h]][i])) else NULL,
-                dnm_mm = if (!is.null(col_dnm)) suppressWarnings(as.numeric(out[[col_dnm]][i])) else NULL
-            )
-
+            ## ctx <- list(
+            ##     pr = nfi_orig[[col_pr]][i],
+            ##     especie = nfi_orig[[col_spec]][i],
+            ##     d_mm = if (!is.null(col_d)) suppressWarnings(as.numeric(out[[col_d]][i])) else NULL,
+            ##     h_m = if (!is.null(col_h)) suppressWarnings(as.numeric(out[[col_h]][i])) else NULL,
+            ##     dnm_mm = if (!is.null(col_dnm)) suppressWarnings(as.numeric(out[[col_dnm]][i])) else NULL
+            ## )
+ctx <- list(
+    pr = nfi_orig[[col_pr]][i],
+    especie = nfi_orig[[col_spec]][i],
+    d_mm = if (!is.null(col_d)) suppressWarnings(as.numeric(nfi[[col_d]][i])) else NULL,
+    h_m = if (!is.null(col_h)) suppressWarnings(as.numeric(nfi[[col_h]][i])) else NULL,
+    dnm_mm = if (!is.null(col_dnm)) suppressWarnings(as.numeric(nfi[[col_dnm]][i])) else NULL
+)
             resolved <- list(
                 legacy_v_m3 = legacy_v_m3[i],
                 vcc_m3 = NA_real_
@@ -503,17 +510,52 @@ if (need_legacy && can_compute_legacy) {
             out <- out[, !names(out) %in% drop_cols, drop = FALSE]
     }
 
-    keep_out <- unique(vapply(keep_param, function(x) method_registry[[x]]$output, character(1)))
-    vol_cols_all <- unique(vapply(method_registry, function(x) x$output, character(1)))
+##     keep_out <- unique(vapply(keep_param, function(x) method_registry[[x]]$output, character(1)))
+##     vol_cols_all <- unique(vapply(method_registry, function(x) x$output, character(1)))
+##     drop_vol <- intersect(tolower(names(out)), tolower(vol_cols_all))
+##     drop_vol <- setdiff(drop_vol, tolower(keep_out))
+##     if (length(drop_vol))
+##         out <- out[, !tolower(names(out)) %in% drop_vol, drop = FALSE]
+
+##     units_orig <- attr(nfi_orig, "units")
+##     out_cols <- intersect(keep_out, names(out))
+##     new_units <- setNames(rep("m3", length(out_cols)), out_cols)
+##     attr(out, "units") <- c(units_orig, new_units)
+
+##     rownames(out) <- NULL
+##     n <- names(out)
+##     first <- c("nfi.nr", "pr", "estadillo", "especie")
+##     i <- match(first, tolower(n))
+##     i <- i[!is.na(i)]
+##     out <- out[, c(n[i], n[-i]), drop = FALSE]
+
+    
+##     attr(out, "nfi.nr") <- nfi_nr
+##     class(out) <- append("metrics2vol", class(out))
+
+##     if (length(warn_msg))
+##         warning(paste(unique(warn_msg), collapse = "\n"), call. = FALSE)
+
+##     out
+## })
+
+        keep_out <- unique(vapply(
+        keep_param,
+        function(x) method_registry[[x]]$output %||% tolower(x),
+        character(1)
+    ))
+
+    vol_cols_all <- unique(vapply(
+        method_registry,
+        function(x) x$output %||% NA_character_,
+        character(1)
+    ))
+    vol_cols_all <- vol_cols_all[!is.na(vol_cols_all)]
+
     drop_vol <- intersect(tolower(names(out)), tolower(vol_cols_all))
     drop_vol <- setdiff(drop_vol, tolower(keep_out))
     if (length(drop_vol))
         out <- out[, !tolower(names(out)) %in% drop_vol, drop = FALSE]
-
-    units_orig <- attr(nfi_orig, "units")
-    out_cols <- intersect(keep_out, names(out))
-    new_units <- setNames(rep("m3", length(out_cols)), out_cols)
-    attr(out, "units") <- c(units_orig, new_units)
 
     rownames(out) <- NULL
     n <- names(out)
@@ -522,6 +564,76 @@ if (need_legacy && can_compute_legacy) {
     i <- i[!is.na(i)]
     out <- out[, c(n[i], n[-i]), drop = FALSE]
 
+    ## rebuild units from surviving nfiMetrics columns + returned volume outputs
+    units_orig <- attr(nfi_orig, "units")
+    if (is.null(units_orig))
+        units_orig <- setNames(character(0), character(0))
+
+    ## nfiMetrics stores units as: values = variable names, names = units
+    ## convert to the more convenient form: names = variable names, values = units
+    if (length(units_orig)) {
+        units_keep <- setNames(names(units_orig), as.character(units_orig))
+        units_keep <- units_keep[names(units_keep) %in% names(out)]
+    } else {
+        units_keep <- setNames(character(0), character(0))
+    }
+
+    ## add units for returned computed outputs
+    vol_units <- vapply(
+        keep_out,
+        function(out_nm) {
+            hit <- which(vapply(
+                method_registry,
+                function(z) identical(z$output %||% NA_character_, out_nm),
+                logical(1)
+            ))[1L]
+
+            if (is.na(hit))
+                return("m3")
+
+            method_registry[[hit]]$unit %||% "m3"
+        },
+        character(1)
+    )
+    names(vol_units) <- keep_out
+
+    ## computed outputs override any same-named original entry
+    units_out <- c(units_keep, vol_units)
+    units_out <- units_out[!duplicated(names(units_out), fromLast = TRUE)]
+
+    ## keep only units for columns that are present, in output order
+    units_out <- units_out[intersect(names(out), names(units_out))]
+
+    attr(out, "units") <- units_out
+    
+    ## ## rebuild units from original nfiMetrics units + returned volume outputs
+    ## units_orig <- attr(nfi_orig, "units")
+    ## if (is.null(units_orig))
+    ##     units_orig <- setNames(character(0), character(0))
+
+    ## vol_units <- vapply(
+    ##     keep_out,
+    ##     function(out_nm) {
+    ##         hit <- which(vapply(
+    ##             method_registry,
+    ##             function(z) identical(z$output %||% NA_character_, out_nm),
+    ##             logical(1)
+    ##         ))[1L]
+
+    ##         if (is.na(hit))
+    ##             return("m3")
+
+    ##         method_registry[[hit]]$unit %||% "m3"
+    ##     },
+    ##     character(1)
+    ## )
+    ## names(vol_units) <- keep_out
+
+    ## units_out <- c(units_orig, vol_units)
+    ## units_out <- units_out[match(names(out), names(units_out))]
+    ## names(units_out) <- names(out)
+
+    ## attr(out, "units") <- units_out
     attr(out, "nfi.nr") <- nfi_nr
     class(out) <- append("metrics2vol", class(out))
 
