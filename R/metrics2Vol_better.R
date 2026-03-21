@@ -219,12 +219,6 @@ compute_legacy_v <- function(nfi_input, cub.met = "freq", nfi.nr = NULL) {
         any(grepl("spec|espec", names(nfi_orig), ignore.case = TRUE))
 
     need_legacy <- keep.legacy || any(parametro %in% c("V", "VCC", "VSC", "IAVC", "VLE"))
-    ## legacy_v_m3 <- rep(NA_real_, nrow(out))
-    ## if (need_legacy && can_compute_legacy) {
-    ##     legacy_v_m3 <- compute_legacy_v(nfi_orig, cub.met = cub.met)
-    ## } else if (need_legacy) {
-    ##     warn_msg <- c(warn_msg, "Legacy method not available: missing species, pr, d and/or h.")
-    ## }
 
 legacy_v_m3 <- rep(NA_real_, nrow(out))
 if (need_legacy && can_compute_legacy) {
@@ -240,18 +234,11 @@ if (need_legacy && can_compute_legacy) {
     if (keep.legacy || "V" %in% parametro)
         out[[method_registry[["V"]]$output]] <- legacy_v_m3
 
-    ## can_use_new <- !is.null(col_pr) &&
-    ##     !is.null(col_spec) &&
-    ##     exists("SNFI43_all_volume_coefficients", inherits = TRUE)
-
 can_use_new <- !is.null(col_pr) && !is.null(col_spec)
     
     if (can_use_new) {
-        ## coef_tab <- SNFI43_all_volume_coefficients
-        ## coef_names <- names(coef_tab)
-        ## coef_names_lc <- tolower(coef_names)
-coef_tab <- if (exists("SNFI43_all_volume_coefficients", inherits = TRUE)) {
-    SNFI43_all_volume_coefficients
+        coef_tab <- if (exists("SNFI43_all_volume_coefficients", inherits = TRUE)) {
+                        SNFI43_all_volume_coefficients
 } else {
     NULL
 }
@@ -281,10 +268,6 @@ coef_names_lc <- tolower(coef_names)
     if (is.null(coef_tab) || is.null(coef_col_nfi) || is.null(coef_col_pr))
         return(data.frame())
         
-        ## match_coef_rows <- function(pr, especie, param = NULL, cub.met = "freq") {
-        ##     if (is.null(coef_col_nfi) || is.null(coef_col_pr))
-        ##         return(coef_tab[0, , drop = FALSE])
-
             x <- coef_tab[
                 coef_tab[[coef_col_nfi]] == nfi_nr &
                 coef_tab[[coef_col_pr]] == suppressWarnings(as.numeric(as.character(pr))),
@@ -382,13 +365,6 @@ get_method_pars <- function(param, ctx, resolved) {
 }
         
 
-        ## get_method_fun <- function(def) {
-        ##     fn <- def$fun_name
-        ##     if (is.null(fn))
-        ##         return(NULL)
-        ##     get0(fn, mode = "function", inherits = TRUE)
-        ## }
-
 get_method_fun <- function(def) {
     if (is.function(def$fun))
         return(def$fun)
@@ -400,20 +376,6 @@ get_method_fun <- function(def) {
     get0(fn, mode = "function", inherits = TRUE)
 }
         
-        ## eval_method <- function(param, ctx, resolved) {
-        ##     def <- method_registry[[param]]
-        ##     fun <- get_method_fun(def)
-        ##     if (is.null(fun))
-        ##         return(def$fallback(ctx, NULL, resolved))
-
-        ##     pars <- match_coef_rows(
-        ##         pr = ctx$pr,
-        ##         especie = ctx$especie,
-        ##         param = param,
-        ##         cub.met = cub.met
-        ##     )
-        ##     if (!nrow(pars))
-        ##         return(def$fallback(ctx, NULL, resolved))
 
 eval_method <- function(param, ctx, resolved) {
     def <- method_registry[[param]]
@@ -437,12 +399,6 @@ eval_method <- function(param, ctx, resolved) {
                 do.call(fun, args),
                 error = function(e) NA_real_
             )
-        ##     val <- suppressWarnings(as.numeric(val)[1L])
-        ##     if (!length(val) || is.na(val))
-        ##         return(def$fallback(ctx, pars, resolved))
-
-        ##     val / 1000
-        ## }
 
             val <- suppressWarnings(as.numeric(val)[1L])
             if (!length(val) || is.na(val))
@@ -456,13 +412,6 @@ eval_method <- function(param, ctx, resolved) {
         param_order <- intersect(param_order, setdiff(names(method_registry), "V"))
 
         for (i in seq_len(nrow(out))) {
-            ## ctx <- list(
-            ##     pr = nfi_orig[[col_pr]][i],
-            ##     especie = nfi_orig[[col_spec]][i],
-            ##     d_mm = if (!is.null(col_d)) suppressWarnings(as.numeric(out[[col_d]][i])) else NULL,
-            ##     h_m = if (!is.null(col_h)) suppressWarnings(as.numeric(out[[col_h]][i])) else NULL,
-            ##     dnm_mm = if (!is.null(col_dnm)) suppressWarnings(as.numeric(out[[col_dnm]][i])) else NULL
-            ## )
 ctx <- list(
     pr = nfi_orig[[col_pr]][i],
     especie = nfi_orig[[col_spec]][i],
