@@ -318,7 +318,17 @@ pars_cache <- new.env(parent = emptyenv())
     ##     }
 
 match_coef_rows <- function(pr, especie, param = NULL, cub.met = "freq") {
-    key <- paste(nfi_nr, pr, especie, param %||% "", cub.met, sep = "\r")
+    ## key <- paste(nfi_nr, pr, especie, param %||% "", cub.met, sep = "\r")
+
+key <- paste(
+    num1(nfi_nr),
+    num1(pr),
+    num1(especie),
+    toupper(param %||% ""),
+    as.character(cub.met),
+    sep = "\r"
+)
+
     hit <- get0(key, envir = pars_cache, inherits = FALSE, ifnotfound = NULL)
     if (!is.null(hit))
         return(hit)
