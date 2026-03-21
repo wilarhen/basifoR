@@ -40,7 +40,7 @@ get_snfi_vcc <- function # SNFI merchantable volume over bark
     r <- as.numeric(pars$r)
     vcc <- p * dbh_mm^q * h_m^r
   } else {
-    print("Model not recognized for VCC.")
+    ## print("Model not recognized for VCC.")
     vcc <- NA_real_
   }
 
@@ -74,7 +74,7 @@ get_snfi_vsc <- function # SNFI merchantable volume under bark
     c <- as.numeric(pars$c)
     vsc <- a + b*vcc + c*vcc^2
   } else {
-    print("Model not recognized for VSC.")
+    ## print("Model not recognized for VSC.")
     vsc <- NA_real_
   }
 
@@ -212,7 +212,7 @@ get_snfi_iavc <- function # SNFI annual increment of volume over bark
     r <- as.numeric(pars$r)
     iavc <- p*dbh_mm^q*h_t^r
   } else {
-    print("Model not recognized for IAVC.")
+    ## print("Model not recognized for IAVC.")
     iavc <- NA_real_
   }
 
@@ -265,7 +265,7 @@ get_snfi_vle <- function # SNFI coarse woody volume
     q <- as.numeric(pars$q)
     vle <- p*dbh_mm^q
   } else {
-    print("Model not recognized for VLE.")
+    ## print("Model not recognized for VLE.")
     vle <- NA_real_
   }
 
