@@ -28,88 +28,162 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                               ##ignored. Default
                               ##\code{c('esta','espe')} matches both
                               ##the sample plot \code{'Estadillos'}
-                              ##and tree species \code{'Especie'}.,
-        ... ##<< Additional arguments in \code{\link{readNFI}}.
+                              ##and tree species \code{'Especie'}. ,
+    ... ##<< Additional arguments in \code{\link{readNFI}}.
 
 ) {
-        ## if(is.null(nfi)|is.character(nfi)|is.numeric(nfi)){
-            nfi. <- nfi
-        ## ## nfi <- readNFI(nfi, ...)
-        ## nfi <- getNFI(nfi, ...)
-        if(is.null(nfi.))
-            return(nfi)
-            ## }
-            
-            if(!inherits(nfi., "readNFI"))
-                nfi <- readNFI(nfi, ...)
-nfi_nr <- attr(nfi, "nfi.nr")
-                
+    nfi. <- nfi
+    if(is.null(nfi.))
+        return(nfi)
+
+    if(!inherits(nfi., "readNFI"))
+        nfi <- readNFI(nfi, ...)
+
+    nfi_nr <- attr(nfi, "nfi.nr")
+
     fc <- function(dt, cl.){
         nt. <- paste(cl., collapse = '|')
         nt.. <- grep(nt., names(dt),
                      ignore.case = TRUE)
         cl.nm <- sort(names(dt)[nt..],
                       decreasing = TRUE)
-        return(cl.nm)}
+        return(cl.nm)
+    }
 
-        var. <- var[!var%in%'Hd']
+    var. <- var[!var %in% 'Hd']
+
+    diam_cols <- character(0)
+    ht_cols <- character(0)
+
+    if(any(var. %in% c('d', 'n', 'ba')))
+        diam_cols <- fc(nfi, c('Dn', 'Diamet'))
+
+    if(any(var. %in% 'h'))
+        ht_cols <- fc(nfi, c('altura', 'Ht'))
+
+    get_numeric_matrix <- function(dt, cols) {
+        if(length(cols) == 0L)
+            return(NULL)
+
+        x <- dt[, cols, drop = FALSE]
+        x <- lapply(x, function(z) as.numeric(as.character(z)))
+        x <- as.data.frame(x, check.names = FALSE,
+                           stringsAsFactors = FALSE)
+        as.matrix(x)
+    }
+
+    diam_mm <- NULL
+    diam_cm <- NULL
+    trees_ha <- NULL
+
+    if(length(diam_cols) > 0L) {
+        diam_mat <- get_numeric_matrix(nfi, diam_cols)
+        diam_mat[diam_mat == 0] <- NA_real_
+
+        if(ncol(diam_mat) == 1L) {
+            diam_mm <- diam_mat[, 1L]
+        } else {
+            nn <- rowSums(!is.na(diam_mat))
+            diam_mm <- rowMeans(diam_mat, na.rm = TRUE)
+            diam_mm[nn == 0L] <- NA_real_
+        }
+
+        if(any(var. %in% c('ba', 'n')))
+            diam_cm <- conv_unit(diam_mm, from = 'mm', to = 'cm')
+
+        if(any(var. %in% 'n')) {
+            design <- snfi_design()
+            trees_ha <- rep(NA_real_, length(diam_cm))
+            ok <- !is.na(diam_cm) & diam_cm >= design$min_dbh_cm[1]
+            if(any(ok)) {
+                idx <- findInterval(diam_cm[ok], design$min_dbh_cm)
+                trees_ha[ok] <- design$sf[idx]
+            }
+        }
+    }
+
     fdn <- function(dbh, var){
-        if(var%in%c('d','n','ba'))
-            dm <- apply(dbh[,fc(dbh,c('Dn','Diamet'))],1,
-                        function(x)dbhMetric(x,var))
-        if(var%in%'h'){
-            ht <- fc(dbh,c('altura','Ht'))
-            dm <- as.numeric(as.character(dbh[,ht]))}
-        return(dm)}
-    
-        dmt <- mapply(function(y)
-            fdn(nfi,y), y = var.)
-        if(!is.null(attr(nfi,'pr.')))
-        dmt <- cbind(pr = attr(nfi,'pr.'), dmt)
-        ## nms <- flev(nfi, levels)
-        ## nm.. <- c(nms, colnames(dmt))
-        ## dmt <- data.frame(nfi[,nms], dmt)
-        ## names(dmt) <- nm..
+        if(var %in% 'd') {
+            if(length(diam_cols) > 0L)
+                return(diam_mm)
+            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+                         function(x) dbhMetric(x, var)))
+        }
 
-nm_all <- names(nfi)
+        if(var %in% 'ba') {
+            if(length(diam_cols) > 0L)
+                return(pi * diam_cm^2 * (4 * 1E4)^-1)
+            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+                         function(x) dbhMetric(x, var)))
+        }
 
-match_cols <- function(want, nm_all) {
-    out <- nm_all[tolower(nm_all) %in% tolower(want)]
-    unique(out)
-}
+        if(var %in% 'n') {
+            if(length(diam_cols) > 0L)
+                return(trees_ha)
+            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+                         function(x) dbhMetric(x, var)))
+        }
 
-## id_cols <- match_cols(c("nfi.nr", "provincia"), nm_all)
-id_cols <- match_cols(c("nfi.nr", "pr"), nm_all)
+        if(var %in% 'h') {
+            ht <- if(length(ht_cols) > 0L) ht_cols else fc(dbh, c('altura', 'Ht'))
+            return(as.numeric(as.character(dbh[, ht])))
+        }
+    }
 
-nms_raw <- flev(nfi, levels)
-nms_raw <- nms_raw[!is.na(nms_raw)]
-nms <- match_cols(nms_raw, nm_all)
+    metric_list <- vector('list', length(var.))
+    if(length(var.) > 0L) {
+        for(i in seq_along(var.))
+            metric_list[[i]] <- fdn(nfi, var.[i])
+    }
 
-keep_cols <- unique(c(id_cols, nms))
-keep_cols <- keep_cols[keep_cols %in% nm_all]
+    dmt <- data.frame(metric_list, check.names = FALSE,
+                      stringsAsFactors = FALSE)
+    if(length(var.) > 0L)
+        names(dmt) <- var.
 
-if(length(keep_cols) == 0) {
-    dmt <- data.frame(dmt, check.names = FALSE)
-} else {
-    dmt <- data.frame(nfi[, keep_cols, drop = FALSE], dmt, check.names = FALSE)
-}
+    if(!is.null(attr(nfi, 'pr.')))
+        dmt <- cbind(pr = attr(nfi, 'pr.'), dmt)
 
-        if('Hd'%in%var){
-            needed <- c('h','d','n')
-            nd <- paste(needed, collapse = '?,')
-            if(!all(needed%in%var))
-                stop(paste0('Hd: missing variables: var = c(',nd,'?, ...)'))
-            spl <- split(dmt, dmt[,nms], drop = TRUE)
-            dmhe <- Map(function(y)
-                cbind(y, Hd = tryCatch(domheight(y$'h',y$'d',y$'n'),
-                                       error = function(e) NA)), spl)
-            dmt <- do.call('rbind', dmhe) 
-            rownames(dmt) <- NULL}
-        attr(dmt, "nfi.nr") <- nfi_nr
+    nm_all <- names(nfi)
 
-        dmt <- conv_units(dmt)
+    match_cols <- function(want, nm_all) {
+        out <- nm_all[tolower(nm_all) %in% tolower(want)]
+        unique(out)
+    }
 
-    class(dmt) <- append('nfiMetrics',class(dmt))
+    id_cols <- match_cols(c('nfi.nr', 'pr'), nm_all)
+
+    nms_raw <- flev(nfi, levels)
+    nms_raw <- nms_raw[!is.na(nms_raw)]
+    nms <- match_cols(nms_raw, nm_all)
+
+    keep_cols <- unique(c(id_cols, nms))
+    keep_cols <- keep_cols[keep_cols %in% nm_all]
+
+    if(length(keep_cols) == 0L) {
+        dmt <- data.frame(dmt, check.names = FALSE)
+    } else {
+        dmt <- data.frame(nfi[, keep_cols, drop = FALSE], dmt,
+                          check.names = FALSE)
+    }
+
+    if('Hd' %in% var) {
+        needed <- c('h', 'd', 'n')
+        nd <- paste(needed, collapse = '?,')
+        if(!all(needed %in% var))
+            stop(paste0('Hd: missing variables: var = c(', nd, '?, ...)'))
+        spl <- split(dmt, dmt[, nms], drop = TRUE)
+        dmhe <- Map(function(y)
+            cbind(y, Hd = tryCatch(domheight(y$'h', y$'d', y$'n'),
+                                   error = function(e) NA)), spl)
+        dmt <- do.call('rbind', dmhe)
+        rownames(dmt) <- NULL
+    }
+
+    attr(dmt, 'nfi.nr') <- nfi_nr
+    dmt <- conv_units(dmt)
+
+    class(dmt) <- append('nfiMetrics', class(dmt))
     return(dmt)
 
 ### \code{data.frame} containing columns which match the strings in
@@ -134,5 +208,5 @@ get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100,]
 metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
 
 # see metric units
-    attr(metrics_ifn4p45,'units')
+attr(metrics_ifn4p45,'units')
 })
