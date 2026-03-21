@@ -264,44 +264,181 @@ coef_names_lc <- tolower(coef_names)
 
         if (!is.null(coef_col_param))
             coef_tab[[coef_col_param]] <- toupper(as.character(coef_tab[[coef_col_param]]))
+coef_param_chr <- if (!is.null(coef_col_param)) coef_tab[[coef_col_param]] else NULL
 
-        match_coef_rows <- function(pr, especie, param = NULL, cub.met = "freq") {
-    if (is.null(coef_tab) || is.null(coef_col_nfi) || is.null(coef_col_pr))
-        return(data.frame())
+num1 <- function(x) suppressWarnings(as.numeric(as.character(x)))
+
+pr_num  <- num1(nfi_orig[[col_pr]])
+sp_num  <- num1(nfi_orig[[col_spec]])
+d_num   <- if (!is.null(col_d))   num1(nfi[[col_d]])   else rep(NA_real_, nrow(out))
+h_num   <- if (!is.null(col_h))   num1(nfi[[col_h]])   else rep(NA_real_, nrow(out))
+dnm_num <- if (!is.null(col_dnm)) num1(nfi[[col_dnm]]) else rep(NA_real_, nrow(out))
+
+coef_pr_num <- if (!is.null(coef_col_pr)) num1(coef_tab[[coef_col_pr]]) else NULL
+coef_sp_num <- if (!is.null(coef_col_specn)) num1(coef_tab[[coef_col_specn]]) else NULL
+## coef_fc_chr <- if (!is.null(coef_col_fc)) as.character(coef_tab[[coef_col_fc]]) else NULL
+
+pars_cache <- new.env(parent = emptyenv())
+
         
-            x <- coef_tab[
-                coef_tab[[coef_col_nfi]] == nfi_nr &
-                coef_tab[[coef_col_pr]] == suppressWarnings(as.numeric(as.character(pr))),
-                , drop = FALSE
-            ]
-            if (!nrow(x))
-                return(x)
+    ##     match_coef_rows <- function(pr, especie, param = NULL, cub.met = "freq") {
+    ## if (is.null(coef_tab) || is.null(coef_col_nfi) || is.null(coef_col_pr))
+    ##     return(data.frame())
+        
+    ##         x <- coef_tab[
+    ##             coef_tab[[coef_col_nfi]] == nfi_nr &
+    ##             coef_tab[[coef_col_pr]] == suppressWarnings(as.numeric(as.character(pr))),
+    ##             , drop = FALSE
+    ##         ]
+    ##         if (!nrow(x))
+    ##             return(x)
 
-            sp_num <- suppressWarnings(as.numeric(as.character(especie)))
-            if (!is.na(sp_num) && !is.null(coef_col_specn)) {
-                y <- x[x[[coef_col_specn]] == sp_num, , drop = FALSE]
-                if (nrow(y))
-                    x <- y
-            }
+    ##         sp_num <- suppressWarnings(as.numeric(as.character(especie)))
+    ##         if (!is.na(sp_num) && !is.null(coef_col_specn)) {
+    ##             y <- x[x[[coef_col_specn]] == sp_num, , drop = FALSE]
+    ##             if (nrow(y))
+    ##                 x <- y
+    ##         }
 
-            if (!is.null(param) && !is.null(coef_col_param)) {
-                y <- x[x[[coef_col_param]] == toupper(param), , drop = FALSE]
-                if (nrow(y))
-                    x <- y
-            }
+    ##         if (!is.null(param) && !is.null(coef_col_param)) {
+    ##             y <- x[x[[coef_col_param]] == toupper(param), , drop = FALSE]
+    ##             if (nrow(y))
+    ##                 x <- y
+    ##         }
 
-            # Never use Estadillo from nfiMetrics as if it were coefficient F.c.
-            # Only use cub.met when the user explicitly requests a specific form.
-            if (nrow(x) > 1L && !is.null(coef_col_fc) && !identical(cub.met, "freq")) {
-                y <- x[as.character(x[[coef_col_fc]]) == as.character(cub.met), , drop = FALSE]
-                if (nrow(y))
-                    x <- y
-            }
+    ##         # Never use Estadillo from nfiMetrics as if it were coefficient F.c.
+    ##         # Only use cub.met when the user explicitly requests a specific form.
+    ##         if (nrow(x) > 1L && !is.null(coef_col_fc) && !identical(cub.met, "freq")) {
+    ##             y <- x[as.character(x[[coef_col_fc]]) == as.character(cub.met), , drop = FALSE]
+    ##             if (nrow(y))
+    ##                 x <- y
+    ##         }
 
-            x
+    ##         x
+    ##     }
+
+## match_coef_rows <- function(pr, especie, param = NULL, cub.met = "freq") {
+##     ## key <- paste(nfi_nr, pr, especie, param %||% "", cub.met, sepub.met),
+##     sep = "\r"
+## )
+
+##     hit <- get0(key, envir = pars_cache, inherits = FALSE, ifnotfound = NULL)
+##     if (!is.null(hit))
+##         return(hit)
+
+##     if (is.null(coef_tab) || is.null(coef_col_nfi) || is.null(coef_col_pr)) {
+##         assign(key, data.frame(), envir = pars_cache)
+##         return(data.frame())
+##     }
+
+##     pr1 <- num1(pr)
+##     sp1 <- num1(especie)
+
+##     ii <- coef_tab[[coef_col_nfi]] == nfi_nr
+##     if (!is.na(pr1))
+##         ii <- ii & (coef_pr_num == pr1)
+
+##     x <- coef_tab[ii, , drop = FALSE]
+##     if (!nrow(x)) {
+##         assign(key, x, envir = pars_cache)
+##         return(x)
+##     }
+
+##     if (!is.na(sp1) && !is.null(coef_col_specn)) {
+##         jj <- coef_sp_num[ii] == sp1
+##         y <- x[jj, , drop = FALSE]
+##         if (nrow(y))
+##             x <- y
+##     }
+
+##     if (!is.null(param) && !is.null(coef_col_paraarax[jj]
+##     }
+## }
+
+## if (!is.null(param) && !is.null(coef_col_param)) {
+##     y <- x[param_x == toupper(param), , drop = FALSE]
+##     if (nrow(y))
+##         x <- y
+## }
+
+
+##         if (nrow(y))
+##             x <- y
+##     }
+
+##     if (nrow(x) > 1L && !is.null(coef_col_fc) && !identical(cub.met, "freq")) {
+##    y <- x[fc_x == as.character(cub.met), , drop = FALSE]
+##         if (nrow(y))
+##             x <- y
+##     }
+
+##     assign(key, x, envir = pars_cache)
+##     x
+## }
+## pars_def_cache <- new.env(parent = emptyenv())
+
+match_coef_rows <- function(pr, especie, param = NULL, cub.met = "freq") {
+    key <- paste(
+        num1(nfi_nr),
+        num1(pr),
+        num1(especie),
+        toupper(param %||% ""),
+        as.character(cub.met),
+        sep = "\r"
+    )
+
+    hit <- get0(key, envir = pars_cache, inherits = FALSE, ifnotfound = NULL)
+    if (!is.null(hit))
+        return(hit)
+
+    if (is.null(coef_tab) || is.null(coef_col_nfi) || is.null(coef_col_pr)) {
+        assign(key, data.frame(), envir = pars_cache)
+        return(data.frame())
+    }
+
+    pr1 <- num1(pr)
+    sp1 <- num1(especie)
+
+    ii <- coef_tab[[coef_col_nfi]] == nfi_nr
+    if (!is.na(pr1))
+        ii <- ii & (coef_pr_num == pr1)
+
+    x <- coef_tab[ii, , drop = FALSE]
+    if (!nrow(x)) {
+        assign(key, x, envir = pars_cache)
+        return(x)
+    }
+
+    param_x <- if (!is.null(coef_col_param)) coef_param_chr[ii] else NULL
+
+    if (!is.na(sp1) && !is.null(coef_col_specn)) {
+        jj <- coef_sp_num[ii] == sp1
+        y <- x[jj, , drop = FALSE]
+        if (nrow(y)) {
+            x <- y
+            if (!is.null(param_x))
+                param_x <- param_x[jj]
         }
+    }
 
+    if (!is.null(param) && !is.null(coef_col_param)) {
+        y <- x[param_x == toupper(param), , drop = FALSE]
+        if (nrow(y))
+            x <- y
+    }
 
+    if (nrow(x) > 1L && !is.null(coef_col_fc) && !identical(cub.met, "freq")) {
+        fc_x <- as.character(x[[coef_col_fc]])
+        y <- x[fc_x == as.character(cub.met), , drop = FALSE]
+        if (nrow(y))
+            x <- y
+    }
+
+    assign(key, x, envir = pars_cache)
+    x
+}
+
+        
 get_method_pars <- function(param, ctx, resolved) {
     def <- method_registry[[param]]
 
@@ -317,6 +454,7 @@ get_method_pars <- function(param, ctx, resolved) {
     }
 
     if (!is.null(def$pars)) {
+
         p <- def$pars
         if (!is.data.frame(p))
             p <- as.data.frame(p, stringsAsFactors = FALSE)
@@ -413,13 +551,22 @@ eval_method <- function(param, ctx, resolved) {
         param_order <- intersect(param_order, setdiff(names(method_registry), "V"))
 
         for (i in seq_len(nrow(out))) {
+## ctx <- list(
+##     pr = nfi_orig[[col_pr]][i],
+##     especie = nfi_orig[[col_spec]][i],
+##     d_mm = if (!is.null(col_d)) suppressWarnings(as.numeric(nfi[[col_d]][i])) else NULL,
+##     h_m = if (!is.null(col_h)) suppressWarnings(as.numeric(nfi[[col_h]][i])) else NULL,
+##     dnm_mm = if (!is.null(col_dnm)) suppressWarnings(as.numeric(nfi[[col_dnm]][i])) else NULL
+## )
+
 ctx <- list(
-    pr = nfi_orig[[col_pr]][i],
-    especie = nfi_orig[[col_spec]][i],
-    d_mm = if (!is.null(col_d)) suppressWarnings(as.numeric(nfi[[col_d]][i])) else NULL,
-    h_m = if (!is.null(col_h)) suppressWarnings(as.numeric(nfi[[col_h]][i])) else NULL,
-    dnm_mm = if (!is.null(col_dnm)) suppressWarnings(as.numeric(nfi[[col_dnm]][i])) else NULL
+    pr = pr_num[i],
+    especie = sp_num[i],
+    d_mm = d_num[i],
+    h_m = h_num[i],
+    dnm_mm = dnm_num[i]
 )
+
             resolved <- list(
                 legacy_v_m3 = legacy_v_m3[i],
                 vcc_m3 = NA_real_

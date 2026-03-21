@@ -264,7 +264,7 @@ coef_names_lc <- tolower(coef_names)
 
         if (!is.null(coef_col_param))
             coef_tab[[coef_col_param]] <- toupper(as.character(coef_tab[[coef_col_param]]))
-
+coef_param_chr <- if (!is.null(coef_col_param)) coef_tab[[coef_col_param]] else NULL
 
 num1 <- function(x) suppressWarnings(as.numeric(as.character(x)))
 
@@ -276,7 +276,7 @@ dnm_num <- if (!is.null(col_dnm)) num1(nfi[[col_dnm]]) else rep(NA_real_, nrow(o
 
 coef_pr_num <- if (!is.null(coef_col_pr)) num1(coef_tab[[coef_col_pr]]) else NULL
 coef_sp_num <- if (!is.null(coef_col_specn)) num1(coef_tab[[coef_col_specn]]) else NULL
-coef_fc_chr <- if (!is.null(coef_col_fc)) as.character(coef_tab[[coef_col_fc]]) else NULL
+## coef_fc_chr <- if (!is.null(coef_col_fc)) as.character(coef_tab[[coef_col_fc]]) else NULL
 
 pars_cache <- new.env(parent = emptyenv())
 
@@ -317,17 +317,75 @@ pars_cache <- new.env(parent = emptyenv())
     ##         x
     ##     }
 
-match_coef_rows <- function(pr, especie, param = NULL, cub.met = "freq") {
-    ## key <- paste(nfi_nr, pr, especie, param %||% "", cub.met, sep = "\r")
+## match_coef_rows <- function(pr, especie, param = NULL, cub.met = "freq") {
+##     ## key <- paste(nfi_nr, pr, especie, param %||% "", cub.met, sepub.met),
+##     sep = "\r"
+## )
 
-key <- paste(
-    num1(nfi_nr),
-    num1(pr),
-    num1(especie),
-    toupper(param %||% ""),
-    as.character(cub.met),
-    sep = "\r"
-)
+##     hit <- get0(key, envir = pars_cache, inherits = FALSE, ifnotfound = NULL)
+##     if (!is.null(hit))
+##         return(hit)
+
+##     if (is.null(coef_tab) || is.null(coef_col_nfi) || is.null(coef_col_pr)) {
+##         assign(key, data.frame(), envir = pars_cache)
+##         return(data.frame())
+##     }
+
+##     pr1 <- num1(pr)
+##     sp1 <- num1(especie)
+
+##     ii <- coef_tab[[coef_col_nfi]] == nfi_nr
+##     if (!is.na(pr1))
+##         ii <- ii & (coef_pr_num == pr1)
+
+##     x <- coef_tab[ii, , drop = FALSE]
+##     if (!nrow(x)) {
+##         assign(key, x, envir = pars_cache)
+##         return(x)
+##     }
+
+##     if (!is.na(sp1) && !is.null(coef_col_specn)) {
+##         jj <- coef_sp_num[ii] == sp1
+##         y <- x[jj, , drop = FALSE]
+##         if (nrow(y))
+##             x <- y
+##     }
+
+##     if (!is.null(param) && !is.null(coef_col_paraarax[jj]
+##     }
+## }
+
+## if (!is.null(param) && !is.null(coef_col_param)) {
+##     y <- x[param_x == toupper(param), , drop = FALSE]
+##     if (nrow(y))
+##         x <- y
+## }
+
+
+##         if (nrow(y))
+##             x <- y
+##     }
+
+##     if (nrow(x) > 1L && !is.null(coef_col_fc) && !identical(cub.met, "freq")) {
+##    y <- x[fc_x == as.character(cub.met), , drop = FALSE]
+##         if (nrow(y))
+##             x <- y
+##     }
+
+##     assign(key, x, envir = pars_cache)
+##     x
+## }
+## pars_def_cache <- new.env(parent = emptyenv())
+
+match_coef_rows <- function(pr, especie, param = NULL, cub.met = "freq") {
+    key <- paste(
+        num1(nfi_nr),
+        num1(pr),
+        num1(especie),
+        toupper(param %||% ""),
+        as.character(cub.met),
+        sep = "\r"
+    )
 
     hit <- get0(key, envir = pars_cache, inherits = FALSE, ifnotfound = NULL)
     if (!is.null(hit))
@@ -351,15 +409,20 @@ key <- paste(
         return(x)
     }
 
+    param_x <- if (!is.null(coef_col_param)) coef_param_chr[ii] else NULL
+
     if (!is.na(sp1) && !is.null(coef_col_specn)) {
         jj <- coef_sp_num[ii] == sp1
         y <- x[jj, , drop = FALSE]
-        if (nrow(y))
+        if (nrow(y)) {
             x <- y
+            if (!is.null(param_x))
+                param_x <- param_x[jj]
+        }
     }
 
     if (!is.null(param) && !is.null(coef_col_param)) {
-        y <- x[toupper(as.character(x[[coef_col_param]])) == toupper(param), , drop = FALSE]
+        y <- x[param_x == toupper(param), , drop = FALSE]
         if (nrow(y))
             x <- y
     }
@@ -375,6 +438,7 @@ key <- paste(
     x
 }
 
+        
 get_method_pars <- function(param, ctx, resolved) {
     def <- method_registry[[param]]
 
@@ -390,6 +454,7 @@ get_method_pars <- function(param, ctx, resolved) {
     }
 
     if (!is.null(def$pars)) {
+
         p <- def$pars
         if (!is.data.frame(p))
             p <- as.data.frame(p, stringsAsFactors = FALSE)
