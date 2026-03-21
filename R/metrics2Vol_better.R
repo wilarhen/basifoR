@@ -195,7 +195,7 @@ compute_legacy_v <- function(nfi_input, cub.met = "freq", nfi.nr = NULL) {
         attr(leg, "nfi.nr") <- nfi.nr
 
     old <- tryCatch(
-        metrics2Vol(leg, cub.met = cub.met, keep.var = FALSE),
+        metrics2Vol_legacy(leg, cub.met = cub.met, keep.var = FALSE),
         error = function(e) {
             stop("Legacy metrics2Vol failed: ", conditionMessage(e), call. = FALSE)
         }
