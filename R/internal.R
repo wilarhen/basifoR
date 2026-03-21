@@ -813,30 +813,65 @@ vrs <- paste0('basifoR version ',packageVersion("basifoR"),'\n')
 cat(vrs)
 }
 
-conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
-    units. <- getOption('units')
-    if(!is.null(attr(nfi,'units')))
-        units.  <- attr(nfi,'units')
-    cols <- units.[units.%in%names(nfi)]
-    units_ini <- units_out <- names(cols)
-    matches <- sapply(var,function(m) paste0("^",m,"$"))
-    pos. <- sapply(matches,function(m) grep(m, cols))
-    units_out[pos.]  <- un
-    f_conv_unit <- function(x,y,z){
-        if(y == "" | z == ""){
+conv_units <- function(nfi, var = c("d", "h"), un = c("cm", "m")) {
+    units. <- getOption("units")
+    if (!is.null(attr(nfi, "units")))
+        units. <- attr(nfi, "units")
+
+    cols <- names(units.)[names(units.) %in% names(nfi)]
+    units_ini <- units_out <- unname(units.[cols])
+
+    pos. <- match(var, cols)
+    ok <- !is.na(pos.)
+    units_out[pos.[ok]] <- un[ok]
+
+    f_conv_unit <- function(x, y, z) {
+        if (y == "" || z == "") {
             return(x)
-        }else{
-            conv_unit(x,y,z)}}
-    nfi[,cols] <- data.frame(
-        mapply(function(x,y,z)
-            f_conv_unit(x,y,z),
-            nfi[,cols],
-            units_ini,
-            units_out))
-    un_attr <- cols 
-    names(un_attr) <- units_out
+        } else {
+            conv_unit(x, y, z)
+        }
+    }
+
+    nfi[, cols] <- data.frame(
+        mapply(function(x, y, z) f_conv_unit(x, y, z),
+               nfi[, cols, drop = FALSE],
+               units_ini,
+               units_out,
+               SIMPLIFY = FALSE),
+        check.names = FALSE
+    )
+
+    un_attr <- units_out
+    names(un_attr) <- cols
     attributes(nfi) <- c(attributes(nfi), list(units = un_attr))
-    return(nfi)}
+    return(nfi)
+}
+
+## conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
+##     units. <- getOption('units')
+##     if(!is.null(attr(nfi,'units')))
+##         units.  <- attr(nfi,'units')
+##     cols <- units.[units.%in%names(nfi)]
+##     units_ini <- units_out <- names(cols)
+##     matches <- sapply(var,function(m) paste0("^",m,"$"))
+##     pos. <- sapply(matches,function(m) grep(m, cols))
+##     units_out[pos.]  <- un
+##     f_conv_unit <- function(x,y,z){
+##         if(y == "" | z == ""){
+##             return(x)
+##         }else{
+##             conv_unit(x,y,z)}}
+##     nfi[,cols] <- data.frame(
+##         mapply(function(x,y,z)
+##             f_conv_unit(x,y,z),
+##             nfi[,cols],
+##             units_ini,
+##             units_out))
+##     un_attr <- cols 
+##     names(un_attr) <- units_out
+##     attributes(nfi) <- c(attributes(nfi), list(units = un_attr))
+##     return(nfi)}
 
 convert_factors_to_numeric <- function(df) {
 # Function to convert factor columns to numeric while preserving

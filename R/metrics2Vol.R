@@ -218,7 +218,8 @@ compute_legacy_v <- function(nfi_input, cub.met = "freq", nfi.nr = NULL) {
     can_compute_legacy <- all(c("pr", "d", "h") %in% tolower(names(nfi_orig))) &&
         any(grepl("spec|espec", names(nfi_orig), ignore.case = TRUE))
 
-    need_legacy <- keep.legacy || any(parametro %in% c("V", "VCC", "VSC", "IAVC", "VLE"))
+    ## need_legacy <- keep.legacy || any(parametro %in% c("V", "VCC", "VSC", "IAVC", "VLE"))
+    need_legacy <- keep.legacy || any(parametro %in% c("V", "VCC"))
 
 legacy_v_m3 <- rep(NA_real_, nrow(out))
 if (need_legacy && can_compute_legacy) {
