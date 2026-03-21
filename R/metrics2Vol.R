@@ -98,7 +98,7 @@ metrics2Vol <- structure(function(
     nfi,
     cub.met = "freq",
     parametro = c("VCC"),
-    keep.var = FALSE,
+    keep.var = TRUE,
     keep.legacy = FALSE,
     method_registry = snfi_volume_method_registry(),
     ...
