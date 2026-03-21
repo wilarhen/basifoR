@@ -94,7 +94,7 @@ snfi_volume_method_registry <- function(equations = get0("snfi_volume_equations"
     utils::modifyList(defaults, equations)
 }
 
-metrics2Vol <- structure(function(
+metrics2Vol_better <- structure(function(
     nfi,
     cub.met = "freq",
     parametro = c("VCC"),
