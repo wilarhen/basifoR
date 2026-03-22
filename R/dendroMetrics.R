@@ -195,6 +195,10 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     if (report)
         write.csv(resm, file = "report.csv", row.names = FALSE)
 
+vol_vars <- intersect(c("v", "vcc", "vsc", "iavc", "vle"), names(resm))
+if (length(vol_vars))
+    resm[vol_vars] <- resm[vol_vars] / 1000
+    
     units_out <- c(
         d = "cm",
         h = "m",
