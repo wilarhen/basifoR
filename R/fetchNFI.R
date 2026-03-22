@@ -18,31 +18,70 @@ fetchNFI <- structure(function#Fetch SNF Data
 ) {
     if(is.null(url.))
         return(NULL)
-    temp <- tempfile(tmpdir = dir)
-    is.remote <- grepl('^https?://',url.)
-    if(is.remote){
-        gf <- gracefully_fail(url., timeOut = timeOut)
-        if(is.null(gf))
-            return(gf)
-        download.file(url.,temp)
-    }
-    if(!is.remote)
-        file.copy(url.,temp)
-    con <- unzip(temp,
-                 ## exdir = tempdir(),
-                 exdir = dir,
-                 list = TRUE)
-    con <- unzip(temp,
-                 ## exdir = tempdir(),
-                 exdir = dir,
-                 files = NULL)
-    supr.only <- file_ext
-    tos <- grepl(paste(supr.only,
-                       collapse = "|"), con)
-    con  <- tryCatch(
-        con[tos],error = function(e) NULL)
-    file.remove(temp)
-    return(con)
+    ## temp <- tempfile(tmpdir = dir)
+    ## is.remote <- grepl('^https?://',url.)
+    ## if(is.remote){
+    ##     gf <- gracefully_fail(url., timeOut = timeOut)
+    ##     if(is.null(gf))
+    ##         return(gf)
+    ##     download.file(url.,temp)
+    ## }
+    ## if(!is.remote)
+    ##     file.copy(url.,temp)
+    ## con <- unzip(temp,
+    ##              ## exdir = tempdir(),
+    ##              exdir = dir,
+    ##              list = TRUE)
+    ## con <- unzip(temp,
+    ##              ## exdir = tempdir(),
+    ##              exdir = dir,
+    ##              files = NULL)
+    ## supr.only <- file_ext
+    ## tos <- grepl(paste(supr.only,
+    ##                    collapse = "|"), con)
+    ## con  <- tryCatch(
+    ##     con[tos],error = function(e) NULL)
+    ## file.remove(temp)
+    ## return(con)
+is.remote <- grepl("^https?://", url.)
+
+if (is.remote) {
+    gf <- gracefully_fail(url., timeOut = timeOut)
+    if (is.null(gf))
+        return(gf)
+    zipfile <- file.path(dir, basename(url.))
+} else {
+    zipfile <- normalizePath(url., mustWork = FALSE)
+}
+
+outdir <- file.path(
+    dir,
+    tools::file_path_sans_ext(basename(zipfile))
+)
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+
+pat <- paste0("\\.(", paste(file_ext, collapse = "|"), ")$")
+cached <- list.files(
+    outdir,
+    pattern = pat,
+    full.names = TRUE,
+    ignore.case = TRUE
+)
+
+if (length(cached) > 0L)
+    return(cached)
+
+if (is.remote && !file.exists(zipfile)) {
+    download.file(url., zipfile, mode = "wb")
+}
+
+con <- unzip(zipfile, exdir = outdir, files = NULL)
+
+tos <- grepl(pat, con, ignore.case = TRUE)
+con <- tryCatch(con[tos], error = function(e) NULL)
+
+return(file.path(outdir, basename(con)))
 ### \code{character}. Returns the path to the fetched and decompressed
 ### NFI data (.mdb, .DBF, or .accdb) stored in a temporary file.
 }, ex = function(){
