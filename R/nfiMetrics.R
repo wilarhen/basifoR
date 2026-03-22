@@ -73,22 +73,22 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         as.matrix(x)
     }
 
-trees_per_ha_vec <- function(dbh_cm, design) {
+    trees_per_ha_vec <- function(dbh_cm, design) {
 
-    if (inherits(design, "concentric_design")) {
-        out <- rep(NA_real_, length(dbh_cm))
-        ok <- !is.na(dbh_cm) & dbh_cm >= design$min_dbh_cm[1]
-        if (any(ok)) {
-            idx <- findInterval(dbh_cm[ok], design$min_dbh_cm)
-            out[ok] <- design$sf[idx]
+        if (inherits(design, "concentric_design")) {
+            out <- rep(NA_real_, length(dbh_cm))
+            ok <- !is.na(dbh_cm) & dbh_cm >= design$min_dbh_cm[1]
+            if (any(ok)) {
+                idx <- findInterval(dbh_cm[ok], design$min_dbh_cm)
+                out[ok] <- design$sf[idx]
+            }
+            return(out)
         }
-        return(out)
-    }
 
-    vapply(dbh_cm,
-           function(x) trees_per_ha(design = design, dbh_cm = x),
-           numeric(1))
-}
+        vapply(dbh_cm,
+               function(x) trees_per_ha(design = design, dbh_cm = x),
+               numeric(1))
+    }
     
     diam_mm <- NULL
     diam_cm <- NULL
@@ -96,39 +96,39 @@ trees_per_ha_vec <- function(dbh_cm, design) {
     ht_dm <- NULL
     
 
-if(length(diam_cols) > 0L) {
-    diam_mat <- get_numeric_matrix(nfi, diam_cols)
-    diam_mat[diam_mat == 0] <- NA_real_
+    if(length(diam_cols) > 0L) {
+        diam_mat <- get_numeric_matrix(nfi, diam_cols)
+        diam_mat[diam_mat == 0] <- NA_real_
 
-    if(ncol(diam_mat) == 1L) {
-        diam_mm <- diam_mat[, 1L]
-    } else {
-        nn <- rowSums(!is.na(diam_mat))
-        diam_mm <- rowMeans(diam_mat, na.rm = TRUE)
-        diam_mm[nn == 0L] <- NA_real_
+        if(ncol(diam_mat) == 1L) {
+            diam_mm <- diam_mat[, 1L]
+        } else {
+            nn <- rowSums(!is.na(diam_mat))
+            diam_mm <- rowMeans(diam_mat, na.rm = TRUE)
+            diam_mm[nn == 0L] <- NA_real_
+        }
+
+        if(any(var. %in% c('ba', 'n')))
+            diam_cm <- conv_unit(diam_mm, from = 'mm', to = 'cm')
+
+        if(any(var. %in% 'n'))
+            trees_ha <- trees_per_ha_vec(diam_cm, design)
     }
 
-    if(any(var. %in% c('ba', 'n')))
-        diam_cm <- conv_unit(diam_mm, from = 'mm', to = 'cm')
+    if(length(ht_cols) > 0L) {
+        ht_mat <- get_numeric_matrix(nfi, ht_cols)
+        ht_mat[ht_mat == 0] <- NA_real_
 
-    if(any(var. %in% 'n'))
-        trees_ha <- trees_per_ha_vec(diam_cm, design)
-}
+        if(ncol(ht_mat) == 1L) {
+            ht_m <- ht_mat[, 1L]
+        } else {
+            nn <- rowSums(!is.na(ht_mat))
+            ht_m <- rowMeans(ht_mat, na.rm = TRUE)
+            ht_m[nn == 0L] <- NA_real_
+        }
 
-if(length(ht_cols) > 0L) {
-    ht_mat <- get_numeric_matrix(nfi, ht_cols)
-    ht_mat[ht_mat == 0] <- NA_real_
-
-    if(ncol(ht_mat) == 1L) {
-        ht_m <- ht_mat[, 1L]
-    } else {
-        nn <- rowSums(!is.na(ht_mat))
-        ht_m <- rowMeans(ht_mat, na.rm = TRUE)
-        ht_m[nn == 0L] <- NA_real_
+        ht_dm <- conv_unit(ht_m, from = 'm', to = 'dm')
     }
-
-    ht_dm <- conv_unit(ht_m, from = 'm', to = 'dm')
-}
     
     fdn <- function(dbh, var){
         if(var %in% 'd') {
@@ -146,19 +146,19 @@ if(length(ht_cols) > 0L) {
         }
 
         if(var %in% 'n') {
-    if(length(diam_cols) > 0L)
-        return(trees_ha)
-    return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
-                 function(x) dbhMetric(x, var, design = design)))
-}
+            if(length(diam_cols) > 0L)
+                return(trees_ha)
+            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+                         function(x) dbhMetric(x, var, design = design)))
+        }
 
- if(var %in% 'h') {
-    if(length(ht_cols) > 0L)
-        return(ht_dm)
-    return(apply(dbh[, fc(dbh, c('altura', 'Ht')), drop = FALSE], 1,
-                 function(x) dbhMetric(x, var, design = design)))
-}
-   }
+        if(var %in% 'h') {
+            if(length(ht_cols) > 0L)
+                return(ht_dm)
+            return(apply(dbh[, fc(dbh, c('altura', 'Ht')), drop = FALSE], 1,
+                         function(x) dbhMetric(x, var, design = design)))
+        }
+    }
 
     metric_list <- vector('list', length(var.))
     if(length(var.) > 0L) {
