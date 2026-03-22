@@ -246,7 +246,7 @@ metric_units <- c(
 attr(dmt, "units") <- metric_units[intersect(names(dmt), names(metric_units))]
 
     
-attr(dmt, "units") <- units_map[names(dmt)]
+## attr(dmt, "units") <- units_map[names(dmt)]
     
     class(dmt) <- append('nfiMetrics', class(dmt))
     return(dmt)
