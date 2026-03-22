@@ -235,16 +235,17 @@ nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
     attr(dmt, 'nfi.nr') <- nfi_nr
     dmt <- conv_units(dmt)
 
-units_map <- c(
-    nfi.nr = "dimensionless",
-    pr     = "dimensionless",
-    d      = "mm",
-    h      = "dm",
-    ba     = "m2",
-    n      = "",
-    Hd     = "m"
+metric_units <- c(
+    d  = "mm",
+    h  = "dm",
+    ba = "m2",
+    n  = "",
+    Hd = "dm"
 )
 
+attr(dmt, "units") <- metric_units[intersect(names(dmt), names(metric_units))]
+
+    
 attr(dmt, "units") <- units_map[names(dmt)]
     
     class(dmt) <- append('nfiMetrics', class(dmt))
