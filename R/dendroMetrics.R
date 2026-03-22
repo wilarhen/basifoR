@@ -193,20 +193,6 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
         list(nfi = nfi_i, dots = dots_i)
     }, nfi_list, nfi.nr_list)
 
-    ## run_job <- function(job) {
-    ##     do.call(
-    ##         dendro_one,
-    ##         c(
-    ##             list(
-    ##                 nfi = job$nfi,
-    ##                 summ.vr = summ.vr,
-    ##                 cut.dt = cut.dt,
-    ##                 report = FALSE
-    ##             ),
-    ##             job$dots
-    ##         )
-    ##     )
-    ## }
 
 run_job <- function(job) {
     tryCatch(

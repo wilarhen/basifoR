@@ -813,6 +813,7 @@ vrs <- paste0('basifoR version ',packageVersion("basifoR"),'\n')
 cat(vrs)
 }
 
+
 conv_units <- function(nfi, var = c("d", "h"), un = c("cm", "m")) {
     units. <- getOption("units")
     if (!is.null(attr(nfi, "units")))
@@ -825,16 +826,31 @@ conv_units <- function(nfi, var = c("d", "h"), un = c("cm", "m")) {
     ok <- !is.na(pos.)
     units_out[pos.[ok]] <- un[ok]
 
-    f_conv_unit <- function(x, y, z) {
-        if (y == "" || z == "") {
+    convert_unit_label <- function(x, from, to) {
+        if (from == "" || to == "" || from == to)
             return(x)
-        } else {
-            conv_unit(x, y, z)
+
+        if (!grepl(" ", from, fixed = TRUE) && !grepl(" ", to, fixed = TRUE))
+            return(conv_unit(x, from, to))
+
+        rx <- "^(.+) ha-1$"
+        from_m <- regexec(rx, from)
+        to_m   <- regexec(rx, to)
+
+        from_cap <- regmatches(from, from_m)[[1]]
+        to_cap   <- regmatches(to, to_m)[[1]]
+
+        if (length(from_cap) == 2L && length(to_cap) == 2L) {
+            from_num <- from_cap[2]
+            to_num   <- to_cap[2]
+            return(conv_unit(x, from_num, to_num))
         }
+
+        stop("Unsupported unit conversion from '", from, "' to '", to, "'.")
     }
 
     nfi[, cols] <- data.frame(
-        mapply(function(x, y, z) f_conv_unit(x, y, z),
+        mapply(function(x, y, z) convert_unit_label(x, y, z),
                nfi[, cols, drop = FALSE],
                units_ini,
                units_out,
@@ -848,30 +864,42 @@ conv_units <- function(nfi, var = c("d", "h"), un = c("cm", "m")) {
     return(nfi)
 }
 
-## conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
-##     units. <- getOption('units')
-##     if(!is.null(attr(nfi,'units')))
-##         units.  <- attr(nfi,'units')
-##     cols <- units.[units.%in%names(nfi)]
-##     units_ini <- units_out <- names(cols)
-##     matches <- sapply(var,function(m) paste0("^",m,"$"))
-##     pos. <- sapply(matches,function(m) grep(m, cols))
-##     units_out[pos.]  <- un
-##     f_conv_unit <- function(x,y,z){
-##         if(y == "" | z == ""){
+## conv_units <- function(nfi, var = c("d", "h"), un = c("cm", "m")) {
+##     units. <- getOption("units")
+##     if (!is.null(attr(nfi, "units")))
+##         units. <- attr(nfi, "units")
+
+##     cols <- names(units.)[names(units.) %in% names(nfi)]
+##     units_ini <- units_out <- unname(units.[cols])
+
+##     pos. <- match(var, cols)
+##     ok <- !is.na(pos.)
+##     units_out[pos.[ok]] <- un[ok]
+
+##     f_conv_unit <- function(x, y, z) {
+##         if (y == "" || z == "") {
 ##             return(x)
-##         }else{
-##             conv_unit(x,y,z)}}
-##     nfi[,cols] <- data.frame(
-##         mapply(function(x,y,z)
-##             f_conv_unit(x,y,z),
-##             nfi[,cols],
-##             units_ini,
-##             units_out))
-##     un_attr <- cols 
-##     names(un_attr) <- units_out
+##         } else {
+##             conv_unit(x, y, z)
+##         }
+##     }
+
+##     nfi[, cols] <- data.frame(
+##         mapply(function(x, y, z) f_conv_unit(x, y, z),
+##                nfi[, cols, drop = FALSE],
+##                units_ini,
+##                units_out,
+##                SIMPLIFY = FALSE),
+##         check.names = FALSE
+##     )
+
+##     un_attr <- units_out
+##     names(un_attr) <- cols
 ##     attributes(nfi) <- c(attributes(nfi), list(units = un_attr))
-##     return(nfi)}
+##     return(nfi)
+## }
+
+
 
 convert_factors_to_numeric <- function(df) {
 # Function to convert factor columns to numeric while preserving
