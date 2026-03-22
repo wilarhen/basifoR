@@ -1,47 +1,51 @@
-nfiMetrics <- structure(function#Tree metrics from NFI data
-### This function recursively implements \code{\link{dbhMetric}} on
-### data bases of the Spanish National Forest Inventory (NFI) to
-### derive a variety of tree metrics.  To compute all in-package
-### metrics, run function \code{\link{dendroMetrics}}.
+nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
+### Compute tree-level metrics from Spanish National Forest Inventory
+### records by applying \code{\link{dbhMetric}}-style logic to NFI
+### tables or to files that \code{\link{readNFI}} can import.  The
+### function returns the requested metrics together with the grouping
+### columns selected through \code{levels}.  To derive the full set of
+### package metrics in one call, see \code{\link{dendroMetrics}}.
 (
-    nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to a
-          ##compressed file of the NFI (.zip) having data of either
-          ##.dbf or .mdb file extensions, or a data frame such as that
-          ##produced by \code{\link{readNFI}}.
-    var = c('d','h','ba','n','Hd'), ##<<\code{character}. Metrics. These
-                                    ##can be five: \code{(1)} the mean
-                                    ##diameter \code{'d'}; \code{(2)}
-                                    ##the tree height \code{'h'};
-                                    ##\code{(3)} the basal area
-                                    ##\code{'ba'}; \code{(4)} the
-                                    ##number of trees per hectare
-                                    ##\code{'n'}; and \code{(5)} the
-                                    ##dominant height \code{'Hd'}, see
-                                    ##Details section in
-                                    ##\code{\link{dbhMetric}} for
-                                    ##better understanding of the
-                                    ##metrics units. Default
-                                    ##\code{c('pr','d','h','ba','n','Hd')}.
-    levels = c('esta','espe'), ##<<\code{character}. levels at which
-                               ##the metrics are computed. Pattern
-                               ##matching is supported. Cases are
-                               ##ignored. Default
-                               ##\code{c('esta','espe')} matches both
-                               ##the sample plot \code{'Estadillos'}
-                               ##and tree species \code{'Especie'}.
-    design = snfi_design(),
-    ... ##<< Additional arguments in \code{\link{readNFI}}.
+    nfi,  ##<<\code{character} or \code{data.frame}. Input NFI data.
+          ##Supply either \code{(1)} a path or URL to a compressed NFI
+          ##archive readable by \code{\link{readNFI}}, or \code{(2)} a
+          ##data frame already returned by \code{\link{readNFI}}.
+    var = c('d','h','ba','n','Hd'), ##<<\code{character}. Metrics to compute.
+                                    ##Supported values are \code{'d'}
+                                    ##(diameter), \code{'h'} (height),
+                                    ##\code{'ba'} (basal area), \code{'n'}
+                                    ##(trees per hectare), and \code{'Hd'}
+                                    ##(dominant height).  \code{'Hd'}
+                                    ##requires \code{'h'}, \code{'d'}, and
+                                    ##\code{'n'} to be present in
+                                    ##\code{var}.
+    levels = c('esta','espe'), ##<<\code{character}. Grouping columns kept in
+                               ##the output.  The function matches these
+                               ##strings against column names returned by
+                               ##\code{flev()}, supports partial matching,
+                               ##and ignores case.  The default usually
+                               ##keeps plot- and species-level identifiers.
+    design = snfi_design(), ##<< Sampling design used when computing
+                            ##\code{'n'}.  Pass a
+                            ##\code{\link{snfi_design}} object, another
+                            ##\code{concentric_design}, or any design
+                            ##supported by \code{trees_per_ha()}.
+    ... ##<< Additional arguments passed to \code{\link{readNFI}} when
+        ##\code{nfi} is not already a \code{readNFI} object.
 
 ) {
+    ## Return early on NULL input to preserve the previous behaviour.
     nfi. <- nfi
     if(is.null(nfi.))
         return(nfi)
 
+    ## Import the data only when the input is not already a readNFI object.
     if(!inherits(nfi., "readNFI"))
         nfi <- readNFI(nfi, ...)
 
     nfi_nr <- attr(nfi, "nfi.nr")
 
+    ## Find columns whose names match one or more search patterns.
     fc <- function(dt, cl.){
         nt. <- paste(cl., collapse = '|')
         nt.. <- grep(nt., names(dt),
@@ -51,17 +55,20 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         return(cl.nm)
     }
 
+    ## Dominant height is computed later from h, d, and n.
     var. <- var[!var %in% 'Hd']
 
     diam_cols <- character(0)
     ht_cols <- character(0)
 
+    ## Resolve the raw diameter and height columns only when needed.
     if(any(var. %in% c('d', 'n', 'ba')))
         diam_cols <- fc(nfi, c('Dn', 'Diamet'))
 
     if(any(var. %in% 'h'))
         ht_cols <- fc(nfi, c('altura', 'Ht'))
 
+    ## Convert selected columns to a numeric matrix while preserving order.
     get_numeric_matrix <- function(dt, cols) {
         if(length(cols) == 0L)
             return(NULL)
@@ -73,6 +80,8 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         as.matrix(x)
     }
 
+    ## Vectorised trees-per-hectare calculation for concentric designs,
+    ## with fallback to trees_per_ha() for other supported designs.
     trees_per_ha_vec <- function(dbh_cm, design) {
 
         if (inherits(design, "concentric_design")) {
@@ -89,13 +98,15 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                function(x) trees_per_ha(design = design, dbh_cm = x),
                numeric(1))
     }
-    
+
+    ## Pre-allocate derived vectors.
     diam_mm <- NULL
     diam_cm <- NULL
     trees_ha <- NULL
     ht_dm <- NULL
-    
 
+    ## Diameter-based metrics: treat zeros as missing values and average
+    ## repeated diameter columns row-wise when several measurements exist.
     if(length(diam_cols) > 0L) {
         diam_mat <- get_numeric_matrix(nfi, diam_cols)
         diam_mat[diam_mat == 0] <- NA_real_
@@ -115,6 +126,8 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
             trees_ha <- trees_per_ha_vec(diam_cm, design)
     }
 
+    ## Height-based metrics: treat zeros as missing values and average
+    ## repeated height columns row-wise when present.
     if(length(ht_cols) > 0L) {
         ht_mat <- get_numeric_matrix(nfi, ht_cols)
         ht_mat[ht_mat == 0] <- NA_real_
@@ -129,7 +142,9 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
 
         ht_dm <- conv_unit(ht_m, from = 'm', to = 'dm')
     }
-    
+
+    ## Dispatch each metric, using the fast precomputed vectors when the
+    ## relevant raw columns were already resolved above.
     fdn <- function(dbh, var){
         if(var %in% 'd') {
             if(length(diam_cols) > 0L)
@@ -160,6 +175,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         }
     }
 
+    ## Compute the requested metrics except dominant height.
     metric_list <- vector('list', length(var.))
     if(length(var.) > 0L) {
         for(i in seq_along(var.))
@@ -171,11 +187,14 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
     if(length(var.) > 0L)
         names(dmt) <- var.
 
+    ## Preserve province codes stored as attribute by readNFI().
     if(!is.null(attr(nfi, 'pr.')))
         dmt <- cbind(pr = attr(nfi, 'pr.'), dmt)
 
     nm_all <- names(nfi)
 
+    ## Match grouping columns case-insensitively while preserving their
+    ## original names in the input object.
     match_cols <- function(want, nm_all) {
         out <- nm_all[tolower(nm_all) %in% tolower(want)]
         unique(out)
@@ -190,6 +209,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
     keep_cols <- unique(c(id_cols, nms))
     keep_cols <- keep_cols[keep_cols %in% nm_all]
 
+    ## Bind the grouping columns requested through levels.
     if(length(keep_cols) == 0L) {
         dmt <- data.frame(dmt, check.names = FALSE)
     } else {
@@ -197,6 +217,7 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                           check.names = FALSE)
     }
 
+    ## Compute dominant height within each grouping level.
     if('Hd' %in% var) {
         needed <- c('h', 'd', 'n')
         nd <- paste(needed, collapse = '?,')
@@ -210,33 +231,39 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         rownames(dmt) <- NULL
     }
 
+    ## Restore attributes, attach unit metadata, and set the output class.
     attr(dmt, 'nfi.nr') <- nfi_nr
     dmt <- conv_units(dmt)
 
+units_map <- c(
+    nfi.nr = "dimensionless",
+    pr     = "dimensionless",
+    d      = "mm",
+    h      = "dm",
+    ba     = "m2",
+    n      = "",
+    Hd     = "m"
+)
+
+attr(dmt, "units") <- units_map[names(dmt)]
+    
     class(dmt) <- append('nfiMetrics', class(dmt))
     return(dmt)
 
-### \code{data.frame} containing columns which match the strings in
-### \code{levels}, plus the variables defined in \code{var}, including
-### the province \code{pr} (\code{dimensionless}), the diameter
-### \code{d} (\code{'mm'}), the tree height \code{h} (\code{'dm'}),
-### the basal area \code{ba} (\code{'m2 tree-1'}), the number of trees
-### by hectare \code{n} (\code{dimensionless}), and the tree dominant
-### height \code{Hd} (\code{'m'}).
+### \code{data.frame} with the grouping columns selected through
+### \code{levels} plus the requested metrics in \code{var}.  The output
+### inherits class \code{'nfiMetrics'}.  Inspect
+### \code{attr(x, 'units')} to see the units attached to each returned
+### variable.
 }, ex = function(){
-## Process SNF data for Toledo stored locally
-# Path to Toledo data file in 'basifoR' package
-ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
+## Example with bundled Toledo data
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package = "basifoR")
 
-# Decompress SNF data from the specified file path or URL
+## Decompress the archive and read the first 100 records
 fetch_ifn4p45 <- fetchNFI(ifn4p45)
+get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100, ]
 
-# Read and process the data (first 100 rows)
-get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100,]
-
-# Compute some metrics
+## Compute default metrics and inspect the reported units
 metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
-
-# see metric units
-attr(metrics_ifn4p45,'units')
+attr(metrics_ifn4p45, 'units')
 })
