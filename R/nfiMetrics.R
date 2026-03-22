@@ -110,16 +110,7 @@ trees_per_ha_vec <- function(dbh_cm, design) {
             diam_cm <- conv_unit(diam_mm, from = 'mm', to = 'cm')
 
         if(any(var. %in% 'n'))
-    trees_ha <- trees_per_ha_vec(diam_cm, design)
-        ## if(any(var. %in% 'n')) {
-        ##     design <- snfi_design()
-        ##     trees_ha <- rep(NA_real_, length(diam_cm))
-        ##     ok <- !is.na(diam_cm) & diam_cm >= design$min_dbh_cm[1]
-        ##     if(any(ok)) {
-        ##         idx <- findInterval(diam_cm[ok], design$min_dbh_cm)
-        ##         trees_ha[ok] <- design$sf[idx]
-        ##     }
-        ## }
+            trees_ha <- trees_per_ha_vec(diam_cm, design)
     }
 
     fdn <- function(dbh, var){
@@ -138,12 +129,12 @@ trees_per_ha_vec <- function(dbh_cm, design) {
         }
 
         if(var %in% 'n') {
-            if(length(diam_cols) > 0L)
-                return(trees_ha)
-            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
-                         function(x) dbhMetric(x, var)))
-        }
-
+    if(length(diam_cols) > 0L)
+        return(trees_ha)
+    return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+                 function(x) dbhMetric(x, var, design = design)))
+}
+        
         if(var %in% 'h') {
             ht <- if(length(ht_cols) > 0L) ht_cols else fc(dbh, c('altura', 'Ht'))
             return(as.numeric(as.character(dbh[, ht])))
