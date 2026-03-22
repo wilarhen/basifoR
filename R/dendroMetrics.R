@@ -152,12 +152,20 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
                                weighted_mean_vars,
                                sum_vars))
 
+        ## if (length(summ_names)) {
+        ##     summ <- colSums(dt[, summ_names, drop = FALSE], na.rm = TRUE)
+        ## } else {
+        ##     summ <- numeric(0)
+        ## }
         if (length(summ_names)) {
-            summ <- colSums(dt[, summ_names, drop = FALSE], na.rm = TRUE)
+            sum_or_na <- function(x) {
+                if (all(is.na(x))) NA_real_ else sum(x, na.rm = TRUE)
+            }
+            summ <- vapply(dt[, summ_names, drop = FALSE], sum_or_na, numeric(1))
         } else {
             summ <- numeric(0)
         }
-
+        
         keep_avg <- intersect(weighted_mean_vars, names(summ))
         if (length(keep_avg) && "n" %in% names(summ) &&
             is.finite(summ["n"]) && summ["n"] > 0)
