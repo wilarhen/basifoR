@@ -217,9 +217,18 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
 
     recycle_arg <- function(x, n, arg) {
         if (is.null(x))
-            return(vector("list", n))
+            return(rep(list(NULL), n))
         if (is.data.frame(x))
             return(rep(list(x), n))
+        if (n == 1L)
+            return(list(x))
+        if (is.list(x)) {
+            if (length(x) == 1L)
+                return(rep(x, n))
+            if (length(x) != n)
+                stop("'", arg, "' must have length 1 or length ", n, ".")
+            return(x)
+        }
         if (length(x) == 1L)
             return(rep(as.list(x), n))
         if (length(x) != n)
@@ -230,12 +239,19 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     nfi_list <- recycle_arg(nfi, n_inputs, "nfi")
     nfi.nr_list <- recycle_arg(nfi.nr, n_inputs, "nfi.nr")
 
-    jobs <- Map(function(nfi_i, nfi.nr_i) {
-        dots_i <- dots0
-        if (!is.null(nfi.nr_i))
-            dots_i[["nfi.nr"]] <- nfi.nr_i
-        list(nfi = nfi_i, dots = dots_i)
-    }, nfi_list, nfi.nr_list)
+    dot_names <- setdiff(names(dots0), "nfi.nr")
+    dot_lists <- lapply(dot_names, function(arg) {
+        recycle_arg(dots0[[arg]], n_inputs, arg)
+    })
+    names(dot_lists) <- dot_names
+
+    jobs <- lapply(seq_len(n_inputs), function(i) {
+        dots_i <- lapply(dot_lists, function(x) x[[i]])
+        names(dots_i) <- dot_names
+        if (!is.null(nfi.nr_list[[i]]))
+            dots_i[["nfi.nr"]] <- nfi.nr_list[[i]]
+        list(nfi = nfi_list[[i]], dots = dots_i)
+    })
 
 
 run_job <- function(job) {
@@ -333,17 +349,46 @@ if (any(errs)) {
     if (!length(res_list))
         return(NULL)
 
-    out <- Reduce(function(a, b) {
-        if (is.null(a)) return(b)
-        if (is.null(b)) return(a)
-        rbind(a, b)
-    }, res_list)
+    bind_rows_fill <- function(a, b) {
+        if (is.null(a))
+            return(b)
+        if (is.null(b))
+            return(a)
 
-    out <- data.frame(out)
+        a <- data.frame(a, check.names = FALSE)
+        b <- data.frame(b, check.names = FALSE)
+
+        cols <- union(names(a), names(b))
+
+        missing_a <- setdiff(cols, names(a))
+        missing_b <- setdiff(cols, names(b))
+
+        if (length(missing_a))
+            a[missing_a] <- NA
+        if (length(missing_b))
+            b[missing_b] <- NA
+
+        rbind(a[, cols, drop = FALSE], b[, cols, drop = FALSE])
+    }
+
+    collect_units <- function(x) {
+        units_list <- lapply(x, function(y) attr(y, "units"))
+        units_list <- Filter(Negate(is.null), units_list)
+
+        if (!length(units_list))
+            return(NULL)
+
+        out_units <- do.call(c, units_list)
+        out_units[!duplicated(names(out_units))]
+    }
+
+    out <- Reduce(bind_rows_fill, res_list)
+    out <- data.frame(out, check.names = FALSE)
     rownames(out) <- NULL
 
-    if (length(res_list) && !is.null(attr(res_list[[1]], "units")))
-        attr(out, "units") <- attr(res_list[[1]], "units")
+    out_units <- collect_units(res_list)
+    if (!is.null(out_units))
+        attr(out, "units") <- out_units[names(out_units) %in% names(out)]
 
     if (report)
         write.csv(out, file = "report.csv", row.names = FALSE)
