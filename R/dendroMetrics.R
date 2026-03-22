@@ -195,8 +195,17 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     if (report)
         write.csv(resm, file = "report.csv", row.names = FALSE)
 
+## vol_vars <- intersect(c("v", "vcc", "vsc", "iavc", "vle"), names(resm))
+## if (length(vol_vars))
+##     resm[vol_vars] <- resm[vol_vars] / 1000
+
 vol_vars <- intersect(c("v", "vcc", "vsc", "iavc", "vle"), names(resm))
-if (length(vol_vars))
+vol_units_in <- frm.[intersect(names(frm.), vol_vars)]
+
+needs_div1000 <- length(vol_units_in) &&
+    any(grepl("dm3", vol_units_in, ignore.case = TRUE))
+
+if (length(vol_vars) && needs_div1000)
     resm[vol_vars] <- resm[vol_vars] / 1000
     
     units_out <- c(
@@ -205,7 +214,7 @@ if (length(vol_vars))
         hd = "m",
         dg = "cm",
         ba = "m2 ha-1",
-        n = "",
+        n = "ha-1",
         v = "m3 ha-1",
         vcc = "m3 ha-1",
         vsc = "m3 ha-1",
