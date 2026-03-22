@@ -62,6 +62,7 @@ outdir <- file.path(
 dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
 
 pat <- paste0("\\.(", paste(file_ext, collapse = "|"), ")$")
+
 cached <- list.files(
     outdir,
     pattern = pat,
@@ -72,14 +73,37 @@ cached <- list.files(
 if (length(cached) > 0L)
     return(cached)
 
-if (is.remote && !file.exists(zipfile)) {
-    download.file(url., zipfile, mode = "wb")
+zip_ok <- function(zf) {
+    if (!file.exists(zf))
+        return(FALSE)
+    out <- tryCatch(unzip(zf, list = TRUE), error = function(e) NULL)
+    !is.null(out) && nrow(out) > 0L
 }
 
-con <- unzip(zipfile, exdir = outdir, files = NULL)
+if (is.remote) {
+    if (file.exists(zipfile) && !zip_ok(zipfile))
+        unlink(zipfile)
+
+    if (!file.exists(zipfile))
+        download.file(url., zipfile, mode = "wb")
+}
+
+if (!zip_ok(zipfile))
+    return(NULL)
+
+con <- tryCatch(
+    unzip(zipfile, exdir = outdir, files = NULL),
+    error = function(e) NULL
+)
+
+if (is.null(con))
+    return(NULL)
 
 tos <- grepl(pat, con, ignore.case = TRUE)
-con <- tryCatch(con[tos], error = function(e) NULL)
+con <- con[tos]
+
+if (length(con) == 0L)
+    return(NULL)
 
 return(file.path(outdir, basename(con)))
 ### \code{character}. Returns the path to the fetched and decompressed
