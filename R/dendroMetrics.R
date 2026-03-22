@@ -1,4 +1,4 @@
-dendroMetrics <- structure(function#Summarize dendrometrics
+dendroMetrics_semantic <- structure(function#Summarize dendrometrics
 ### This function summarizes dendrometric data from the Spanish
 ### National Forest Inventory (SNF). It primarily accepts a province
 ### name or number, a local compressed SNF file, or a URL to a
@@ -102,9 +102,20 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     names(nfi) <- tolower(names(nfi))
     frm. <- attr(nfi, "units")
 
+    if (!is.null(frm.)) {
+        names(frm.) <- tolower(names(frm.))
+        keep_units <- !is.na(names(frm.)) & nzchar(names(frm.))
+        frm. <- frm.[keep_units]
+        frm. <- frm.[!duplicated(names(frm.))]
+        frm. <- frm.[names(frm.) %in% names(nfi)]
+        attr(nfi, "units") <- frm.
+    }
+
     if (is.null(summ.vr)) {
         nfi <- subset(nfi, eval(parse(text = cut.dt)))
-        attributes(nfi) <- c(attributes(nfi), list(units = frm.))
+
+        if (!is.null(frm.))
+            attr(nfi, "units") <- frm.[intersect(names(nfi), names(frm.))]
 
         if (report)
             write.csv(nfi, file = "report.csv", row.names = FALSE)
@@ -113,31 +124,54 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     }
 
     summ.vr <- flev(nfi, summ.vr)
-    var <- getOption("units1")[getOption("units1") %in% names(nfi)]
-    to. <- names(var)
-    var. <- var[var != "n"]
 
-    nfi <- conv_units(nfi, var = var, un = to.)
+    weighted_mean_vars <- intersect(c("d", "h", "hd"), names(nfi))
+    sum_vars <- intersect(c("ba", "n", "v", "vcc", "vsc", "iavc", "vle"),
+                          names(nfi))
+
+    mean_target_units <- c(d = "cm", h = "m", hd = "m")
+    if (length(weighted_mean_vars)) {
+        nfi <- conv_units(
+            nfi,
+            var = weighted_mean_vars,
+            un = unname(mean_target_units[weighted_mean_vars])
+        )
+    }
+
     msp <- split(nfi, nfi[summ.vr])
     msp <- Filter("nrow", msp)
 
     fsum <- function(dt) {
-        dt[, var.] <- dt[, var.] * dt[, "n"]
+        scale_vars <- unique(c(setdiff(weighted_mean_vars, "n"),
+                               setdiff(sum_vars, "n")))
 
-        summ <- apply(dt[, var, drop = FALSE], 2, sum, na.rm = TRUE)
+        if (length(scale_vars))
+            dt[, scale_vars] <- dt[, scale_vars, drop = FALSE] * dt[, "n"]
 
-        keep_avg <- intersect(c("d", "h", "Hd"), names(summ))
-        if (length(keep_avg))
+        summ_names <- unique(c(intersect("n", names(dt)),
+                               weighted_mean_vars,
+                               sum_vars))
+
+        if (length(summ_names)) {
+            summ <- colSums(dt[, summ_names, drop = FALSE], na.rm = TRUE)
+        } else {
+            summ <- numeric(0)
+        }
+
+        keep_avg <- intersect(weighted_mean_vars, names(summ))
+        if (length(keep_avg) && "n" %in% names(summ) &&
+            is.finite(summ["n"]) && summ["n"] > 0)
             summ[keep_avg] <- summ[keep_avg] / summ["n"]
 
-        if (all(c("ba", "n") %in% names(summ)))
+        if (all(c("ba", "n") %in% names(summ)) &&
+            is.finite(summ["n"]) && summ["n"] > 0)
             summ["dg"] <- sqrt((4E4 * summ["ba"] / summ["n"]) / pi)
 
         summ <- summ[order(names(summ))]
         summ <- sapply(summ, function(x) round(x, 3))
         summ <- t(as.matrix(summ))
 
-        fcs. <- names(dt)[!names(dt) %in% var]
+        fcs. <- names(dt)[!names(dt) %in% unique(c(weighted_mean_vars, sum_vars))]
         fcs <- dt[1, fcs., drop = FALSE]
 
         cbind(fcs, summ)
@@ -153,10 +187,20 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     if (report)
         write.csv(resm, file = "report.csv", row.names = FALSE)
 
-    dgcm <- "dg"
-    names(dgcm) <- "cm"
-    attr. <- c(attr(nfi, "units"), dgcm)
-    attributes(resm) <- c(attributes(resm), list(units = attr.))
+    units_out <- c(
+        d = "cm",
+        h = "m",
+        hd = "m",
+        dg = "cm",
+        ba = "m2 ha-1",
+        n = "",
+        v = "m3 ha-1",
+        vcc = "m3 ha-1",
+        vsc = "m3 ha-1",
+        iavc = "m3 ha-1",
+        vle = "m3 ha-1"
+    )
+    attr(resm, "units") <- units_out[intersect(names(resm), names(units_out))]
 
     resm
 }
