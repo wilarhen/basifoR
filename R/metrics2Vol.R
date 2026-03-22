@@ -191,7 +191,43 @@ metrics2Vol <- structure(function(#Tree volumes in NFI data
     col_h    <- pick_col(c("h"), required = FALSE)
     col_dnm  <- pick_col(c("D.n.m.", "dnm", "d_nm"), required = FALSE)
 
-    ## Standardize measurement units before dispatching any equation.
+    ## Validate and standardize measurement-unit metadata before
+    ## dispatching any equation.
+    get_units_map <- function(x) {
+        un <- attr(x, "units")
+
+        if (is.null(un))
+            return(setNames(character(0), character(0)))
+
+        if (is.null(names(un)) || anyNA(names(un)) || any(names(un) == ""))
+            stop("'attr(nfi, \"units\")' must be a named vector whose names match variable names and whose values are unit strings.",
+                 call. = FALSE)
+
+        un[!duplicated(names(un))]
+    }
+
+    require_units_for <- function(x, cols, where = "nfi") {
+        cols <- cols[!is.null(cols)]
+        cols <- cols[!is.na(cols)]
+        cols <- cols[nzchar(cols)]
+
+        if (!length(cols))
+            return(invisible(NULL))
+
+        un <- get_units_map(x)
+        miss <- setdiff(cols, names(un))
+
+        if (length(miss))
+            stop("Missing unit metadata in attr(", where, ', "units") for: ',
+                 paste(miss, collapse = ", "),
+                 call. = FALSE)
+
+        invisible(un)
+    }
+
+    if (inherits(nfi, "nfiMetrics"))
+        require_units_for(nfi, c(col_d, col_h, col_dnm))
+
     if (!is.null(col_d))
         nfi <- conv_units(nfi, var = col_d, un = "mm")
     if (!is.null(col_h))
@@ -593,20 +629,11 @@ metrics2Vol <- structure(function(#Tree volumes in NFI data
     i <- i[!is.na(i)]
     out <- out[, c(n[i], n[-i]), drop = FALSE]
 
-    ## Rebuild units from surviving `nfiMetrics` columns plus returned
-    ## volume outputs.
-    units_orig <- attr(nfi_orig, "units")
-    if (is.null(units_orig))
-        units_orig <- setNames(character(0), character(0))
-
-    ## `nfiMetrics` stores units as values = variable names and names =
-    ## units, so invert them first.
-    if (length(units_orig)) {
-        units_keep <- setNames(names(units_orig), as.character(units_orig))
-        units_keep <- units_keep[names(units_keep) %in% names(out)]
-    } else {
-        units_keep <- setNames(character(0), character(0))
-    }
+    ## Rebuild units from surviving input columns plus returned volume
+    ## outputs. `nfiMetrics` stores units as a named vector:
+    ## names = variable names, values = unit strings.
+    units_orig <- get_units_map(nfi_orig)
+    units_keep <- units_orig[names(units_orig) %in% names(out)]
 
     ## Add units for the computed outputs that are returned.
     vol_units <- vapply(
