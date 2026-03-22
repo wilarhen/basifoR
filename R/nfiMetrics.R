@@ -23,12 +23,13 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
                                     ##metrics units. Default
                                     ##\code{c('pr','d','h','ba','n','Hd')}.
     levels = c('esta','espe'), ##<<\code{character}. levels at which
-                              ##the metrics are computed. Pattern
-                              ##matching is supported. Cases are
-                              ##ignored. Default
-                              ##\code{c('esta','espe')} matches both
-                              ##the sample plot \code{'Estadillos'}
-                              ##and tree species \code{'Especie'}. ,
+                               ##the metrics are computed. Pattern
+                               ##matching is supported. Cases are
+                               ##ignored. Default
+                               ##\code{c('esta','espe')} matches both
+                               ##the sample plot \code{'Estadillos'}
+                               ##and tree species \code{'Especie'}.
+    design = snfi_design(),
     ... ##<< Additional arguments in \code{\link{readNFI}}.
 
 ) {
@@ -72,6 +73,23 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         as.matrix(x)
     }
 
+trees_per_ha_vec <- function(dbh_cm, design) {
+
+    if (inherits(design, "concentric_design")) {
+        out <- rep(NA_real_, length(dbh_cm))
+        ok <- !is.na(dbh_cm) & dbh_cm >= design$min_dbh_cm[1]
+        if (any(ok)) {
+            idx <- findInterval(dbh_cm[ok], design$min_dbh_cm)
+            out[ok] <- design$sf[idx]
+        }
+        return(out)
+    }
+
+    vapply(dbh_cm,
+           function(x) trees_per_ha(design = design, dbh_cm = x),
+           numeric(1))
+}
+    
     diam_mm <- NULL
     diam_cm <- NULL
     trees_ha <- NULL
@@ -91,15 +109,17 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         if(any(var. %in% c('ba', 'n')))
             diam_cm <- conv_unit(diam_mm, from = 'mm', to = 'cm')
 
-        if(any(var. %in% 'n')) {
-            design <- snfi_design()
-            trees_ha <- rep(NA_real_, length(diam_cm))
-            ok <- !is.na(diam_cm) & diam_cm >= design$min_dbh_cm[1]
-            if(any(ok)) {
-                idx <- findInterval(diam_cm[ok], design$min_dbh_cm)
-                trees_ha[ok] <- design$sf[idx]
-            }
-        }
+        if(any(var. %in% 'n'))
+    trees_ha <- trees_per_ha_vec(diam_cm, design)
+        ## if(any(var. %in% 'n')) {
+        ##     design <- snfi_design()
+        ##     trees_ha <- rep(NA_real_, length(diam_cm))
+        ##     ok <- !is.na(diam_cm) & diam_cm >= design$min_dbh_cm[1]
+        ##     if(any(ok)) {
+        ##         idx <- findInterval(diam_cm[ok], design$min_dbh_cm)
+        ##         trees_ha[ok] <- design$sf[idx]
+        ##     }
+        ## }
     }
 
     fdn <- function(dbh, var){
