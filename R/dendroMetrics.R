@@ -1,4 +1,4 @@
-dendroMetrics_semantic <- structure(function#Summarize dendrometrics
+dendroMetrics <- structure(function#Summarize dendrometrics
 ### This function summarizes dendrometric data from the Spanish
 ### National Forest Inventory (SNF). It primarily accepts a province
 ### name or number, a local compressed SNF file, or a URL to a
