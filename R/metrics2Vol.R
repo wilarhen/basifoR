@@ -1,7 +1,9 @@
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-# Default metadata used to dispatch SNFI cubication functions.
-default_snfi_volume_equations <- function() {
+default_snfi_volume_equations <- function(
+    ### Build the default registry used to dispatch SNFI volume
+    ### equations and fallback methods.
+) {
     list(
         V = list(
             output = "v",
@@ -70,11 +72,14 @@ default_snfi_volume_equations <- function() {
     )
 }
 
-# Build the registry from an object named `snfi_volume_equations` when it exists.
-# This lets you keep the dispatch map next to the equation functions.
-snfi_volume_method_registry <- function(equations = get0("snfi_volume_equations",
-                                                          inherits = TRUE,
-                                                          ifnotfound = NULL)) {
+snfi_volume_method_registry <- function(
+    equations = get0("snfi_volume_equations",
+                     inherits = TRUE,
+                     ifnotfound = NULL)
+    ### Optional user registry. When omitted, the function uses an object
+    ### named `snfi_volume_equations` if it exists, otherwise the
+    ### package defaults.
+) {
     defaults <- default_snfi_volume_equations()
 
     if (is.null(equations))
@@ -94,44 +99,72 @@ snfi_volume_method_registry <- function(equations = get0("snfi_volume_equations"
     utils::modifyList(defaults, equations)
 }
 
-metrics2Vol <- structure(function(
+metrics2Vol <- structure(function(#Tree volumes in NFI data
+### This function computes over bark volumes (\code{'m3'}) processing
+### tree metrics from databases of the SNF data and using volume
+### equations established in 2nd NFI, see Details section. To compute
+### all in-package metrics, run function \code{\link{dendroMetrics}}.
     nfi,
+    ### Input accepted by `nfiMetrics()`, or a precomputed `"nfiMetrics"`
+    ### object with tree-level metrics.
+
     cub.met = "freq",
+    ### Cubication selector used when several coefficient rows match.
+
     parametro = c("VCC"),
+    ### One or more volume outputs to compute. Typical values are `"V"`,
+    ### `"VCC"`, `"VSC"`, `"IAVC"`, and `"VLE"`.
+
     keep.var = TRUE,
+    ### Keep auxiliary coefficient columns when available.
+
     keep.legacy = FALSE,
+    ### Also return the legacy volume estimate for backward compatibility.
+
     method_registry = snfi_volume_method_registry(),
+    ### Registry that maps each requested output to its equation function,
+    ### output column name, units, and fallback rule.
+
     ...
+    ### Passed to `nfiMetrics()` when `nfi` is not already an
+    ### `"nfiMetrics"` object.
 ) {
+    ## Return early for `NULL` input.
     nfi. <- nfi
     if (is.null(nfi.))
         return(nfi)
 
+    ## Build dendrometric metrics when the input is not already
+    ## standardized.
     if (!inherits(nfi., "nfiMetrics"))
         nfi <- nfiMetrics(nfi, ...)
 
+    ## Resolve the inventory edition from the object attribute first and
+    ## from a column only as a fallback.
     nfi_nr <- attr(nfi, "nfi.nr")
 
-if (is.null(nfi_nr) || length(nfi_nr) != 1L || is.na(nfi_nr)) {
-    nm0 <- names(nfi)
-    nm  <- tolower(nm0)
-    i_nfi <- match("nfi.nr", nm)
+    if (is.null(nfi_nr) || length(nfi_nr) != 1L || is.na(nfi_nr)) {
+        nm0 <- names(nfi)
+        nm  <- tolower(nm0)
+        i_nfi <- match("nfi.nr", nm)
 
-    if (!is.na(i_nfi)) {
-        vals <- unique(stats::na.omit(nfi[[nm0[i_nfi]]]))
-        if (length(vals) == 1L)
-            nfi_nr <- vals[1L]
+        if (!is.na(i_nfi)) {
+            vals <- unique(stats::na.omit(nfi[[nm0[i_nfi]]]))
+            if (length(vals) == 1L)
+                nfi_nr <- vals[1L]
+        }
     }
-}
 
-if (is.null(nfi_nr) || length(nfi_nr) != 1L || is.na(nfi_nr))
-    stop("Could not determine 'nfi.nr' from attribute or column.", call. = FALSE)
-    
+    if (is.null(nfi_nr) || length(nfi_nr) != 1L || is.na(nfi_nr))
+        stop("Could not determine 'nfi.nr' from attribute or column.",
+             call. = FALSE)
+
     nfi_orig <- nfi
 
     nm0 <- names(nfi)
     nm <- tolower(nm0)
 
+    ## Match the first available column name among accepted aliases.
     pick_col <- function(candidates, required = TRUE) {
         ii <- match(tolower(candidates), nm)
         ii <- ii[!is.na(ii)]
@@ -151,12 +184,14 @@ if (is.null(nfi_nr) || length(nfi_nr) != 1L || is.na(nfi_nr))
         sort(names(dt)[ii], decreasing = TRUE)
     }
 
+    ## Identify the core columns needed by the volume equations.
     col_spec <- pick_col(c("Especie", "especie", "codigo_especie", "spec"))
     col_pr   <- pick_col(c("pr", "codigo_provincia"))
     col_d    <- pick_col(c("d"))
     col_h    <- pick_col(c("h"), required = FALSE)
     col_dnm  <- pick_col(c("D.n.m.", "dnm", "d_nm"), required = FALSE)
 
+    ## Standardize measurement units before dispatching any equation.
     if (!is.null(col_d))
         nfi <- conv_units(nfi, var = col_d, un = "mm")
     if (!is.null(col_h))
@@ -164,6 +199,7 @@ if (is.null(nfi_nr) || length(nfi_nr) != 1L || is.na(nfi_nr))
     if (!is.null(col_dnm))
         nfi <- conv_units(nfi, var = col_dnm, un = "mm")
 
+    ## Validate requested outputs against the method registry.
     parametro <- unique(toupper(parametro))
     valid_param <- unique(toupper(names(method_registry)))
     bad_param <- setdiff(parametro, valid_param)
@@ -172,8 +208,8 @@ if (is.null(nfi_nr) || length(nfi_nr) != 1L || is.na(nfi_nr))
              paste(bad_param, collapse = ", "),
              call. = FALSE)
 
+    ## Preallocate all requested output columns.
     out <- nfi_orig
-    ## out <- nfi
     keep_param <- unique(c(if (keep.legacy) "V", parametro))
     requested_outputs <- unique(vapply(
         keep_param,
@@ -185,68 +221,79 @@ if (is.null(nfi_nr) || length(nfi_nr) != 1L || is.na(nfi_nr))
 
     warn_msg <- character(0)
 
-compute_legacy_v <- function(nfi_input, cub.met = "freq", nfi.nr = NULL) {
-    if (!exists("metrics2Vol", mode = "function", inherits = TRUE))
-        return(rep(NA_real_, nrow(nfi_input)))
+    ## Compute the legacy volume once so modern methods can fall back to
+    ## it when needed.
+    compute_legacy_v <- function(nfi_input, cub.met = "freq", nfi.nr = NULL) {
+        if (!exists("metrics2Vol", mode = "function", inherits = TRUE))
+            return(rep(NA_real_, nrow(nfi_input)))
 
-    leg <- nfi_input
-    leg$.rowid_legacy <- seq_len(nrow(leg))
-    if (!is.null(nfi.nr))
-        attr(leg, "nfi.nr") <- nfi.nr
+        leg <- nfi_input
+        leg$.rowid_legacy <- seq_len(nrow(leg))
+        if (!is.null(nfi.nr))
+            attr(leg, "nfi.nr") <- nfi.nr
 
-    old <- tryCatch(
-        metrics2Vol_legacy(leg, cub.met = cub.met, keep.var = FALSE),
-        error = function(e) {
-            stop("Legacy metrics2Vol failed: ", conditionMessage(e), call. = FALSE)
-        }
-    )
+        old <- tryCatch(
+            metrics2Vol_legacy(leg, cub.met = cub.met, keep.var = FALSE),
+            error = function(e) {
+                stop("Legacy metrics2Vol failed: ",
+                     conditionMessage(e),
+                     call. = FALSE)
+            }
+        )
 
-    if (is.null(old) || !"v" %in% names(old))
-        return(rep(NA_real_, nrow(leg)))
+        if (is.null(old) || !"v" %in% names(old))
+            return(rep(NA_real_, nrow(leg)))
 
-    id_col <- names(old)[tolower(names(old)) == ".rowid_legacy"]
-    if (!length(id_col))
-        stop("Legacy metrics2Vol did not preserve '.rowid_legacy'.", call. = FALSE)
+        id_col <- names(old)[tolower(names(old)) == ".rowid_legacy"]
+        if (!length(id_col))
+            stop("Legacy metrics2Vol did not preserve '.rowid_legacy'.",
+                 call. = FALSE)
 
-    out_v <- rep(NA_real_, nrow(leg))
-    idx <- match(seq_len(nrow(leg)), old[[id_col[1L]]])
-    ok <- !is.na(idx)
-    out_v[ok] <- suppressWarnings(as.numeric(old[["v"]][idx[ok]]))
-    out_v
-}
-    
+        out_v <- rep(NA_real_, nrow(leg))
+        idx <- match(seq_len(nrow(leg)), old[[id_col[1L]]])
+        ok <- !is.na(idx)
+        out_v[ok] <- suppressWarnings(as.numeric(old[["v"]][idx[ok]]))
+        out_v
+    }
+
+    ## Decide whether legacy estimates can be computed from the input.
     can_compute_legacy <- all(c("pr", "d", "h") %in% tolower(names(nfi_orig))) &&
         any(grepl("spec|espec", names(nfi_orig), ignore.case = TRUE))
 
-    ## need_legacy <- keep.legacy || any(parametro %in% c("V", "VCC", "VSC", "IAVC", "VLE"))
     need_legacy <- keep.legacy || any(parametro %in% c("V", "VCC"))
 
-legacy_v_m3 <- rep(NA_real_, nrow(out))
-if (need_legacy && can_compute_legacy) {
-    legacy_v_m3 <- compute_legacy_v(
-        nfi_input = nfi_orig,
-        cub.met = cub.met,
-        nfi.nr = nfi_nr
-    )
-} else if (need_legacy) {
-    warn_msg <- c(warn_msg, "Legacy method not available: missing species, pr, d and/or h.")
-}
-    
+    legacy_v_m3 <- rep(NA_real_, nrow(out))
+    if (need_legacy && can_compute_legacy) {
+        legacy_v_m3 <- compute_legacy_v(
+            nfi_input = nfi_orig,
+            cub.met = cub.met,
+            nfi.nr = nfi_nr
+        )
+    } else if (need_legacy) {
+        warn_msg <- c(
+            warn_msg,
+            "Legacy method not available: missing species, pr, d and/or h."
+        )
+    }
+
     if (keep.legacy || "V" %in% parametro)
         out[[method_registry[["V"]]$output]] <- legacy_v_m3
 
-can_use_new <- !is.null(col_pr) && !is.null(col_spec)
-    
-    if (can_use_new) {
-        coef_tab <- if (exists("SNFI43_all_volume_coefficients", inherits = TRUE)) {
-                        SNFI43_all_volume_coefficients
-} else {
-    NULL
-}
+    ## Load and normalize the coefficient table used by registry-based
+    ## methods.
+    can_use_new <- !is.null(col_pr) && !is.null(col_spec)
 
-coef_names <- if (is.null(coef_tab)) character(0) else names(coef_tab)
-coef_names_lc <- tolower(coef_names)
-        
+    if (can_use_new) {
+        coef_tab <- if (exists("SNFI43_all_volume_coefficients",
+                               inherits = TRUE)) {
+            SNFI43_all_volume_coefficients
+        } else {
+            NULL
+        }
+
+        coef_names <- if (is.null(coef_tab)) character(0) else names(coef_tab)
+        coef_names_lc <- tolower(coef_names)
+
         coef_col <- function(candidates) {
             ii <- match(tolower(candidates), coef_names_lc)
             ii <- ii[!is.na(ii)]
@@ -263,174 +310,190 @@ coef_names_lc <- tolower(coef_names)
         coef_col_model <- coef_col(c("Modelo", "modelo"))
 
         if (!is.null(coef_col_param))
-            coef_tab[[coef_col_param]] <- toupper(as.character(coef_tab[[coef_col_param]]))
-coef_param_chr <- if (!is.null(coef_col_param)) coef_tab[[coef_col_param]] else NULL
-
-num1 <- function(x) suppressWarnings(as.numeric(as.character(x)))
-
-pr_num  <- num1(nfi_orig[[col_pr]])
-sp_num  <- num1(nfi_orig[[col_spec]])
-d_num   <- if (!is.null(col_d))   num1(nfi[[col_d]])   else rep(NA_real_, nrow(out))
-h_num   <- if (!is.null(col_h))   num1(nfi[[col_h]])   else rep(NA_real_, nrow(out))
-dnm_num <- if (!is.null(col_dnm)) num1(nfi[[col_dnm]]) else rep(NA_real_, nrow(out))
-
-coef_pr_num <- if (!is.null(coef_col_pr)) num1(coef_tab[[coef_col_pr]]) else NULL
-coef_sp_num <- if (!is.null(coef_col_specn)) num1(coef_tab[[coef_col_specn]]) else NULL
-## coef_fc_chr <- if (!is.null(coef_col_fc)) as.character(coef_tab[[coef_col_fc]]) else NULL
-
-pars_cache <- new.env(parent = emptyenv())
-
-        
-
-match_coef_rows <- function(pr, especie, param = NULL, cub.met = "freq") {
-    key <- paste(
-        num1(nfi_nr),
-        num1(pr),
-        num1(especie),
-        toupper(param %||% ""),
-        as.character(cub.met),
-        sep = "\r"
-    )
-
-    hit <- get0(key, envir = pars_cache, inherits = FALSE, ifnotfound = NULL)
-    if (!is.null(hit))
-        return(hit)
-
-    if (is.null(coef_tab) || is.null(coef_col_nfi) || is.null(coef_col_pr)) {
-        assign(key, data.frame(), envir = pars_cache)
-        return(data.frame())
-    }
-
-    pr1 <- num1(pr)
-    sp1 <- num1(especie)
-
-    ii <- coef_tab[[coef_col_nfi]] == nfi_nr
-    if (!is.na(pr1))
-        ii <- ii & (coef_pr_num == pr1)
-
-    x <- coef_tab[ii, , drop = FALSE]
-    if (!nrow(x)) {
-        assign(key, x, envir = pars_cache)
-        return(x)
-    }
-
-    param_x <- if (!is.null(coef_col_param)) coef_param_chr[ii] else NULL
-
-    if (!is.na(sp1) && !is.null(coef_col_specn)) {
-        jj <- coef_sp_num[ii] == sp1
-        y <- x[jj, , drop = FALSE]
-        if (nrow(y)) {
-            x <- y
-            if (!is.null(param_x))
-                param_x <- param_x[jj]
+            coef_tab[[coef_col_param]] <- toupper(as.character(
+                coef_tab[[coef_col_param]]
+            ))
+        coef_param_chr <- if (!is.null(coef_col_param)) {
+            coef_tab[[coef_col_param]]
+        } else {
+            NULL
         }
-    }
 
-    if (!is.null(param) && !is.null(coef_col_param)) {
-        y <- x[param_x == toupper(param), , drop = FALSE]
-        if (nrow(y))
-            x <- y
-    }
+        num1 <- function(x) suppressWarnings(as.numeric(as.character(x)))
 
-    if (nrow(x) > 1L && !is.null(coef_col_fc) && !identical(cub.met, "freq")) {
-        fc_x <- as.character(x[[coef_col_fc]])
-        y <- x[fc_x == as.character(cub.met), , drop = FALSE]
-        if (nrow(y))
-            x <- y
-    }
+        ## Convert relevant inputs and coefficient keys to numeric values.
+        pr_num  <- num1(nfi_orig[[col_pr]])
+        sp_num  <- num1(nfi_orig[[col_spec]])
+        d_num   <- if (!is.null(col_d))   num1(nfi[[col_d]])   else rep(NA_real_, nrow(out))
+        h_num   <- if (!is.null(col_h))   num1(nfi[[col_h]])   else rep(NA_real_, nrow(out))
+        dnm_num <- if (!is.null(col_dnm)) num1(nfi[[col_dnm]]) else rep(NA_real_, nrow(out))
 
-    assign(key, x, envir = pars_cache)
-    x
-}
+        coef_pr_num <- if (!is.null(coef_col_pr)) num1(coef_tab[[coef_col_pr]]) else NULL
+        coef_sp_num <- if (!is.null(coef_col_specn)) num1(coef_tab[[coef_col_specn]]) else NULL
 
-        
-get_method_pars <- function(param, ctx, resolved) {
-    def <- method_registry[[param]]
+        ## Cache row matches to avoid repeated filtering of the same
+        ## coefficient subset.
+        pars_cache <- new.env(parent = emptyenv())
 
-    if (is.function(def$get_pars)) {
-        p <- def$get_pars(
-            ctx = ctx,
-            resolved = resolved,
-            nfi = nfi_orig,
-            cub.met = cub.met
-        )
-        if (!is.null(p) && nrow(as.data.frame(p)) > 0)
-            return(as.data.frame(p, stringsAsFactors = FALSE))
-    }
+        match_coef_rows <- function(pr, especie, param = NULL,
+                                    cub.met = "freq") {
+            key <- paste(
+                num1(nfi_nr),
+                num1(pr),
+                num1(especie),
+                toupper(param %||% ""),
+                as.character(cub.met),
+                sep = "\r"
+            )
 
-    if (!is.null(def$pars)) {
+            hit <- get0(key, envir = pars_cache,
+                        inherits = FALSE, ifnotfound = NULL)
+            if (!is.null(hit))
+                return(hit)
 
-        p <- def$pars
-        if (!is.data.frame(p))
-            p <- as.data.frame(p, stringsAsFactors = FALSE)
+            if (is.null(coef_tab) || is.null(coef_col_nfi) ||
+                is.null(coef_col_pr)) {
+                assign(key, data.frame(), envir = pars_cache)
+                return(data.frame())
+            }
 
-        if (!nrow(p))
-            return(NULL)
+            pr1 <- num1(pr)
+            sp1 <- num1(especie)
 
-        nms <- tolower(names(p))
-        y <- p
+            ii <- coef_tab[[coef_col_nfi]] == nfi_nr
+            if (!is.na(pr1))
+                ii <- ii & (coef_pr_num == pr1)
 
-        col_pr   <- names(p)[match("pr", nms)]
-        col_spec <- names(p)[match("especie", nms)]
-        col_nfi  <- names(p)[match("nfi.nr", nms)]
+            x <- coef_tab[ii, , drop = FALSE]
+            if (!nrow(x)) {
+                assign(key, x, envir = pars_cache)
+                return(x)
+            }
 
-        if (!is.na(col_pr))
-            y <- y[suppressWarnings(as.numeric(as.character(y[[col_pr]]))) ==
-                   suppressWarnings(as.numeric(as.character(ctx$pr))), , drop = FALSE]
+            param_x <- if (!is.null(coef_col_param)) coef_param_chr[ii] else NULL
 
-        if (!is.na(col_spec))
-            y <- y[suppressWarnings(as.numeric(as.character(y[[col_spec]]))) ==
-                   suppressWarnings(as.numeric(as.character(ctx$especie))), , drop = FALSE]
+            if (!is.na(sp1) && !is.null(coef_col_specn)) {
+                jj <- coef_sp_num[ii] == sp1
+                y <- x[jj, , drop = FALSE]
+                if (nrow(y)) {
+                    x <- y
+                    if (!is.null(param_x))
+                        param_x <- param_x[jj]
+                }
+            }
 
-        if (!is.na(col_nfi))
-            y <- y[y[[col_nfi]] == nfi_nr, , drop = FALSE]
+            if (!is.null(param) && !is.null(coef_col_param)) {
+                y <- x[param_x == toupper(param), , drop = FALSE]
+                if (nrow(y))
+                    x <- y
+            }
 
-        if (nrow(y) > 0)
-            return(y[1L, , drop = FALSE])
+            if (nrow(x) > 1L && !is.null(coef_col_fc) &&
+                !identical(cub.met, "freq")) {
+                fc_x <- as.character(x[[coef_col_fc]])
+                y <- x[fc_x == as.character(cub.met), , drop = FALSE]
+                if (nrow(y))
+                    x <- y
+            }
 
-        return(NULL)
-    }
+            assign(key, x, envir = pars_cache)
+            x
+        }
 
-    p <- match_coef_rows(
-        pr = ctx$pr,
-        especie = ctx$especie,
-        param = param,
-        cub.met = cub.met
-    )
+        ## Resolve the parameter row for one method and one tree.
+        get_method_pars <- function(param, ctx, resolved) {
+            def <- method_registry[[param]]
 
-    if (!nrow(p))
-        return(NULL)
+            if (is.function(def$get_pars)) {
+                p <- def$get_pars(
+                    ctx = ctx,
+                    resolved = resolved,
+                    nfi = nfi_orig,
+                    cub.met = cub.met
+                )
+                if (!is.null(p) && nrow(as.data.frame(p)) > 0)
+                    return(as.data.frame(p, stringsAsFactors = FALSE))
+            }
 
-    p <- p[1L, , drop = FALSE]
-    if (!is.null(coef_col_model) && !"Modelo" %in% names(p))
-        p$Modelo <- p[[coef_col_model]]
+            if (!is.null(def$pars)) {
+                p <- def$pars
+                if (!is.data.frame(p))
+                    p <- as.data.frame(p, stringsAsFactors = FALSE)
 
-    p
-}
-        
+                if (!nrow(p))
+                    return(NULL)
 
-get_method_fun <- function(def) {
-    if (is.function(def$fun))
-        return(def$fun)
+                nms <- tolower(names(p))
+                y <- p
 
-    fn <- def$fun_name %||% NULL
-    if (is.null(fn))
-        return(NULL)
+                col_pr   <- names(p)[match("pr", nms)]
+                col_spec <- names(p)[match("especie", nms)]
+                col_nfi  <- names(p)[match("nfi.nr", nms)]
 
-    get0(fn, mode = "function", inherits = TRUE)
-}
-        
+                if (!is.na(col_pr))
+                    y <- y[suppressWarnings(as.numeric(as.character(
+                        y[[col_pr]]
+                    ))) == suppressWarnings(as.numeric(as.character(
+                        ctx$pr
+                    ))), , drop = FALSE]
 
-eval_method <- function(param, ctx, resolved) {
-    def <- method_registry[[param]]
-    fun <- get_method_fun(def)
-    if (is.null(fun))
-        return(def$fallback(ctx, NULL, resolved))
+                if (!is.na(col_spec))
+                    y <- y[suppressWarnings(as.numeric(as.character(
+                        y[[col_spec]]
+                    ))) == suppressWarnings(as.numeric(as.character(
+                        ctx$especie
+                    ))), , drop = FALSE]
 
-    pars <- get_method_pars(param, ctx, resolved)
-    if (is.null(pars))
-        return(def$fallback(ctx, NULL, resolved))
-        
+                if (!is.na(col_nfi))
+                    y <- y[y[[col_nfi]] == nfi_nr, , drop = FALSE]
+
+                if (nrow(y) > 0)
+                    return(y[1L, , drop = FALSE])
+
+                return(NULL)
+            }
+
+            p <- match_coef_rows(
+                pr = ctx$pr,
+                especie = ctx$especie,
+                param = param,
+                cub.met = cub.met
+            )
+
+            if (!nrow(p))
+                return(NULL)
+
+            p <- p[1L, , drop = FALSE]
+            if (!is.null(coef_col_model) && !"Modelo" %in% names(p))
+                p$Modelo <- p[[coef_col_model]]
+
+            p
+        }
+
+        ## Resolve the equation function for one registry entry.
+        get_method_fun <- function(def) {
+            if (is.function(def$fun))
+                return(def$fun)
+
+            fn <- def$fun_name %||% NULL
+            if (is.null(fn))
+                return(NULL)
+
+            get0(fn, mode = "function", inherits = TRUE)
+        }
+
+        ## Evaluate one registry method and scale the result to cubic
+        ## metres.
+        eval_method <- function(param, ctx, resolved) {
+            def <- method_registry[[param]]
+            fun <- get_method_fun(def)
+            if (is.null(fun))
+                return(def$fallback(ctx, NULL, resolved))
+
+            pars <- get_method_pars(param, ctx, resolved)
+            if (is.null(pars))
+                return(def$fallback(ctx, NULL, resolved))
+
             pars <- pars[1L, , drop = FALSE]
             if (!is.null(coef_col_model) && !"Modelo" %in% names(pars))
                 pars$Modelo <- pars[[coef_col_model]]
@@ -449,21 +512,22 @@ eval_method <- function(param, ctx, resolved) {
                 return(def$fallback(ctx, pars, resolved))
 
             scale_to_m3 <- def$scale_to_m3 %||% (1 / 1000)
-    val * scale_to_m3
-    }
-    
+            val * scale_to_m3
+        }
+
+        ## Evaluate methods row by row. `VCC` is computed first because
+        ## later outputs may reuse it.
         param_order <- unique(c("VCC", setdiff(parametro, c("V", "VCC"))))
         param_order <- intersect(param_order, setdiff(names(method_registry), "V"))
 
         for (i in seq_len(nrow(out))) {
-
-ctx <- list(
-    pr = pr_num[i],
-    especie = sp_num[i],
-    d_mm = d_num[i],
-    h_m = h_num[i],
-    dnm_mm = dnm_num[i]
-)
+            ctx <- list(
+                pr = pr_num[i],
+                especie = sp_num[i],
+                d_mm = d_num[i],
+                h_m = h_num[i],
+                dnm_mm = dnm_num[i]
+            )
 
             resolved <- list(
                 legacy_v_m3 = legacy_v_m3[i],
@@ -484,10 +548,13 @@ ctx <- list(
             }
         }
     } else {
-        warn_msg <- c(warn_msg,
-                      "SNFI43 coefficients not used: missing matching variables or coefficient table not available.")
+        warn_msg <- c(
+            warn_msg,
+            "SNFI43 coefficients not used: missing matching variables or coefficient table not available."
+        )
     }
 
+    ## Drop auxiliary coefficient columns when requested.
     if (!keep.var) {
         drop_cols <- intersect(
             c("par1", "par2", "par3", "fc", "parametro",
@@ -499,8 +566,8 @@ ctx <- list(
             out <- out[, !names(out) %in% drop_cols, drop = FALSE]
     }
 
-
-        keep_out <- unique(vapply(
+    ## Keep only the requested computed outputs.
+    keep_out <- unique(vapply(
         keep_param,
         function(x) method_registry[[x]]$output %||% tolower(x),
         character(1)
@@ -518,6 +585,7 @@ ctx <- list(
     if (length(drop_vol))
         out <- out[, !tolower(names(out)) %in% drop_vol, drop = FALSE]
 
+    ## Reorder identifying columns to the front of the output.
     rownames(out) <- NULL
     n <- names(out)
     first <- c("nfi.nr", "pr", "estadillo", "especie")
@@ -525,13 +593,14 @@ ctx <- list(
     i <- i[!is.na(i)]
     out <- out[, c(n[i], n[-i]), drop = FALSE]
 
-    ## rebuild units from surviving nfiMetrics columns + returned volume outputs
+    ## Rebuild units from surviving `nfiMetrics` columns plus returned
+    ## volume outputs.
     units_orig <- attr(nfi_orig, "units")
     if (is.null(units_orig))
         units_orig <- setNames(character(0), character(0))
 
-    ## nfiMetrics stores units as: values = variable names, names = units
-    ## convert to the more convenient form: names = variable names, values = units
+    ## `nfiMetrics` stores units as values = variable names and names =
+    ## units, so invert them first.
     if (length(units_orig)) {
         units_keep <- setNames(names(units_orig), as.character(units_orig))
         units_keep <- units_keep[names(units_keep) %in% names(out)]
@@ -539,7 +608,7 @@ ctx <- list(
         units_keep <- setNames(character(0), character(0))
     }
 
-    ## add units for returned computed outputs
+    ## Add units for the computed outputs that are returned.
     vol_units <- vapply(
         keep_out,
         function(out_nm) {
@@ -558,15 +627,14 @@ ctx <- list(
     )
     names(vol_units) <- keep_out
 
-    ## computed outputs override any same-named original entry
+    ## Computed outputs override any original units with the same name.
     units_out <- c(units_keep, vol_units)
     units_out <- units_out[!duplicated(names(units_out), fromLast = TRUE)]
 
-    ## keep only units for columns that are present, in output order
+    ## Keep units only for columns present in the final output.
     units_out <- units_out[intersect(names(out), names(units_out))]
 
     attr(out, "units") <- units_out
-    
     attr(out, "nfi.nr") <- nfi_nr
     class(out) <- append("metrics2vol", class(out))
 
@@ -574,4 +642,11 @@ ctx <- list(
         warning(paste(unique(warn_msg), collapse = "\n"), call. = FALSE)
 
     out
-})
+},
+ex = c(
+    "if (FALSE) {",
+    "  x <- nfiMetrics('toledo')",
+    "  y <- metrics2Vol(x, parametro = c('VCC', 'VSC'))",
+    "  head(y[c('nfi.nr', 'pr', 'especie', 'vcc', 'vsc')])",
+    "}"
+))
