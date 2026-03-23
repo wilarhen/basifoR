@@ -195,18 +195,9 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     if (report)
         write.csv(resm, file = "report.csv", row.names = FALSE)
 
-## vol_vars <- intersect(c("v", "vcc", "vsc", "iavc", "vle"), names(resm))
-## if (length(vol_vars))
-##     resm[vol_vars] <- resm[vol_vars] / 1000
-
+## metrics2Vol() already returns volume outputs in m3
+## so dendroMetrics() should only aggregate and relabel them.
 vol_vars <- intersect(c("v", "vcc", "vsc", "iavc", "vle"), names(resm))
-vol_units_in <- frm.[intersect(names(frm.), vol_vars)]
-
-needs_div1000 <- length(vol_units_in) &&
-    any(grepl("dm3", vol_units_in, ignore.case = TRUE))
-
-if (length(vol_vars) && needs_div1000)
-    resm[vol_vars] <- resm[vol_vars] / 1000
     
     units_out <- c(
         d = "cm",
