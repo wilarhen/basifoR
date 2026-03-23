@@ -1,14 +1,13 @@
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-default_snfi_volume_equations <- function(
-    ### Build the default registry used to dispatch SNFI volume
-    ### equations and fallback methods.
-) {
+default_snfi_volume_equations <- function() {
     list(
         V = list(
             output = "v",
             fun_name = NULL,
             unit = "m3",
+            raw_unit = "m3",
+            scale_to_m3 = 1,
             build_args = function(ctx, pars, resolved) list(),
             fallback = function(ctx, pars, resolved) resolved$legacy_v_m3 %||% NA_real_
         ),
@@ -16,8 +15,10 @@ default_snfi_volume_equations <- function(
             output = "vcc",
             fun_name = "get_snfi_vcc",
             unit = "m3",
+            raw_unit = "dm3",
+            scale_to_m3 = 1 / 1000,
             build_args = function(ctx, pars, resolved) {
-                list(dbh_mm = ctx$d_mm, h_m = ctx$h_m, pars = pars)
+                list(dbh_mm = ctx$d_mm, h_t = ctx$h_m, pars = pars)
             },
             fallback = function(ctx, pars, resolved) resolved$legacy_v_m3 %||% NA_real_
         ),
@@ -25,6 +26,8 @@ default_snfi_volume_equations <- function(
             output = "vsc",
             fun_name = "get_snfi_vsc",
             unit = "m3",
+            raw_unit = "dm3",
+            scale_to_m3 = 1 / 1000,
             build_args = function(ctx, pars, resolved) {
                 vcc_m3 <- resolved$vcc_m3
                 if (is.null(vcc_m3) || is.na(vcc_m3))
@@ -34,43 +37,10 @@ default_snfi_volume_equations <- function(
                 list(vcc = vcc_m3 * 1000, pars = pars)
             },
             fallback = function(ctx, pars, resolved) NA_real_
-        ),
-        IAVC = list(
-            output = "iavc",
-            fun_name = "get_snfi_iavc",
-            unit = "m3",
-            build_args = function(ctx, pars, resolved) {
-                vcc_m3 <- resolved$vcc_m3
-                if (is.null(vcc_m3) || is.na(vcc_m3))
-                    vcc_m3 <- resolved$legacy_v_m3
-                list(
-                    dbh_mm = ctx$d_mm,
-                    dnm_mm = ctx$dnm_mm,
-                    h_t = ctx$h_m,
-                    vcc = if (is.null(vcc_m3) || is.na(vcc_m3)) NULL else vcc_m3 * 1000,
-                    pars = pars
-                )
-            },
-            fallback = function(ctx, pars, resolved) NA_real_
-        ),
-        VLE = list(
-            output = "vle",
-            fun_name = "get_snfi_vle",
-            unit = "m3",
-            build_args = function(ctx, pars, resolved) {
-                vcc_m3 <- resolved$vcc_m3
-                if (is.null(vcc_m3) || is.na(vcc_m3))
-                    vcc_m3 <- resolved$legacy_v_m3
-                list(
-                    dbh_mm = ctx$d_mm,
-                    vcc = if (is.null(vcc_m3) || is.na(vcc_m3)) NULL else vcc_m3 * 1000,
-                    pars = pars
-                )
-            },
-            fallback = function(ctx, pars, resolved) NA_real_
         )
     )
 }
+
 
 snfi_volume_method_registry <- function(
     equations = get0("snfi_volume_equations",
@@ -99,7 +69,7 @@ snfi_volume_method_registry <- function(
     utils::modifyList(defaults, equations)
 }
 
-metrics2Vol <- structure(function(#Tree volumes in NFI data
+metrics2Vol_provenance <- structure(function(#Tree volumes in NFI data
 ### This function computes over bark volumes (\code{'m3'}) processing
 ### tree metrics from databases of the SNF data and using volume
 ### equations established in 2nd NFI, see Details section. To compute
@@ -124,6 +94,10 @@ metrics2Vol <- structure(function(#Tree volumes in NFI data
     method_registry = snfi_volume_method_registry(),
     ### Registry that maps each requested output to its equation function,
     ### output column name, units, and fallback rule.
+
+    track_provenance = TRUE,
+    ### Add per-row provenance columns and a compact audit trail
+    ### attribute for computed volume outputs.
 
     ...
     ### Passed to `nfiMetrics()` when `nfi` is not already an
@@ -255,6 +229,16 @@ metrics2Vol <- structure(function(#Tree volumes in NFI data
     for (nm_out in requested_outputs)
         out[[nm_out]] <- NA_real_
 
+    if (track_provenance) {
+        for (nm_out in requested_outputs) {
+            out[[paste0(nm_out, "_source")]] <- NA_character_
+            out[[paste0(nm_out, "_status")]] <- NA_character_
+            out[[paste0(nm_out, "_raw_unit")]] <- NA_character_
+            out[[paste0(nm_out, "_scale")]] <- NA_real_
+            out[[paste0(nm_out, "_model")]] <- NA_character_
+        }
+    }
+
     warn_msg <- character(0)
 
     ## Compute the legacy volume once so modern methods can fall back to
@@ -312,8 +296,22 @@ metrics2Vol <- structure(function(#Tree volumes in NFI data
         )
     }
 
-    if (keep.legacy || "V" %in% parametro)
-        out[[method_registry[["V"]]$output]] <- legacy_v_m3
+    if (keep.legacy || "V" %in% parametro) {
+        nm_out_v <- method_registry[["V"]]$output
+        out[[nm_out_v]] <- legacy_v_m3
+
+        if (track_provenance) {
+            out[[paste0(nm_out_v, "_source")]] <- ifelse(
+                is.na(legacy_v_m3), "missing", "legacy"
+            )
+            out[[paste0(nm_out_v, "_status")]] <- ifelse(
+                is.na(legacy_v_m3), "legacy_unavailable", "ok"
+            )
+            out[[paste0(nm_out_v, "_raw_unit")]] <- method_registry[["V"]]$raw_unit %||% "m3"
+            out[[paste0(nm_out_v, "_scale")]] <- method_registry[["V"]]$scale_to_m3 %||% 1
+            out[[paste0(nm_out_v, "_model")]] <- NA_character_
+        }
+    }
 
     ## Load and normalize the coefficient table used by registry-based
     ## methods.
@@ -518,37 +516,96 @@ metrics2Vol <- structure(function(#Tree volumes in NFI data
             get0(fn, mode = "function", inherits = TRUE)
         }
 
-        ## Evaluate one registry method and scale the result to cubic
-        ## metres.
+        ## Evaluate one registry method and return both value and
+        ## provenance.
         eval_method <- function(param, ctx, resolved) {
             def <- method_registry[[param]]
+
+            mk <- function(value = NA_real_,
+                           source = NA_character_,
+                           status = NA_character_,
+                           raw_unit = def$raw_unit %||% NA_character_,
+                           scale = def$scale_to_m3 %||% (1 / 1000),
+                           model = NA_character_) {
+                list(
+                    value = value,
+                    source = source,
+                    status = status,
+                    raw_unit = raw_unit,
+                    scale = scale,
+                    model = model
+                )
+            }
+
             fun <- get_method_fun(def)
-            if (is.null(fun))
-                return(def$fallback(ctx, NULL, resolved))
+            if (is.null(fun)) {
+                fb <- def$fallback(ctx, NULL, resolved)
+                return(mk(
+                    value = fb,
+                    source = if (!is.na(fb)) "fallback_legacy" else "missing",
+                    status = "no_function"
+                ))
+            }
 
             pars <- get_method_pars(param, ctx, resolved)
-            if (is.null(pars))
-                return(def$fallback(ctx, NULL, resolved))
+            if (is.null(pars)) {
+                fb <- def$fallback(ctx, NULL, resolved)
+                return(mk(
+                    value = fb,
+                    source = if (!is.na(fb)) "fallback_legacy" else "missing",
+                    status = "no_parameters"
+                ))
+            }
 
             pars <- pars[1L, , drop = FALSE]
             if (!is.null(coef_col_model) && !"Modelo" %in% names(pars))
                 pars$Modelo <- pars[[coef_col_model]]
 
-            args <- def$build_args(ctx, pars, resolved)
-            if (is.null(args))
-                return(def$fallback(ctx, pars, resolved))
+            model_val <- if ("Modelo" %in% names(pars)) {
+                as.character(pars$Modelo[1L])
+            } else {
+                NA_character_
+            }
 
-            val <- tryCatch(
+            args <- def$build_args(ctx, pars, resolved)
+            if (is.null(args)) {
+                fb <- def$fallback(ctx, pars, resolved)
+                return(mk(
+                    value = fb,
+                    source = if (!is.na(fb)) "fallback_legacy" else "missing",
+                    status = "no_arguments",
+                    model = model_val
+                ))
+            }
+
+            err_msg <- NULL
+            val_raw <- tryCatch(
                 do.call(fun, args),
-                error = function(e) NA_real_
+                error = function(e) {
+                    err_msg <<- conditionMessage(e)
+                    NA_real_
+                }
             )
 
-            val <- suppressWarnings(as.numeric(val)[1L])
-            if (!length(val) || is.na(val))
-                return(def$fallback(ctx, pars, resolved))
+            val_raw <- suppressWarnings(as.numeric(val_raw)[1L])
+            if (!length(val_raw) || is.na(val_raw)) {
+                fb <- def$fallback(ctx, pars, resolved)
+                return(mk(
+                    value = fb,
+                    source = if (!is.na(fb)) "fallback_legacy" else "missing",
+                    status = if (is.null(err_msg)) "returned_na" else paste0("error: ", err_msg),
+                    model = model_val
+                ))
+            }
 
             scale_to_m3 <- def$scale_to_m3 %||% (1 / 1000)
-            val * scale_to_m3
+
+            mk(
+                value = val_raw * scale_to_m3,
+                source = "equation",
+                status = "ok",
+                model = model_val
+            )
         }
 
         ## Evaluate methods row by row. `VCC` is computed first because
@@ -571,16 +628,35 @@ metrics2Vol <- structure(function(#Tree volumes in NFI data
             )
 
             if ("VCC" %in% param_order) {
-                vcc_val <- eval_method("VCC", ctx, resolved)
-                resolved$vcc_m3 <- vcc_val
-                if ("VCC" %in% parametro)
-                    out[[method_registry[["VCC"]]$output]][i] <- vcc_val
+                vcc_res <- eval_method("VCC", ctx, resolved)
+                resolved$vcc_m3 <- vcc_res$value
+                if ("VCC" %in% parametro) {
+                    nm_out <- method_registry[["VCC"]]$output
+                    out[[nm_out]][i] <- vcc_res$value
+
+                    if (track_provenance) {
+                        out[[paste0(nm_out, "_source")]][i] <- vcc_res$source
+                        out[[paste0(nm_out, "_status")]][i] <- vcc_res$status
+                        out[[paste0(nm_out, "_raw_unit")]][i] <- vcc_res$raw_unit
+                        out[[paste0(nm_out, "_scale")]][i] <- vcc_res$scale
+                        out[[paste0(nm_out, "_model")]][i] <- vcc_res$model
+                    }
+                }
             }
 
             rest <- setdiff(param_order, "VCC")
             for (param in rest) {
-                val <- eval_method(param, ctx, resolved)
-                out[[method_registry[[param]]$output]][i] <- val
+                res <- eval_method(param, ctx, resolved)
+                nm_out <- method_registry[[param]]$output
+                out[[nm_out]][i] <- res$value
+
+                if (track_provenance) {
+                    out[[paste0(nm_out, "_source")]][i] <- res$source
+                    out[[paste0(nm_out, "_status")]][i] <- res$status
+                    out[[paste0(nm_out, "_raw_unit")]][i] <- res$raw_unit
+                    out[[paste0(nm_out, "_scale")]][i] <- res$scale
+                    out[[paste0(nm_out, "_model")]][i] <- res$model
+                }
             }
         }
     } else {
@@ -662,6 +738,29 @@ metrics2Vol <- structure(function(#Tree volumes in NFI data
     units_out <- units_out[intersect(names(out), names(units_out))]
 
     attr(out, "units") <- units_out
+
+    if (track_provenance) {
+        attr(out, "volume_meta") <- list(
+            input_units = get_units_map(nfi_orig),
+            normalized_input_units = c(d = "mm", h = "m", dnm = "mm"),
+            returned_units = vol_units,
+            methods = lapply(
+                keep_param,
+                function(param) {
+                    def <- method_registry[[param]]
+                    list(
+                        param = param,
+                        output = def$output %||% tolower(param),
+                        raw_unit = def$raw_unit %||% NA_character_,
+                        returned_unit = def$unit %||% "m3",
+                        scale_to_m3 = def$scale_to_m3 %||% (1 / 1000)
+                    )
+                }
+            )
+        )
+        names(attr(out, "volume_meta")$methods) <- keep_param
+    }
+
     attr(out, "nfi.nr") <- nfi_nr
     class(out) <- append("metrics2vol", class(out))
 
