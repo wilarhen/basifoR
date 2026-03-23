@@ -244,7 +244,7 @@ metrics2Vol <- structure(function(#Tree volumes in NFI data
     ## Compute the legacy volume once so modern methods can fall back to
     ## it when needed.
     compute_legacy_v <- function(nfi_input, cub.met = "freq", nfi.nr = NULL) {
-        if (!exists("metrics2Vol", mode = "function", inherits = TRUE))
+        if (!exists("metrics2Vol_legacy", mode = "function", inherits = TRUE))
             return(rep(NA_real_, nrow(nfi_input)))
 
         leg <- nfi_input
