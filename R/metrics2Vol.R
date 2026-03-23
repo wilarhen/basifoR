@@ -69,7 +69,7 @@ snfi_volume_method_registry <- function(
     utils::modifyList(defaults, equations)
 }
 
-metrics2Vol_provenance <- structure(function(#Tree volumes in NFI data
+metrics2Vol <- structure(function(#Tree volumes in NFI data
 ### This function computes over bark volumes (\code{'m3'}) processing
 ### tree metrics from databases of the SNF data and using volume
 ### equations established in 2nd NFI, see Details section. To compute
