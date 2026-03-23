@@ -29,7 +29,7 @@ requires \code{'h'}, \code{'d'}, and
   \item{levels}{\code{character}. Grouping columns kept in
 the output. \code{} The function matches these
 strings against column names returned by
-\code{flev(\code{})}, supports partial matching,
+\code{flev()}, supports partial matching,
 and ignores case. \code{} The default usually
 keeps plot- and species-level identifiers.}
   \item{design}{Sampling \code{design} used when computing

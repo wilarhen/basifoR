@@ -22,7 +22,7 @@ nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
     levels = c('esta','espe'), ##<<\code{character}. Grouping columns kept in
                                ##the output.  The function matches these
                                ##strings against column names returned by
-                               ##\code{flev()}, supports partial matching,
+                               ##\code{flev}, supports partial matching,
                                ##and ignores case.  The default usually
                                ##keeps plot- and species-level identifiers.
     design = snfi_design(), ##<< Sampling design used when computing
