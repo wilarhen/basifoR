@@ -1,4 +1,5 @@
-`%||%` <- function(x, y) if (is.null(x)) y else x
+## `%||%` <- function(x, y) if (is.null(x)) y else x
+scale_to_m3 <- if (is.null(def$scale_to_m3)) 1 / 1000 else def$scale_to_m3
 
 default_snfi_volume_equations <- function() {
     list(
@@ -69,11 +70,34 @@ snfi_volume_method_registry <- function(
     utils::modifyList(defaults, equations)
 }
 
-metrics2Vol <- structure(function(#Tree volumes in NFI data
-### This function computes over bark volumes (\code{'m3'}) processing
-### tree metrics from databases of the SNF data and using volume
-### equations established in 2nd NFI, see Details section. To compute
-### all in-package metrics, run function \code{\link{dendroMetrics}}.
+metrics2Vol <- structure(function#Compute tree-level volume variables
+                                 #from NFI metrics
+### Computes one or more tree-level volume variables from Spanish
+### National Forest Inventory data. The function standardizes the
+### input, selects the appropriate volume model for each tree, applies
+### equation-based methods defined in a method registry, converts
+### results to cubic metres, and optionally keeps legacy outputs and
+### provenance information.
+                          ##details<<
+    ##details<< If `nfi` is not already an `"nfiMetrics"` object, the
+    ##details<< function first calls `nfiMetrics()` to derive standardized
+    ##details<< tree metrics from the input. :contentReference[oaicite:1]{index=1}
+    ##details<<
+    ##details<< The function then resolves the inventory edition, identifies
+    ##details<< key columns such as province, species, diameter, height, and
+    ##details<< optional bark thickness variables, and normalizes working
+    ##details<< units before evaluating volume equations. 
+    ##details<<
+    ##details<< Requested outputs are computed through a method registry.
+    ##details<< Each registry entry defines the output name, equation
+    ##details<< function, input arguments, raw unit, scale factor, and
+    ##details<< fallback behavior. Default methods include legacy volume
+    ##details<< (`V`), over-bark volume (`VCC`), and stem volume (`VSC`).
+    ##details<<
+    ##details<< The function can also track provenance, including the source,
+    ##details<< status, model, and unit conversion used for each returned
+    ##details<< volume value. 
+(                         
     nfi,
     ### Input accepted by `nfiMetrics()`, or a precomputed `"nfiMetrics"`
     ### object with tree-level metrics.
