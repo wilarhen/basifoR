@@ -19,12 +19,12 @@ nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
                                     ##requires \code{'h'}, \code{'d'}, and
                                     ##\code{'n'} to be present in
                                     ##\code{var}.
-    levels = c('esta','espe'), ##<<\code{character}. Grouping columns kept in
-                               ##the output.  The function matches these
-                               ##strings against column names returned by
-                               ##\code{flev}, supports partial matching,
-                               ##and ignores case.  The default usually
-                               ##keeps plot- and species-level identifiers.
+    levels = c('esta','espe'), ##<<\code{character}. Grouping columns
+                               ##kept in the output.  The function
+                               ##supports partial matching, and
+                               ##ignores case.  The default usually
+                               ##keeps plot- and species-level
+                               ##identifiers.
     design = snfi_design(), ##<< Sampling design used when computing
                             ##\code{'n'}.  Pass a
                             ##\code{\link{snfi_design}} object, another
