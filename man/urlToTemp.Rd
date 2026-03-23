@@ -2,11 +2,11 @@
 \alias{urlToTemp}
 \title{Temporary NFI data }
 \description{This function is implemented by other routines of the package to
-decompress \code{.zip} files with data sets of the SNF. }
+decompress \code{.zip} files with data sets of the SNF. \code{}}
 \usage{urlToTemp(url., timeOut = timeout(60), 
     ...)}
 \arguments{
-  \item{url.}{\code{character}.  URL/path to a compressed file of the
+  \item{url.}{\code{character}. \code{} URL/path to a compressed file of the
 SNF (.zip) having data of either .dbf or .mdb file
 extensions..}
   \item{timeOut}{\code{request}. Maximum request time,

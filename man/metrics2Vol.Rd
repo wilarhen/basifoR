@@ -6,67 +6,37 @@ tree metrics from databases of the SNF data and using volume
 equations established in 2nd NFI, see Details section. To compute
 all in-package metrics, run function \code{\link{dendroMetrics}}.}
 \usage{metrics2Vol(nfi, cub.met = "freq", 
-    keep.var = FALSE, 
+    parametro = c("VCC"), 
+    keep.var = TRUE, 
+    keep.legacy = FALSE, 
+    method_registry = snfi_volume_method_registry(), 
+    track_provenance = FALSE, 
     ...)}
 \arguments{
-  \item{nfi}{\code{character} or \code{data.frame}.  URL/path to a
-compressed file of the NFI (.zip) having data of either
-.dbf or .mdb file extensions; or data frame such as that
-produced by \code{\link{nfiMetrics}}; or data frame such
-as that produced by \code{\link{readNFI}}.}
-  \item{cub.met}{\code{character}. Cubication
-method. Default \code{'freq'} implements the
-equation form that most frequently match the
-data, see \code{details} section. Additional
-methods have not yet been implemented.}
-  \item{keep.var}{\code{logical}. Keep the variables used to
-compute the volumes. Default \code{FALSE}.}
-  \item{\dots}{Depending on \code{'nfi'}, additional arguments in
-\code{\link{nfiMetrics}} or
-\code{\link{readNFI}}.}
+  \item{nfi}{Input accepted by `nfiMetrics(\code{})`, or a precomputed `"nfiMetrics"`
+object with tree-level metrics.}
+  \item{cub.met}{Cubication selector used when several coefficient rows match.}
+  \item{parametro}{One or more volume outputs to compute. Typical values are `"V"`,
+`"VCC"`, `"VSC"`, `"IAVC"`, and `"VLE"`.}
+  \item{keep.var}{Keep auxiliary coefficient columns when available.}
+  \item{keep.legacy}{Also return the legacy volume estimate for backward compatibility.}
+  \item{method_registry}{Registry that maps each requested output to its equation function,
+output column name, units, and fallback rule.}
+  \item{track_provenance}{Add per-row provenance columns and a compact audit trail
+attribute for computed volume outputs.}
+  \item{\dots}{Passed to `nfiMetrics(\code{})` when `nfi` is not already an
+`"nfiMetrics"` object.}
 }
-\details{The quations from the second SNF
-used have the forms \code{'v ~ par1 + par2
-* (d^2) * h'}, and \code{'v ~ par1 *
-(d^par2) * (h^par3)'}. These equations
-estimate over bark volumes in \code{'dcm3'}
-but the function transform the units so the
-output volumes have \code{'m3'} units. The
-function assign equation forms and
-parameters depending on several variables,
-including the provincial unit, the tree
-species, the tree diameter, and the tree
-height. Consequently, objects from
-\code{\link{nfiMetrics}} must have these
-variables.}
-\value{\code{data.frame}. Depending on \code{keep.var}, short or expanded
-data set.  Short data sets contain the volumes \code{v}
-(\code{'m3'}) plus the metrics defined in
-\code{\link{nfiMetrics}}. The expanded data contains additional
-columns with the variables used to compute the volumes.}
+
+
 
 \author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (ORCID: <https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <angelcristobal.ordonez@uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-5354-3760>), Aitor Vázquez-Veloso <aitor.vazquez.veloso@uva.es> [aut] (ORCID: <https://orcid.org/0000-0003-0227-506X>), Felipe Bravo <felipe.bravo@uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-7348-6695>)}
 
 
 
 
-\examples{
-## Process SNF data for Toledo stored locally
-# Path to Toledo data file in 'basifoR' package
-ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
-
-# Decompress SNF data from the specified file path or URL
-fetch_ifn4p45 <- fetchNFI(ifn4p45)
-
-# Read and process the data (first 100 rows)
-get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100,]
-
-# Compute some metrics
-metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
-
-# Calculate volume metrics 
-vol_ifn4p45 <- metrics2Vol(metrics_ifn4p45)
-
-## see metric units
-    attr(vol_ifn4p45,'units')
-}
+\examples{if (FALSE) {
+  x <- nfiMetrics('toledo')
+  y <- metrics2Vol(x, parametro = c('VCC', 'VSC'))
+  head(y[c('nfi.nr', 'pr', 'especie', 'vcc', 'vsc')])
+}}
