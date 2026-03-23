@@ -1,4 +1,12 @@
-default_snfi_volume_equations <- function() {
+default_snfi_volume_equations <- function(
+### Return the default SNFI volume-equation registry.
+###
+### Creates the default set of method definitions used by `metrics2Vol()`
+### to compute tree-level volume variables. Each registry entry describes
+### how one output is computed, including the target column name, equation
+### function, unit conversion, argument builder, and fallback rule.
+                                          ) {
+    ##title<< Default SNFI volume-equation methods
     list(
         V = list(
             output = "v",
@@ -41,13 +49,19 @@ default_snfi_volume_equations <- function() {
 
 
 snfi_volume_method_registry <- function(
+                                        ### Return the active SNFI
+                                        ### volume-method registry.
+###
+### Builds the final registry of SNFI volume methods used by
+### `metrics2Vol()` by combining the defaults with optional
+### user-defined overrides or additions. The returned registry
+### controls which parameters are available and how each requested
+### volume output is computed.
     equations = get0("snfi_volume_equations",
                      inherits = TRUE,
                      ifnotfound = NULL)
-    ### Optional user registry. When omitted, the function uses an object
-    ### named `snfi_volume_equations` if it exists, otherwise the
-    ### package defaults.
-) {
+    ) {
+    ##title<< Build the active registry of SNFI volume methods
     defaults <- default_snfi_volume_equations()
 
     if (is.null(equations))
