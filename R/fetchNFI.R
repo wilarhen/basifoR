@@ -13,7 +13,7 @@ fetchNFI <- structure(function#Fetch SNF Data
     file_ext = c('mdb','DBF', 'accdb'), ##<<\code{character}. Supported
                                         ##file extensions.
     timeOut = timeout(60) ##<<\code{request}. Maximum request time,
-                          ##see \code{\link{timeout}}. Default is
+                          ##see \code{\link[httr]{timeout}}. Default is
                           ##\code{timeout(60)}.
 ) {
     if(is.null(url.))
