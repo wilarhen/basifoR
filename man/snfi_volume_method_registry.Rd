@@ -1,7 +1,14 @@
 \name{snfi_volume_method_registry}
 \alias{snfi_volume_method_registry}
-\title{snfi volume method registry}
+\title{Build the active registry of SNFI volume methods}
+\description{Return the active SNFI
+volume-method registry.
 
+Builds the final registry of SNFI volume methods used by
+`metrics2Vol()` by combining the defaults with optional
+user-defined overrides or additions. The returned registry
+controls which parameters are available and how each requested
+volume output is computed.}
 \usage{snfi_volume_method_registry(equations = get0("snfi_volume_equations", 
     inherits = TRUE, 
     ifnotfound = NULL))}
