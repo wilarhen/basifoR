@@ -95,7 +95,7 @@ metrics2Vol <- structure(function(#Tree volumes in NFI data
     ### Registry that maps each requested output to its equation function,
     ### output column name, units, and fallback rule.
 
-    track_provenance = TRUE,
+    track_provenance = FALSE,
     ### Add per-row provenance columns and a compact audit trail
     ### attribute for computed volume outputs.
 
