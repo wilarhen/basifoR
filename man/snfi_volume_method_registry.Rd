@@ -6,7 +6,7 @@
     inherits = TRUE, 
     ifnotfound = NULL))}
 \arguments{
-  \item{equations}{equations \code{}}
+  \item{equations}{equations }
 }
 
 

@@ -1,6 +1,3 @@
-## `%||%` <- function(x, y) if (is.null(x)) y else x
-scale_to_m3 <- if (is.null(def$scale_to_m3)) 1 / 1000 else def$scale_to_m3
-
 default_snfi_volume_equations <- function() {
     list(
         V = list(
@@ -70,64 +67,45 @@ snfi_volume_method_registry <- function(
     utils::modifyList(defaults, equations)
 }
 
-metrics2Vol <- structure(function#Compute tree-level volume variables
-                                 #from NFI metrics
-### Computes one or more tree-level volume variables from Spanish
-### National Forest Inventory data. The function standardizes the
-### input, selects the appropriate volume model for each tree, applies
-### equation-based methods defined in a method registry, converts
-### results to cubic metres, and optionally keeps legacy outputs and
+metrics2Vol <- structure(function(
+                                  ### Computes one or more tree-level
+### volume variables from Spanish National Forest Inventory data. The
+### function standardizes the input, selects the appropriate volume
+### model for each tree, applies equation-based methods defined in a
+### method registry, converts results to cubic metres, and optionally
+### keeps legacy outputs (from previous versions of the package) and
 ### provenance information.
-                          ##details<<
-    ##details<< If `nfi` is not already an `"nfiMetrics"` object, the
-    ##details<< function first calls `nfiMetrics()` to derive standardized
-    ##details<< tree metrics from the input. :contentReference[oaicite:1]{index=1}
-    ##details<<
-    ##details<< The function then resolves the inventory edition, identifies
-    ##details<< key columns such as province, species, diameter, height, and
-    ##details<< optional bark thickness variables, and normalizes working
-    ##details<< units before evaluating volume equations. 
-    ##details<<
-    ##details<< Requested outputs are computed through a method registry.
-    ##details<< Each registry entry defines the output name, equation
-    ##details<< function, input arguments, raw unit, scale factor, and
-    ##details<< fallback behavior. Default methods include legacy volume
-    ##details<< (`V`), over-bark volume (`VCC`), and stem volume (`VSC`).
-    ##details<<
-    ##details<< The function can also track provenance, including the source,
-    ##details<< status, model, and unit conversion used for each returned
-    ##details<< volume value. 
-(                         
     nfi,
     ### Input accepted by `nfiMetrics()`, or a precomputed `"nfiMetrics"`
     ### object with tree-level metrics.
-
     cub.met = "freq",
     ### Cubication selector used when several coefficient rows match.
-
     parametro = c("VCC"),
-    ### One or more volume outputs to compute. Typical values are `"V"`,
-    ### `"VCC"`, `"VSC"`, `"IAVC"`, and `"VLE"`.
-
+    ### One or more volume outputs to compute.
     keep.var = TRUE,
     ### Keep auxiliary coefficient columns when available.
-
     keep.legacy = FALSE,
     ### Also return the legacy volume estimate for backward compatibility.
-
     method_registry = snfi_volume_method_registry(),
     ### Registry that maps each requested output to its equation function,
     ### output column name, units, and fallback rule.
-
     track_provenance = FALSE,
-    ### Add per-row provenance columns and a compact audit trail
-    ### attribute for computed volume outputs.
-
+    ### Add per-row provenance columns and audit metadata.
     ...
     ### Passed to `nfiMetrics()` when `nfi` is not already an
     ### `"nfiMetrics"` object.
 ) {
-    ## Return early for `NULL` input.
+    ##title<< Compute tree-level volume variables from NFI metrics
+    ##details<<
+    ##details<< Computes requested volume outputs from standardized NFI
+    ##details<< tree metrics using registry-based methods and optional
+    ##details<< fallback to legacy estimates.
+    ##value<<
+    ##value<< A data.frame with the requested volume outputs added.
+    ##seealso<< nfiMetrics, snfi_volume_method_registry
+    ##note<< Registry-based dispatcher for volume equations.
+    
+## Return early for `NULL` input.
     nfi. <- nfi
     if (is.null(nfi.))
         return(nfi)

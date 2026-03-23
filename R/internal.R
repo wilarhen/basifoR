@@ -1,3 +1,7 @@
+## `%||%` <- function(x, y) if (is.null(x)) y else x
+null_or <- function(x, y) if (is.null(x)) y else x
+
+
 metrics2Vol_legacy <- structure(function#Tree volumes in NFI data
 ### This function computes over bark volumes (\code{'m3'}) processing
 ### tree metrics from databases of the SNF data and using volume

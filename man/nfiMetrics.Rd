@@ -3,9 +3,9 @@
 \title{Tree-level metrics from Spanish NFI records}
 \description{Compute tree-level metrics from Spanish National Forest Inventory
 records by applying \code{\link{dbhMetric}}-style logic to NFI
-tables or to files that \code{\link{readNFI}} can import. \code{} The
+tables or to files that \code{\link{readNFI}} can import.  The
 function returns the requested metrics together with the grouping
-columns selected through \code{levels}. \code{} To derive the full set of
+columns selected through \code{levels}.  To derive the full set of
 package metrics in one call, see \code{\link{dendroMetrics}}.}
 \usage{nfiMetrics(nfi, var = c("d", 
     "h", "ba", "n", "Hd"), 
@@ -22,28 +22,28 @@ Supported values are \code{'d'}
 (diameter), \code{'h'} (height),
 \code{'ba'} (basal area), \code{'n'}
 (trees per hectare), and \code{'Hd'}
-(dominant height). \code{} \code{'Hd'}
+(dominant height).  \code{'Hd'}
 requires \code{'h'}, \code{'d'}, and
 \code{'n'} to be present in
 \code{var}.}
   \item{levels}{\code{character}. Grouping columns
-kept in the output. \code{} The function
+kept in the output.  The function
 supports partial matching, and
-ignores case. \code{} The default usually
+ignores case.  The default usually
 keeps plot- and species-level
 identifiers.}
   \item{design}{Sampling \code{design} used when computing
-\code{'n'}. \code{} Pass a
+\code{'n'}.  Pass a
 \code{\link{snfi_design}} object, another
 \code{concentric_design}, or any \code{design}
-supported by \code{trees_per_ha(\code{})}.}
+supported by \code{trees_per_ha()}.}
   \item{\dots}{Additional arguments passed to \code{\link{readNFI}} when
 \code{nfi} is not already a \code{readNFI} object.}
 }
 
 \value{\code{data.frame} with the grouping columns selected through
-\code{levels} plus the requested metrics in \code{var}. \code{} The output
-inherits class \code{'nfiMetrics'}. \code{} Inspect
+\code{levels} plus the requested metrics in \code{var}.  The output
+inherits class \code{'nfiMetrics'}.  Inspect
 \code{attr(x, 'units')} to see the units attached to each returned
 variable.}
 
