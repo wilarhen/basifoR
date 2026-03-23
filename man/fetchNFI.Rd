@@ -16,7 +16,7 @@ file will be stored.}
   \item{file_ext}{\code{character}. Supported
 file extensions.}
   \item{timeOut}{\code{request}. Maximum request time,
-see \code{\link{timeout}}. Default is
+see \code{\link[httr]{timeout}}. Default is
 \code{timeout(60)}.}
 }
 \details{The data should be in files with
