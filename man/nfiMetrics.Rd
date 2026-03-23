@@ -26,12 +26,12 @@ Supported values are \code{'d'}
 requires \code{'h'}, \code{'d'}, and
 \code{'n'} to be present in
 \code{var}.}
-  \item{levels}{\code{character}. Grouping columns kept in
-the output. \code{} The function matches these
-strings against column names returned by
-\code{flev()}, supports partial matching,
-and ignores case. \code{} The default usually
-keeps plot- and species-level identifiers.}
+  \item{levels}{\code{character}. Grouping columns
+kept in the output. \code{} The function
+supports partial matching, and
+ignores case. \code{} The default usually
+keeps plot- and species-level
+identifiers.}
   \item{design}{Sampling \code{design} used when computing
 \code{'n'}. \code{} Pass a
 \code{\link{snfi_design}} object, another
