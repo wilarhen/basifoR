@@ -91,6 +91,17 @@ nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. A
         ##including \code{nfi.nr} when required.
 
 ) {
+    call0 <- match.call(expand.dots = TRUE)
+
+    finalize_output <- function(out, call) {
+        if (is.null(out))
+            return(finalize_output(out, call0))
+
+        attr(out, "call") <- call
+        class(out) <- unique(c("dendroMetrics", class(out)))
+        out
+    }
+
 dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     nfi. <- nfi
     if (is.null(nfi.))
@@ -345,7 +356,7 @@ run_job <- function(job) {
                 jobs[[1]]$dots
             )
         )
-        return(out)
+        return(finalize_output(out, call0))
     }
 
     mc.cores <- as.integer(mc.cores)
@@ -472,7 +483,7 @@ if (any(errs)) {
     if (report)
         write.csv(out, file = "report.csv", row.names = FALSE)
 
-    out
+    finalize_output(out, call0)
 ### \code{data.frame}. Depending on \code{summ.vr = NULL}, an output from
 ### \code{\link{metrics2Vol}}, or a summary of the variables, see
 ### Details section.
@@ -515,3 +526,115 @@ attr(dendromet_ifn4p45,'units')
 ## }
     
 })
+
+
+update.dendroMetrics <- function #Update a dendroMetrics result
+##title<< Update a stored dendroMetrics call
+##description<< Re-run \code{\link{dendroMetrics}} from the call stored
+## in a previous \code{"dendroMetrics"} result while replacing one or
+## more named arguments in \code{...}. This method supports reproducible
+## re-evaluation of the original workflow and can either return the
+## updated result or the reconstructed call.
+### This S3 method requires an object created by the updatable
+### \code{\link{dendroMetrics}} definition, which stores the original
+### call in \code{attr(x, "call")}. All arguments supplied in
+### \code{...} must be named.
+(
+    object, ##<< A \code{"dendroMetrics"} object created by the
+            ## updatable \code{\link{dendroMetrics}} definition.
+    ..., ##<< Named arguments used to replace entries in the stored
+         ## call before evaluation.
+    evaluate = TRUE ##<< \code{logical}. If \code{TRUE}, evaluate the
+                    ## updated call and return the resulting object.
+                    ## If \code{FALSE}, return the reconstructed call
+                    ## without evaluation.
+) {
+    if (!inherits(object, "dendroMetrics"))
+        stop(
+            "'object' must inherit from 'dendroMetrics'. ",
+            "Call dendroMetrics(...) first and then use update(result, ...).",
+            call. = FALSE
+        )
+
+    call0 <- attr(object, "call")
+
+    if (is.null(call0))
+        stop(
+            "No stored call found in 'object'. ",
+            "Recreate the result with the updatable dendroMetrics() definition ",
+            "and then call update(result, ...).",
+            call. = FALSE
+        )
+
+    extras <- as.list(substitute(list(...)))[-1L]
+
+    if (length(extras)) {
+        extra_names <- names(extras)
+        has_name <- !is.na(extra_names) & nzchar(extra_names)
+
+        if (any(!has_name))
+            stop("All arguments in '...' must be named.", call. = FALSE)
+
+        call_list <- as.list(call0)
+        for (i in seq_along(extras))
+            call_list[[extra_names[[i]]]] <- extras[[i]]
+        call0 <- as.call(call_list)
+    }
+
+    if (isTRUE(evaluate))
+        eval(call0, envir = parent.frame())
+    else
+        call0
+    ##value<< A new \code{"dendroMetrics"} object when
+    ## \code{evaluate = TRUE}; otherwise the updated call.
+}
+
+
+update.list <- function #Guard against raw dendroMetrics inputs
+##title<< Guard raw list inputs in \code{update}
+##description<< Catch attempts to call \code{\link[utils:update]{update}}
+## on raw input lists intended for \code{\link{dendroMetrics}} and
+## return a workflow-specific error message. When the input does not
+## look like a \code{dendroMetrics} workflow, this method falls back to
+## \code{update.default}.
+### This helper makes \code{update(list("toledo", "madrid"), ...)}
+### fail with a message that points users to
+### \code{dendroMetrics(...)} followed by \code{update(result, ...)}.
+(
+    object, ##<< A \code{list} passed to \code{update()}.
+    ..., ##<< Additional arguments passed to \code{update()}.
+    evaluate = TRUE ##<< \code{logical}. Passed through to
+                    ## \code{update.default} when no
+                    ## \code{dendroMetrics}-specific guard is triggered.
+) {
+    extras <- as.list(substitute(list(...)))[-1L]
+    extra_names <- names(extras)
+    likely_dendro_args <- c(
+        "nfi", "nfi.nr", "summ.vr", "cut.dt", "report", "var",
+        "parametro", "keep.var", "keep.legacy", "method_registry",
+        "track_provenance", "cub.met"
+    )
+
+    looks_like_dendro_input <-
+        length(object) > 0L &&
+        all(vapply(object, function(x) is.character(x) && length(x) == 1L, logical(1)))
+
+    asks_for_dendro_update <-
+        length(extras) > 0L &&
+        any(!is.na(extra_names) & nzchar(extra_names) & extra_names %in% likely_dendro_args)
+
+    if (looks_like_dendro_input || asks_for_dendro_update) {
+        stop(
+            "update() cannot start from raw inputs such as list('toledo', 'madrid'). ",
+            "First create a result with dendroMetrics(...), then call update(result, ...).\n",
+            "Example:\n",
+            "  x <- dendroMetrics(list('toledo', 'madrid'), nfi.nr = c(4, 4))\n",
+            "  y <- update(x, cut.dt = 'h > 12')",
+            call. = FALSE
+        )
+    }
+
+    getS3method("update", "default")(object, ..., evaluate = evaluate)
+    ##value<< Either an error with a \code{dendroMetrics}-specific
+    ## message or the result of \code{update.default()}.
+}
