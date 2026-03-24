@@ -2,6 +2,58 @@
 ## Sampling-design classes and methods
 ## =========================================================
 
+new_inventory_design <- function(sample_area_m2,
+                                 min_dbh_cm = 0,
+                                 name = "custom",
+                                 metadata = NULL) {
+  if (!is.numeric(sample_area_m2) || !is.numeric(min_dbh_cm))
+    stop("'sample_area_m2' and 'min_dbh_cm' must be numeric.")
+  if (length(sample_area_m2) != length(min_dbh_cm))
+    stop("'sample_area_m2' and 'min_dbh_cm' must have the same length.")
+  if (!length(sample_area_m2))
+    stop("Design vectors cannot be empty.")
+  if (any(sample_area_m2 <= 0, na.rm = TRUE))
+    stop("'sample_area_m2' must contain positive values.")
+
+  o <- order(min_dbh_cm)
+
+  structure(
+    list(
+      name = name,
+      min_dbh_cm = min_dbh_cm[o],
+      sample_area_m2 = sample_area_m2[o],
+      sf = 1e4 / sample_area_m2[o],
+      metadata = if (is.null(metadata)) list() else metadata
+    ),
+    class = "inventory_design"
+  )
+}
+
+print.inventory_design <- function(x, ...) {
+  cat("Inventory design:", x$name, "\n")
+  cat("Minimum DBH (cm):", paste(x$min_dbh_cm, collapse = ", "), "\n")
+  cat("Sample area (m2):", paste(x$sample_area_m2, collapse = ", "), "\n")
+  cat("Expansion factors:", paste(round(x$sf, 2), collapse = ", "), "\n")
+  invisible(x)
+}
+
+trees_per_ha.inventory_design <- function(design, dbh_cm) {
+  dbh_cm <- as.numeric(dbh_cm)
+
+  if (length(dbh_cm) > 1L)
+    dbh_cm <- mean(dbh_cm, na.rm = TRUE)
+
+  if (all(is.na(dbh_cm)))
+    return(NA_real_)
+
+  if (is.na(dbh_cm) || dbh_cm < design$min_dbh_cm[1L])
+    return(NA_real_)
+
+  idx <- findInterval(dbh_cm, design$min_dbh_cm)
+  design$sf[idx]
+}
+
+
 new_concentric_design <- structure(function#Constructor for concentric plot designs
 ### Create a concentric forest inventory design from subplot radii and
 ### minimum diameter thresholds. The function returns an object of class
