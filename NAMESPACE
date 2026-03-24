@@ -10,4 +10,4 @@ importFrom("utils", "data","download.file", "packageVersion", "unzip","write.csv
 export(dbhMetric,default_snfi_volume_equations,dendroMetrics,fetchNFI,getNFI,new_concentric_design,snfi_design,metrics2Vol,snfi_volume_method_registry,nfiMetrics,readNFI,trees_per_ha)
 S3method(trees_per_ha, concentric_design)
 S3method(print, concentric_design)
-
+S3method(update,dendroMetrics)
