@@ -755,6 +755,10 @@ metrics2Vol <- structure(function(
 
     attr(out, "units") <- units_out
 
+    design_meta <- attr(nfi_orig, "design_meta")
+    if (!is.null(design_meta))
+        attr(out, "design_meta") <- design_meta
+
     if (track_provenance) {
         attr(out, "volume_meta") <- list(
             input_units = get_units_map(nfi_orig),

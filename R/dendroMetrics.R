@@ -99,7 +99,12 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     if (!inherits(nfi., "metrics2vol"))
         nfi <- metrics2Vol(nfi, ...)
 
+    design_meta <- attr(nfi, "design_meta")
+    volume_meta <- attr(nfi, "volume_meta")
+    nfi_nr_attr <- attr(nfi, "nfi.nr")
+
     names(nfi) <- tolower(names(nfi))
+
     frm. <- attr(nfi, "units")
 
     if (!is.null(frm.)) {
@@ -116,6 +121,12 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
 
         if (!is.null(frm.))
             attr(nfi, "units") <- frm.[intersect(names(nfi), names(frm.))]
+        if (!is.null(design_meta))
+            attr(nfi, "design_meta") <- design_meta
+        if (!is.null(volume_meta))
+            attr(nfi, "volume_meta") <- volume_meta
+        if (!is.null(nfi_nr_attr))
+            attr(nfi, "nfi.nr") <- nfi_nr_attr
 
         if (report)
             write.csv(nfi, file = "report.csv", row.names = FALSE)
@@ -185,9 +196,31 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
         cbind(fcs, summ)
     }
 
+    bind_rows_fill_local <- function(a, b) {
+        if (is.null(a))
+            return(data.frame(b, check.names = FALSE))
+        if (is.null(b))
+            return(data.frame(a, check.names = FALSE))
+
+        a <- data.frame(a, check.names = FALSE)
+        b <- data.frame(b, check.names = FALSE)
+
+        cols <- union(names(a), names(b))
+
+        missing_a <- setdiff(cols, names(a))
+        missing_b <- setdiff(cols, names(b))
+
+        if (length(missing_a))
+            a[missing_a] <- NA
+        if (length(missing_b))
+            b[missing_b] <- NA
+
+        rbind(a[, cols, drop = FALSE], b[, cols, drop = FALSE])
+    }
+
     resm <- lapply(msp, fsum)
-    resm <- Reduce("rbind", resm)
-    resm <- data.frame(resm)
+    resm <- Reduce(bind_rows_fill_local, resm, init = NULL)
+    resm <- data.frame(resm, check.names = FALSE)
 
     resm <- subset(resm, eval(parse(text = cut.dt)))
     rownames(resm) <- NULL
@@ -213,6 +246,12 @@ vol_vars <- intersect(c("v", "vcc", "vsc", "iavc", "vle"), names(resm))
         vle = "m3 ha-1"
     )
     attr(resm, "units") <- units_out[intersect(names(resm), names(units_out))]
+    if (!is.null(design_meta))
+        attr(resm, "design_meta") <- design_meta
+    if (!is.null(volume_meta))
+        attr(resm, "volume_meta") <- volume_meta
+    if (!is.null(nfi_nr_attr))
+        attr(resm, "nfi.nr") <- nfi_nr_attr
 
     resm
 }
@@ -394,6 +433,22 @@ if (any(errs)) {
         out_units[!duplicated(names(out_units))]
     }
 
+    collect_attr <- function(x, attr_name) {
+        vals <- lapply(x, function(y) attr(y, attr_name))
+        vals <- Filter(Negate(is.null), vals)
+
+        if (!length(vals))
+            return(NULL)
+        if (length(vals) == 1L)
+            return(vals[[1L]])
+
+        same <- vapply(vals[-1L], function(z) identical(z, vals[[1L]]), logical(1))
+        if (all(same))
+            return(vals[[1L]])
+
+        vals
+    }
+
     out <- Reduce(bind_rows_fill, res_list)
     out <- data.frame(out, check.names = FALSE)
     rownames(out) <- NULL
@@ -401,6 +456,18 @@ if (any(errs)) {
     out_units <- collect_units(res_list)
     if (!is.null(out_units))
         attr(out, "units") <- out_units[names(out_units) %in% names(out)]
+
+    out_design_meta <- collect_attr(res_list, "design_meta")
+    if (!is.null(out_design_meta))
+        attr(out, "design_meta") <- out_design_meta
+
+    out_volume_meta <- collect_attr(res_list, "volume_meta")
+    if (!is.null(out_volume_meta))
+        attr(out, "volume_meta") <- out_volume_meta
+
+    out_nfi_nr <- collect_attr(res_list, "nfi.nr")
+    if (!is.null(out_nfi_nr))
+        attr(out, "nfi.nr") <- out_nfi_nr
 
     if (report)
         write.csv(out, file = "report.csv", row.names = FALSE)

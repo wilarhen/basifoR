@@ -26,10 +26,14 @@ nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
                                ##keeps plot- and species-level
                                ##identifiers.
     design = snfi_design(), ##<< Sampling design used when computing
-                            ##\code{'n'}.  Pass a
-                            ##\code{\link{snfi_design}} object, another
-                            ##\code{concentric_design}, or any design
-                            ##supported by \code{trees_per_ha()}.
+                            ##\code{'n'}. Pass the default
+                            ##\code{\link{snfi_design}}, another
+                            ##\code{concentric_design}, or any
+                            ##\code{inventory_design} supported by
+                            ##\code{trees_per_ha()}. The returned
+                            ##object stores a \code{design_meta}
+                            ##attribute with the design used to derive
+                            ##\code{'n'}.
     ... ##<< Additional arguments passed to \code{\link{readNFI}} when
         ##\code{nfi} is not already a \code{readNFI} object.
 
@@ -245,17 +249,31 @@ metric_units <- c(
 
 attr(dmt, "units") <- metric_units[intersect(names(dmt), names(metric_units))]
 
-    
+    if (any(var %in% c("n", "Hd"))) {
+        design_meta <- list(
+            name = if (!is.null(design$name)) design$name else NA_character_,
+            class = class(design),
+            min_dbh_cm = if (!is.null(design$min_dbh_cm)) design$min_dbh_cm else NA_real_,
+            sample_area_m2 = if (!is.null(design$sample_area_m2)) design$sample_area_m2 else NA_real_,
+            expansion_factor = if (!is.null(design$sf)) design$sf else NA_real_,
+            metadata = if (!is.null(design$metadata)) design$metadata else list(),
+            used_for = "n",
+            returned_unit = "trees/ha"
+        )
+        attr(dmt, "design_meta") <- design_meta
+    }
+
 ## attr(dmt, "units") <- units_map[names(dmt)]
-    
+
     class(dmt) <- append('nfiMetrics', class(dmt))
     return(dmt)
 
 ### \code{data.frame} with the grouping columns selected through
-### \code{levels} plus the requested metrics in \code{var}.  The output
-### inherits class \code{'nfiMetrics'}.  Inspect
+### \code{levels} plus the requested metrics in \code{var}. The output
+### inherits class \code{'nfiMetrics'}. Inspect
 ### \code{attr(x, 'units')} to see the units attached to each returned
-### variable.
+### variable and \code{attr(x, 'design_meta')} to inspect the sampling
+### design used to derive \code{'n'}.
 }, ex = function(){
 ## Example with bundled Toledo data
 ifn4p45 <- system.file("Ifn4_Toledo.zip", package = "basifoR")

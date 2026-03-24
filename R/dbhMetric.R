@@ -2,6 +2,62 @@
 ## Sampling-design classes and methods
 ## =========================================================
 
+new_inventory_design <- structure(function#Constructor for generic inventory designs
+### Create a generic forest inventory design from sampled areas and
+### minimum diameter thresholds. The function returns an object of class
+### \code{"inventory_design"}. Expansion factors are computed as trees
+### per hectare for each threshold tier. The design is shape-agnostic:
+### users can describe circular, square, strip, ring, or other layouts
+### through sampled area and optional metadata.
+(sample_area_m2, ##<< \code{numeric}. Sampled area in square metres for
+                 ##<< each tally tier.
+ min_dbh_cm = 0, ##<< \code{numeric}. Minimum diameter at breast height
+                 ##<< in \code{cm} required for a tree to be tallied in
+                 ##<< each tier.
+ name = "custom",##<< \code{character(1)}. Design name.
+ metadata = NULL ##<< Optional \code{list}. Additional design metadata,
+                 ##<< such as shape, radii, side length, strip width,
+                 ##<< or field protocol notes.
+) {
+
+    if (!is.numeric(sample_area_m2) || !is.numeric(min_dbh_cm))
+        stop("'sample_area_m2' and 'min_dbh_cm' must be numeric.")
+
+    if (length(sample_area_m2) != length(min_dbh_cm))
+        stop("'sample_area_m2' and 'min_dbh_cm' must have the same length.")
+
+    if (length(sample_area_m2) == 0)
+        stop("Design vectors cannot be empty.")
+
+    if (any(sample_area_m2 <= 0))
+        stop("'sample_area_m2' must contain positive values.")
+
+    o <- order(min_dbh_cm)
+
+    if (is.null(metadata))
+        metadata <- list()
+
+    structure(
+        list(
+            name = name,
+            min_dbh_cm = min_dbh_cm[o],
+            sample_area_m2 = sample_area_m2[o],
+            sf = 1e4 / sample_area_m2[o],
+            metadata = metadata
+        ),
+        class = "inventory_design"
+    )
+
+}, ex = function() {
+    dsg <- new_inventory_design(
+        sample_area_m2 = c(100, 400),
+        min_dbh_cm = c(0, 20),
+        name = "Square design",
+        metadata = list(shape = "square", side_m = c(10, 20))
+    )
+    dsg
+})
+
 new_concentric_design <- structure(function#Constructor for concentric plot designs
 ### Create a concentric forest inventory design from subplot radii and
 ### minimum diameter thresholds. The function returns an object of class
@@ -11,7 +67,8 @@ new_concentric_design <- structure(function#Constructor for concentric plot desi
  min_dbh_cm,    ##<< \code{numeric}. Minimum diameter at breast height
                 ##<< in \code{cm} required for a tree to be tallied in each
                 ##<< subplot.
- name = "custom"##<< \code{character(1)}. Design name.
+ name = "custom",##<< \code{character(1)}. Design name.
+ metadata = NULL ##<< Optional \code{list}. Additional design metadata.
 ) {
 
     if (!is.numeric(radii_m) || !is.numeric(min_dbh_cm))
@@ -25,15 +82,22 @@ new_concentric_design <- structure(function#Constructor for concentric plot desi
 
     o <- order(min_dbh_cm)
 
-    structure(
-        list(
-            name = name,
-            radii_m = radii_m[o],
-            min_dbh_cm = min_dbh_cm[o],
-            sf = 1e4 / (pi * radii_m[o]^2)
-        ),
-        class = c("concentric_design", "inventory_design")
+    if (is.null(metadata))
+        metadata <- list()
+
+    dsg <- new_inventory_design(
+        sample_area_m2 = pi * radii_m[o]^2,
+        min_dbh_cm = min_dbh_cm[o],
+        name = name,
+        metadata = utils::modifyList(
+            list(shape = "circular", radii_m = radii_m[o]),
+            metadata
+        )
     )
+
+    dsg$radii_m <- radii_m[o]
+    class(dsg) <- c("concentric_design", "inventory_design")
+    dsg
 
 }, ex = function() {
     dsg <- new_concentric_design(
@@ -55,6 +119,20 @@ snfi_design <- structure(function#Spanish National Forest Inventory design
     )
 }, ex = function() {
     snfi_design()
+})
+
+print.inventory_design <- structure(function#Print a generic inventory design
+### Display the main components of an \code{"inventory_design"} object:
+### design name, diameter thresholds, sampled areas, and expansion
+### factors.
+(x,   ##<< Object of class \code{"inventory_design"}.
+ ...  ##<< Further arguments passed to methods. Currently unused.
+) {
+    cat("Inventory design:", x$name, "\n")
+    cat("Minimum DBH (cm):", paste(x$min_dbh_cm, collapse = ", "), "\n")
+    cat("Sample area (m2):", paste(x$sample_area_m2, collapse = ", "), "\n")
+    cat("Expansion factors:", paste(round(x$sf, 2), collapse = ", "), "\n")
+    invisible(x)
 })
 
 print.concentric_design <- structure(function#Print a concentric plot design
@@ -79,6 +157,34 @@ trees_per_ha <- structure(function#Trees per hectare from a sampling design
          ##<< mean after removing missing values.
 ) {
     UseMethod("trees_per_ha")
+})
+
+trees_per_ha.inventory_design <- structure(function#Trees per hectare for generic designs
+### Compute the trees-per-hectare expansion factor for a tree measured
+### under a generic inventory design. The returned value depends on the
+### tally tier into which the tree falls according to its diameter.
+(design, ##<< Object of class \code{"inventory_design"}.
+ dbh_cm  ##<< \code{numeric}. Diameter at breast height in \code{cm}.
+         ##<< If several values are supplied, the function uses their
+         ##<< mean after removing missing values.
+) {
+
+    dbh_cm <- as.numeric(dbh_cm)
+
+    if (length(dbh_cm) > 1)
+        dbh_cm <- mean(dbh_cm, na.rm = TRUE)
+
+    if (all(is.na(dbh_cm)))
+        return(NA_real_)
+
+    if (is.na(dbh_cm) || dbh_cm < design$min_dbh_cm[1])
+        return(NA_real_)
+
+    idx <- findInterval(dbh_cm, design$min_dbh_cm)
+    design$sf[idx]
+
+}, ex = function() {
+    trees_per_ha(new_inventory_design(c(100, 400), c(0, 20)), 13)
 })
 
 trees_per_ha.concentric_design <- structure(function#Trees per hectare for concentric designs
