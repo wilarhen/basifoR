@@ -59,6 +59,51 @@ nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
         return(cl.nm)
     }
 
+    ## Resolve measurement columns conservatively to avoid averaging
+    ## unrelated DBH or height fields before tier assignment. Prefer an
+    ## exact alias first; otherwise allow numbered repeats of the same
+    ## base field (for example Dn1, Dn2) and only then average them.
+    resolve_measure_cols <- function(dt, aliases) {
+        nm0 <- names(dt)
+        nml <- tolower(nm0)
+        ali <- tolower(aliases)
+
+        ## Prefer an exact alias, in declared order.
+        ii <- match(ali, nml)
+        ii <- ii[!is.na(ii)]
+        if(length(ii) > 0L)
+            return(nm0[ii[1L]])
+
+        ## Otherwise allow numbered repeats of the same base field.
+        hits <- integer(0)
+        for(a in ali) {
+            rx <- paste0('^', a, '([._]?[0-9]+)?$')
+            hits <- c(hits, grep(rx, nml, perl = TRUE))
+        }
+        hits <- unique(hits)
+
+        if(length(hits) == 0L)
+            return(character(0))
+
+        cols <- nm0[hits]
+        base <- sub('([._]?[0-9]+)$', '', tolower(cols))
+
+        ## Only average if all matched columns are numbered repeats of
+        ## one field. If the match is ambiguous, keep the first column
+        ## and warn instead of averaging different sources.
+        if(length(unique(base)) > 1L) {
+            warning(
+                'Ambiguous measurement columns matched: ',
+                paste(cols, collapse = ', '),
+                '. Using ', cols[1L],
+                call. = FALSE
+            )
+            return(cols[1L])
+        }
+
+        cols[order(cols)]
+    }
+
     ## Dominant height is computed later from h, d, and n.
     var. <- var[!var %in% 'Hd']
 
@@ -67,10 +112,10 @@ nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
 
     ## Resolve the raw diameter and height columns only when needed.
     if(any(var. %in% c('d', 'n', 'ba')))
-        diam_cols <- fc(nfi, c('Dn', 'Diamet'))
+        diam_cols <- resolve_measure_cols(nfi, c('Dn', 'Diamet', 'Diametro'))
 
     if(any(var. %in% 'h'))
-        ht_cols <- fc(nfi, c('altura', 'Ht'))
+        ht_cols <- resolve_measure_cols(nfi, c('altura', 'Ht'))
 
     ## Convert selected columns to a numeric matrix while preserving order.
     get_numeric_matrix <- function(dt, cols) {
@@ -153,28 +198,32 @@ nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
         if(var %in% 'd') {
             if(length(diam_cols) > 0L)
                 return(diam_mm)
-            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+            cols <- resolve_measure_cols(dbh, c('Dn', 'Diamet', 'Diametro'))
+            return(apply(dbh[, cols, drop = FALSE], 1,
                          function(x) dbhMetric(x, var)))
         }
 
         if(var %in% 'ba') {
             if(length(diam_cols) > 0L)
                 return(pi * diam_cm^2 * (4 * 1E4)^-1)
-            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+            cols <- resolve_measure_cols(dbh, c('Dn', 'Diamet', 'Diametro'))
+            return(apply(dbh[, cols, drop = FALSE], 1,
                          function(x) dbhMetric(x, var)))
         }
 
         if(var %in% 'n') {
             if(length(diam_cols) > 0L)
                 return(trees_ha)
-            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+            cols <- resolve_measure_cols(dbh, c('Dn', 'Diamet', 'Diametro'))
+            return(apply(dbh[, cols, drop = FALSE], 1,
                          function(x) dbhMetric(x, var, design = design)))
         }
 
         if(var %in% 'h') {
             if(length(ht_cols) > 0L)
                 return(ht_dm)
-            return(apply(dbh[, fc(dbh, c('altura', 'Ht')), drop = FALSE], 1,
+            cols <- resolve_measure_cols(dbh, c('altura', 'Ht'))
+            return(apply(dbh[, cols, drop = FALSE], 1,
                          function(x) dbhMetric(x, var, design = design)))
         }
     }
