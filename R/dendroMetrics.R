@@ -56,9 +56,9 @@ dendroMetrics <- structure(function#Summarize dendrometrics
                           ## supplied, each one is processed
                           ## independently and the results are merged
                           ## into a single output data frame.
-                          ## Parallel processing is available through
-                          ## argument \code{mc.cores} and can be
-                           ## disabled with \code{.parallel = FALSE}.
+                          ## Parallel processing is controlled by
+                          ## \code{mc.cores}. Values greater than 1
+                          ## process several inputs in parallel.
 (
 nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. A
          ## province name or province number used to locate SNF data;
@@ -83,9 +83,6 @@ nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. A
    mc.cores = getOption("mc.cores", 1L), ##<< \code{integer}. Number
                                          ## of cores used when several
                                          ## inputs are processed.
-   .parallel = TRUE, ##<< \code{logical}. If \code{TRUE}, allow
-                     ##parallel processing when several inputs are
-                     ##supplied.
     ... ##<< Additional arguments passed to \code{\link{readNFI}},
         ##\code{\link{nfiMetrics}}, or \code{\link{metrics2Vol}},
         ##including \code{nfi.nr} when required.
@@ -95,7 +92,7 @@ nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. A
 
     finalize_output <- function(out, call) {
         if (is.null(out))
-            return(finalize_output(out, call0))
+            return(NULL)
 
         attr(out, "call") <- call
         class(out) <- unique(c("dendroMetrics", class(out)))
@@ -363,7 +360,75 @@ run_job <- function(job) {
     if (is.na(mc.cores) || mc.cores < 1L)
         mc.cores <- 1L
 
-    if (!.parallel || mc.cores == 1L) {
+    is_materialized_input <- function(x) {
+        inherits(x, c("readNFI", "nfiMetrics", "metrics2vol"))
+    }
+
+    readnfi_args <- function(dots) {
+        if (!length(dots))
+            return(list())
+
+        nms <- names(dots)
+        keep_named <- !is.na(nms) & nzchar(nms)
+        dots <- dots[keep_named]
+        nms <- names(dots)
+
+        rf <- tryCatch(formals(readNFI), error = function(e) NULL)
+        if (is.null(rf)) {
+            keep <- nms %in% "nfi.nr"
+            return(dots[keep])
+        }
+
+        allowed <- setdiff(names(rf), "nfi")
+        dots[nms %in% allowed]
+    }
+
+    materialize_job_input <- function(job) {
+        if (is.null(job$nfi) || is_materialized_input(job$nfi))
+            return(job)
+
+        read_args <- readnfi_args(job$dots)
+        job$nfi <- do.call(readNFI, c(list(nfi = job$nfi), read_args))
+        job
+    }
+
+    use_parallel <- length(jobs) > 1L && mc.cores > 1L
+
+    if (use_parallel) {
+        jobs <- lapply(jobs, function(job) {
+            tryCatch(
+                materialize_job_input(job),
+                error = function(e) {
+                    structure(
+                        list(
+                            message = conditionMessage(e),
+                            nfi = job$nfi,
+                            nfi.nr = job$dots[["nfi.nr"]]
+                        ),
+                        class = "dendroMetrics_error"
+                    )
+                }
+            )
+        })
+
+        preload_errs <- vapply(jobs, inherits, logical(1), what = "dendroMetrics_error")
+        if (any(preload_errs)) {
+            msg <- vapply(jobs[preload_errs], function(x) {
+                paste0(
+                    "dendroMetrics failed while preloading nfi = ",
+                    paste(x$nfi, collapse = ", "),
+                    ", nfi.nr = ",
+                    paste(x$nfi.nr, collapse = ", "),
+                    ": ",
+                    x$message
+                )
+            }, character(1))
+
+            stop(paste(msg, collapse = "\n"), call. = FALSE)
+        }
+    }
+
+    if (!use_parallel) {
 
         res_list <- lapply(jobs, run_job)
 
