@@ -6,13 +6,15 @@ minimum diameter thresholds. The function returns an object of class
 \code{"concentric_design"} inheriting from \code{"inventory_design"}.
 Expansion factors are computed as trees per hectare for each subplot.}
 \usage{new_concentric_design(radii_m, 
-    min_dbh_cm, name = "custom")}
+    min_dbh_cm, name = "custom", 
+    metadata = NULL)}
 \arguments{
   \item{radii_m}{\code{numeric}. Subplot radii in metres.}
   \item{min_dbh_cm}{\code{numeric}. Minimum diameter at breast height
 << in \code{cm} required for a tree to be tallied in each
 << subplot.}
   \item{name}{\code{character(1)}. Design \code{name}.}
+  \item{metadata}{Optional \code{list}. Additional design \code{metadata}.}
 }
 
 

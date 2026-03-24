@@ -12,8 +12,7 @@ are transformed into stand units, see Details section.}
 \usage{dendroMetrics(nfi, summ.vr = "Estadillo", 
     cut.dt = "d == d", 
     report = FALSE, mc.cores = getOption("mc.cores", 
-        1L), .parallel = TRUE, 
-    ...)}
+        1L), ...)}
 \arguments{
   \item{nfi}{\code{character}, \code{data.frame}, or \code{list}. A
 province name or province number used to locate SNF data;
@@ -38,9 +37,6 @@ in the current working directory.}
   \item{mc.cores}{\code{integer}. Number
 of cores used when several
 inputs are processed.}
-  \item{.parallel}{\code{logical}. If \code{TRUE}, allow
-parallel processing when several inputs are
-supplied.}
   \item{\dots}{Additional arguments passed to \code{\link{readNFI}},
 \code{\link{nfiMetrics}}, or \code{\link{metrics2Vol}},
 including \code{nfi.nr} when required.}
@@ -94,9 +90,9 @@ several inputs. When several inputs are
 supplied, each one is processed
 independently and the results are merged
 into a single output data frame.
-Parallel processing is available through
-argument \code{mc.cores} and can be
-disabled with \code{.parallel = FALSE}.}
+Parallel processing is controlled by
+\code{mc.cores}. Values greater than 1
+process several inputs in parallel.}
 \value{\code{data.frame}. Depending on \code{summ.vr = NULL}, an output from
 \code{\link{metrics2Vol}}, or a summary of the variables, see
 Details section.}

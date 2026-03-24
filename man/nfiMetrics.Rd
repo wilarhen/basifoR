@@ -33,19 +33,24 @@ ignores case.  The default usually
 keeps plot- and species-level
 identifiers.}
   \item{design}{Sampling \code{design} used when computing
-\code{'n'}.  Pass a
-\code{\link{snfi_design}} object, another
-\code{concentric_design}, or any \code{design}
-supported by \code{trees_per_ha()}.}
+\code{'n'}. Pass the default
+\code{\link{snfi_design}}, another
+\code{concentric_design}, or any
+\code{inventory_design} supported by
+\code{trees_per_ha()}. The returned
+object stores a \code{design_meta}
+attribute with the \code{design} used to derive
+\code{'n'}.}
   \item{\dots}{Additional arguments passed to \code{\link{readNFI}} when
 \code{nfi} is not already a \code{readNFI} object.}
 }
 
 \value{\code{data.frame} with the grouping columns selected through
-\code{levels} plus the requested metrics in \code{var}.  The output
-inherits class \code{'nfiMetrics'}.  Inspect
+\code{levels} plus the requested metrics in \code{var}. The output
+inherits class \code{'nfiMetrics'}. Inspect
 \code{attr(x, 'units')} to see the units attached to each returned
-variable.}
+variable and \code{attr(x, 'design_meta')} to inspect the sampling
+\code{design} used to derive \code{'n'}.}
 
 \author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (ORCID: <https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <angelcristobal.ordonez@uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-5354-3760>), Aitor Vázquez-Veloso <aitor.vazquez.veloso@uva.es> [aut] (ORCID: <https://orcid.org/0000-0003-0227-506X>), Felipe Bravo <felipe.bravo@uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-7348-6695>)}
 
