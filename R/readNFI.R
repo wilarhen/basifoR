@@ -1,37 +1,3 @@
-<<<<<<< HEAD
-readNFI <- structure(function#Read NFI data
-### This function can retrieve data sets of the Spanish National
-### Forest Inventory (SNFI). It can process either \code{URLs} to data
-### stored in the SNFI web page (\code{"http://www.miteco.gob.es"}) or
-### paths to files locally stored.
-                      ##details<< Compressed data having file
-                      ##extensions other than \code{.dbf} or
-                      ##\code{.mdb} are not supported. Most data bases
-                      ##in \code{2nd} and \code{3rd} stages of the
-                      ##SNFI can be imported directly from
-                      ##\code{http://www.miteco.gob.es} using
-                      ##appropriate \code{URLs}. Data sets from 2nd
-                      ##SNFI are imported using
-                      ##\code{\link[foreign]{read.dbf}}. Data from latter
-                      ##stages are imported using either
-                      ##\code{\link[RODBC]{odbcConnect}} (Windows) or
-                      ##\code{\link[Hmisc]{mdb.get}} (unix-alike
-                      ##systems). Data from 4th SNFI must be read from
-                      ##local paths.  On Windows, a driver for Office
-                      ##2010 can be installed via the installer
-                      ##\code{'AccessDatabaseEngine.exe'} available
-                      ##from Microsoft, and the package must be
-                      ##implemented using a 32-bit R version. In the
-                      ##case of unix-alike systems, the linux
-                      ##dependence \code{mdbtools} must be installed.
-(
-    nfi,  ##<<\code{character} or \code{data.frame}.  \code{URL/path}
-          ##to a compressed file of the SNFI (\code{.zip}) having data
-          ##of either .dbf or .mdb file extensions.
-    dt.nm = 'PCMayores', ##<< \code{character}. Name of a data set
-                         ##stored in the imported NFI data. Default
-                         ##reads \code{'PCMayores'} (3rd NFI) or
-=======
 readNFI <- structure(function#Read SNF data from path
 ### This function can read compressed data (\code{.zip}) from the 
 ### Spanish National Forest Inventory (SNF). It can process either 
@@ -60,16 +26,9 @@ readNFI <- structure(function#Read SNF data from path
     dt.nm = 'PCMayores', ##<< \code{character}. Name of a dataset
                          ##stored in the imported NFI data. Defaults
                          ##to \code{'PCMayores'} (3rd NFI) or
->>>>>>> basifoR_0.7.1
                          ##\code{'PIESMA'} (2nd NFI).
-    ... ##<< Additional arguments in \code{\link{urlToTemp}}.
-    
+    ... ##<< Additional arguments for \code{\link{fetchNFI}}.
 ) {
-<<<<<<< HEAD
-    imp <- urlToTemp(nfi, ...)
-    fwin <- function(x, dt.nm){
-        ife <- RODBC::odbcConnectAccess(x) 
-=======
     imp <- nfi
 
 
@@ -120,7 +79,6 @@ readNFI <- structure(function#Read SNF data from path
         return(imp)
     fwin <- function(x, dt.nm){
         ife <-RODBC::odbcConnectAccess2007(x, rows_at_time = 1)
->>>>>>> basifoR_0.7.1
         on.exit(odbcClose(ife))
         ifc <- Map(function(x)
             sqlFetch(ife, sqtable = x), dt.nm)
@@ -136,21 +94,12 @@ readNFI <- structure(function#Read SNF data from path
         read.dbf(x)
     }
     is_dbf <- all(grepl('.DBF',imp))
-    is_mdb <- all(grepl('.mdb',imp))
+    ## is_mdb <- all(grepl('.mdb',imp))
+    is_mdb <- all(grepl('\\.mdb$|\\.accdb$',imp))
     is_win <- Sys.info()['sysname']%in%'Windows'
-<<<<<<< HEAD
-    is_i386 <- grepl('i386',R.Version()['system'])
-    if(is_mdb){
-        if(is_win & !is_i386){
-            print('Access driver needed: change to R i386!')
-            return(NULL)
-        }
-        if(is_win & is_i386){
-=======
 
     if(is_mdb){
         if(is_win){
->>>>>>> basifoR_0.7.1
             fnim <- 'fwin'
         } else {
             fnim <- 'fmdb'
@@ -179,10 +128,8 @@ readNFI <- structure(function#Read SNF data from path
     }
     if(dt.nm.[1]%in%'PIESMA')
         pr. <- unique(dset$'PROVINCIA')
+    dset <- convert_factors_to_numeric(dset)
     attributes(dset) <- c(attributes(dset), list(pr. = pr.))
-<<<<<<< HEAD
-        class(dset) <- append('readNFI',class(dset))
-=======
     attr(dset, "nfi.nr") <- nfi.nr
     if('provincia'%in%tolower(names(dset))){
         dset <- data.frame(nfi.nr = nfi.nr, dset)
@@ -190,22 +137,21 @@ readNFI <- structure(function#Read SNF data from path
     } else{
     dset <- data.frame(nfi.nr = nfi.nr, pr = pr., dset)}
     class(dset) <- append('readNFI',class(dset))
->>>>>>> basifoR_0.7.1
     return(dset)
-### \code{data.frame}. A data base  of the NFI.
-}, ex = function(){
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-rmad <- readNFI(madridNFI)[1:100,]
-head(rmad)
+### \code{data.frame} with numeric columns converted from factors back
+### to numeric, while preserving the format of character columns.
+}, ex = function(){    
+    ## donttest{
+    ### Retrieval of a database from the second stage of the SNF using a URL resource
+    
+    ## ifn2_path <-
+    ## '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
+    ## ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path
+    ## = ifn2_path)
+    
+    ##read_ifn2 <- readNFI(ifn2_url)
 
-## Retrieval of a data base from the second stage of the second SNFI:
-
-## donttest{
-## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-## url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-## rnfi <- readNFI(url2)
-## head(rnfi,3)
-## }
-
-
+    ##str(read_ifn2) }
+    
+    
 })

@@ -1,46 +1,3 @@
-<<<<<<< HEAD
-nfiMetrics <- structure(function#Tree metrics from NFI data
-### This function recursively implements \code{\link{dbhMetric}} on
-### data bases of the Spanish National Forest Inventory (NFI) to
-### derive a variety of tree metrics. Use \code{\link{metrics2Vol}} to
-### recursively derive the metrics plus over bark volumes.
-(
-    nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to a
-          ##compressed file of the NFI (.zip) having data of either
-          ##.dbf or .mdb file extensions, or a data frame such as that
-          ##produced by \code{\link{readNFI}}.
-    var = c('d','h','ba','n','Hd'), ##<<\code{character}. Metrics. These
-                                         ##can be five: \code{(1)} the
-                                         ##mean diameter \code{'d'};
-                                         ##\code{(2)} the tree height
-                                         ##\code{'h'}; \code{(3)} the
-                                         ##basal area \code{'ba'};
-                                         ##\code{(4)} the number of
-                                         ##trees per hectare
-                                         ##\code{'n'}; and \code{(5)}
-                                         ##the dominant height
-                                         ##\code{'Hd'}, see Details
-                                         ##section in
-                                         ##\code{\link{dbhMetric}} for
-                                         ##better understanding of the
-                                         ##metrics units. Default
-                                         ##\code{c('pr','d','h','ba','n','Hd')}.
-    levels = c('esta','espe'), ##<<\code{character}. levels at which
-                              ##the metrics are computed. Pattern
-                              ##matching is supported. Cases are
-                              ##ignored. Default
-                              ##\code{c('esta','espe')} matches both
-                              ##the sample plot \code{'Estadillos'}
-                              ##and tree species \code{'Especie'}.,
-        ... ##<< Additional arguments in \code{\link{readNFI}}.
-
-) {
-        if(is.null(nfi)|is.character(nfi)){
-            nfi. <- nfi
-        nfi <- readNFI(nfi, ...)
-        if(is.null(nfi.))
-            return(nfi)}
-=======
 nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
 ### Compute tree-level metrics from Spanish National Forest Inventory
 ### records by applying \code{\link{dbhMetric}}-style logic to NFI
@@ -89,7 +46,6 @@ nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
     nfi_nr <- attr(nfi, "nfi.nr")
 
     ## Find columns whose names match one or more search patterns.
->>>>>>> basifoR_0.7.1
     fc <- function(dt, cl.){
         nt. <- paste(cl., collapse = '|')
         nt.. <- grep(nt., names(dt),
@@ -301,15 +257,6 @@ attr(dmt, "units") <- metric_units[intersect(names(dmt), names(metric_units))]
 ### \code{attr(x, 'units')} to see the units attached to each returned
 ### variable.
 }, ex = function(){
-<<<<<<< HEAD
-    ## seconf NFI
-    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- readNFI(madridNFI)[1:10,]
-    mmad <- nfiMetrics(rmad)
-    head(rmad,3)
-    ## see metric units
-    attr(rmad,'units')
-=======
 ## Example with bundled Toledo data
 ifn4p45 <- system.file("Ifn4_Toledo.zip", package = "basifoR")
 
@@ -320,5 +267,4 @@ get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100, ]
 ## Compute default metrics and inspect the reported units
 metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
 attr(metrics_ifn4p45, 'units')
->>>>>>> basifoR_0.7.1
 })

@@ -1,37 +1,4 @@
 dendroMetrics <- structure(function#Summarize dendrometrics
-<<<<<<< HEAD
-###This function can summarize dendrometric data of the Spanish
-###National Forest Inventory (SNFI). It can also control most other
-###functions of the package. Dendrometric variables in the outputs are
-###transformed into stand units, see the Details section.
-                           ##details<< Dendrometric variables are
-                           ## summarized according to the levels of
-                           ## the argument \code{summ.vr}. The summary
-                           ## outputs include the categorical columns
-                           ## formulated in \code{summ.vr} and the
-                           ## variables defined using
-                           ## arguments/defaults in
-                           ## \code{\link{nfiMetrics}}. These
-                           ## variables include the tree basal area
-                           ## \code{ba} (\code{'m2 ha-1'}), the
-                           ## average diameter at breast height
-                           ## \code{d} (\code{'cm'}), the quadratic
-                           ## mean diameter \code{dg} (\code{'cm'}),
-                           ## the average tree height \code{h}
-                           ## (\code{'m'}), the number of trees by
-                           ## hectare \code{n} ('dimensionless'), and
-                           ## the over bark volume \code{v} (\code{'m3
-                           ## ha-1'}). Subsets of the output summary
-                           ## are extracted using logical expressions
-                           ## in argument \code{'cut.dt'}, see syntax
-                           ## in \code{\link{Logic}}.
-(
-    nfi, ##<<\code{character} or \code{data.frame}.  URL/path to a
-          ##compressed SNFI file (.zip) having data of either
-          ##.dbf or .mdb file extensions; or data frame such as that
-          ##produced by \code{\link{nfiMetrics}}; or data frame such
-          ##as that produced by \code{\link{readNFI}}.
-=======
 ### This function summarizes dendrometric data from the Spanish
 ### National Forest Inventory (SNF). It primarily accepts a province
 ### name or number, a local compressed SNF file, or a URL to a
@@ -101,9 +68,8 @@ nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. A
          ## returned by \code{\link{readNFI}},
          ## \code{\link{nfiMetrics}}, or
     ## \code{\link{metrics2Vol}}; or a list of such objects.
->>>>>>> basifoR_0.7.1
     summ.vr = 'Estadillo', ##<< \code{character} or \code{NULL}. Name
-                           ##of a Categorical variables in the SNFI
+                           ##of a Categorical variables in the SNF
                            ##data used to summarize the outputs. If
                            ##\code{NULL} then output from
                            ##\code{\link{metrics2Vol}} is
@@ -125,17 +91,12 @@ nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. A
         ##including \code{nfi.nr} when required.
 
 ) {
-<<<<<<< HEAD
-    if(is.null(nfi) | is.character(nfi) | inherits(nfi, 'readNFI')){
-        nfi. <- nfi
-=======
 dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     nfi. <- nfi
     if (is.null(nfi.))
         return(nfi)
 
     if (!inherits(nfi., "metrics2vol"))
->>>>>>> basifoR_0.7.1
         nfi <- metrics2Vol(nfi, ...)
 
     names(nfi) <- tolower(names(nfi))
@@ -449,25 +410,41 @@ if (any(errs)) {
 ### \code{\link{metrics2Vol}}, or a summary of the variables, see
 ### Details section.
 }, ex = function(){
-    ## SNFI Data from the province of Madrid
-    madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-    rmad <- readNFI(madridNFI)[1:100,]
-    mmad <- nfiMetrics(rmad)
-    vmad <- metrics2Vol(mmad)
-    dmad <- dendroMetrics(vmad, cut.dt = 'h > 8')
-    head(dmad)
-    ## see metric units
-    attr(dmad,'units')
+## Process SNF data for Toledo stored locally
+# Path to Toledo data file in 'basifoR' package
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-    ## Retrieval of SNFI data in 'www.miteco.gob.es' and computation
-    ## of the corresponding dendrometric summary:
-    
-    ## donttest{
-    ## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-    ## url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-    ## dmad <- dendroMetrics(url2, cut.dt = 'h >= 11')
-    ## head(dmad)
-    ## attr(dmad, 'units')
-    ## }
+# Decompress SNF data from the specified file path or URL
+fetch_ifn4p45 <- fetchNFI(ifn4p45)
+
+# Read and process the data (first 100 rows)
+get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100,]
+
+# Compute some metrics
+metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
+
+# Calculate volume metrics 
+vol_ifn4p45 <- metrics2Vol(metrics_ifn4p45)
+
+# Compute all metrics (dendrometrics) for trees with height > 8
+dendromet_ifn4p45 <- dendroMetrics(vol_ifn4p45, cut.dt='h > 8')
+
+# Display structure of dendrometric data
+str(dendromet_ifn4p45)
+
+# Check units of metrics
+attr(dendromet_ifn4p45,'units')
+
+## Alternatively, download data from 'www.miteco.gob.es'
+## Specify province name/number to compute dendrometrics:
+
+## donttest{
+### Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
+## dendromet_ifn4p45 <- dendroMetrics(provincia=45,nfi=4,cut.dt='h >= 8')
+### Display first few rows
+## head(dendromet_ifn4p45)
+### Check units of metrics
+## attr(dendromet_ifn4p45,'units')
+## }
     
 })

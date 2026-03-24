@@ -1,12 +1,5 @@
 \name{metrics2Vol}
 \alias{metrics2Vol}
-<<<<<<< HEAD
-\title{Tree volumes in NFI data}
-\description{This function computes over bark volumes (\code{'m3'}) processing
-tree metrics from databases of the SNFI data and using volume
-equations established in 2nd NFI, see Details section. To derive
-dendrometric summaries use \code{\link{dendroMetrics}}.}
-=======
 \title{Compute tree-level volume variables from NFI metrics}
 \description{Computes one or more tree-level
 volume variables from Spanish National Forest Inventory data. The
@@ -15,7 +8,6 @@ model for each tree, applies equation-based methods defined in a
 method registry, converts results to cubic metres, and optionally
 keeps legacy outputs (from previous versions of the package) and
 provenance information.}
->>>>>>> basifoR_0.7.1
 \usage{metrics2Vol(nfi, cub.met = "freq", 
     parametro = c("VCC"), 
     keep.var = TRUE, 
@@ -36,41 +28,6 @@ output column name, units, and fallback rule.}
   \item{\dots}{Passed to `nfiMetrics()` when `nfi` is not already an
 `"nfiMetrics"` object.}
 }
-<<<<<<< HEAD
-\details{The quations from the second SNFI
-used have the forms \code{'v ~ par1 + par2
-* (d^2) * h'}, and \code{'v ~ par1 *
-(d^par2) * (h^par3)'}. These equations
-estimate over bark volumes in \code{'dcm3'}
-but the function transform the units so the
-output volumes have \code{'m3'} units. The
-function assign equation forms and
-parameters depending on several variables,
-including the provincial unit, the tree
-species, the tree diameter, and the tree
-height. Consequently, objects from
-\code{\link{nfiMetrics}} must have these
-variables.}
-\value{\code{data.frame}. Depending on \code{keep.var}, short or expanded
-data set.  Short data sets contain the volumes \code{v}
-(\code{'m3'}) plus the metrics defined in
-\code{\link{nfiMetrics}}. The expanded data contains additional
-columns with the variables used to compute the volumes.}
-
-\author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (ORCID: <https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <a_cristo@pvs.uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-5354-3760>), Felipe Bravo <fbravo@pvs.uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-7348-6695>)}
-
-
-
-
-\examples{
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-rmad <- readNFI(madridNFI)[1:10,]
-vmad <- metrics2Vol(rmad)
-head(vmad)
-## see metric units
-attr(vmad,'units')
-}
-=======
 \details{Computes requested volume outputs from standardized NFI
 
 tree metrics using registry-based methods and optional
@@ -122,4 +79,3 @@ Keep units only for columns present in the final output.}
   y <- metrics2Vol(x, parametro = c('VCC', 'VSC'))
   head(y[c('nfi.nr', 'pr', 'especie', 'vcc', 'vsc')])
 }}
->>>>>>> basifoR_0.7.1

@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-## Internal utility functions used by basifoR
-
-conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
-    units. <- getOption('units')
-    if(!is.null(attr(nfi,'units')))
-        units.  <- attr(nfi,'units')
-    cols <- units.[units.%in%names(nfi)]
-    units_ini <- units_out <- names(cols)
-    matches <- sapply(var,function(m) paste0("^",m,"$"))
-    pos. <- sapply(matches,function(m) grep(m, cols))
-    units_out[pos.]  <- un
-    f_conv_unit <- function(x,y,z){
-        if(y == "" | z == ""){
-=======
 ## `%||%` <- function(x, y) if (is.null(x)) y else x
 null_or <- function(x, y) if (is.null(x)) y else x
 
@@ -847,7 +832,6 @@ conv_units <- function(nfi, var = c("d", "h"), un = c("cm", "m")) {
 
     convert_unit_label <- function(x, from, to) {
         if (from == "" || to == "" || from == to)
->>>>>>> basifoR_0.7.1
             return(x)
 
         if (!grepl(" ", from, fixed = TRUE) && !grepl(" ", to, fixed = TRUE))
@@ -921,6 +905,68 @@ conv_units <- function(nfi, var = c("d", "h"), un = c("cm", "m")) {
 
 
 
+convert_factors_to_numeric <- function(df) {
+# Function to convert factor columns to numeric while preserving
+# character columns
+  df[] <- lapply(df, function(col) {
+    if (is.factor(col) && all(grepl("^-?\\d*\\.?\\d+$", as.character(col)))) {
+      return(as.numeric(as.character(col)))
+    } else {
+      return(col)
+    }
+  })
+  return(df)
+}
+
+domheight<-function(h, d, n) {
+## /IFNdyn-master/ github proyect with dominantHeight function for NFI
+## https://github.com/miquelcaceres/IFNdyn
+  o <-order(d, decreasing=TRUE)
+  h = h[o]
+  n = n[o]
+  ncum = 0 
+  for(i in 1:length(h)) {
+    ncum = ncum + n[i]
+    if(!is.na(ncum)&&ncum>100){
+        return(sum(h[1:i]*n[1:i], na.rm=TRUE)/sum(h[1:i]*n[1:i]/h[1:i], na.rm=TRUE))}
+    ## if(ncum>100) return(sum(h[1:i]*n[1:i], na.rm=TRUE)/sum(h[1:i]*n[1:i]/h[1:i], na.rm=TRUE)) ## this produces an error message if the condition is NA
+  }
+  return(sum(h*n)/sum(n))
+}
+
+file_exten <- function(texts)
+    sapply(texts, function(x) sub(".*\\.(.*)", "\\1", x),
+           USE.NAMES = FALSE)
+
+
+
+
+find_provincia_or_codigo <- function(input) { #
+# Function to find provincia if input is numeric, or codigo/codigo2 if
+# input is character (case insensitive)
+    ## to comment:
+    ## load('/home/wihe/Documents/tuh32536/bfRdevel/basifoR/R/sysdata.rda')
+    data <- procods
+    if (is.numeric(input)) {  # Check if input is numeric
+    result <- data$provincia[grepl(paste0("^", input, "$"), data$codigo, ignore.case = TRUE)]
+  } else if (is.character(input)) {  # Assume input is character
+      result <- data$codigo[grepl(input, data$provincia,
+                                  ignore.case = TRUE)]
+    if (length(result) == 0) {
+        result <- data$codigo2[grepl(paste0("^", input, "$"),
+                                     data$provincia, ignore.case = TRUE)]
+    }
+  } else {
+    result <- NA
+  }
+  if (length(result) == 0) {
+    result <- NA
+  }
+    ## if(is.na(result))
+    ## cat(paste0("Warning: provincia or codigo '", input, "' was not found!\n"))
+  return(result)
+}
+
 flev <- function(vmad, levels){
 nma <- names(vmad)
 app <- paste(levels, collapse = '|')
@@ -928,9 +974,9 @@ gap <- grepl(app,nma, ignore.case = TRUE)
 nms <- nma[gap]
 return(nms)}
 
-## source: https://community.rstudio.com/t/internet-resources-should-fail-gracefully/49199/11
-
 gracefully_fail <- function(remote_file, timeOut = timeout(50)) {
+## source:
+## https://community.rstudio.com/t/internet-resources-should-fail-gracefully/49199/11
   try_GET <- function(x, ...) {
     tryCatch(
       GET(url = x, timeOut, ...),
@@ -942,7 +988,6 @@ gracefully_fail <- function(remote_file, timeOut = timeout(50)) {
   is_response <- function(x) {
     class(x) == "response"
   }
-  
   # First check internet connection
   if (!curl::has_internet()) {
     message("No internet connection.")
@@ -959,69 +1004,134 @@ gracefully_fail <- function(remote_file, timeOut = timeout(50)) {
     message_for_status(resp)
     return(invisible(NULL))
   }
-  
 return(TRUE)
 }
 
+insert_ifn_ifn4 <- function(input_string) {
+  # Define the pattern to match "ifn4" followed by "_" or "-"
+  pattern <- "nacionales/ifn4(?=[_-])"
+  # Use gregexpr to find all matches
+  match_positions <- gregexpr(pattern, input_string, perl = TRUE)
+  # Check if there is exactly one match
+  if (length(match_positions[[1]]) == 1 && match_positions[[1]][1] != -1) {
+    # Find the position of the match
+    start_pos <- match_positions[[1]][1]
+    # Insert "ifn/ifn4" before the match
+    result_string <- paste0(substr(input_string, 1, start_pos - 1), 
+                            "ifn/ifn4/", 
+                            substr(input_string, start_pos, nchar(input_string)))
+  } else {
+    # If the pattern is not found exactly once, return the original string
+    result_string <- input_string
+  }
+      return(result_string)
+}
+
+inspect_links <- function(url, pattern = NULL, ...) {
+# Function to inspect links
+    webpage <- rvest::read_html(url)
+    links <- rvest::html_nodes(webpage, 'a')
+    links <- rvest::html_attr(links, "href")
+  if (!is.null(pattern)) {
+    links <- links[grepl(pattern, links, perl = TRUE, ...)]
+  }
+  return(links)
+}
+
+is_decompressed <- function(x)
+    grepl(paste0(getOption('dt.ext'), collapse = '|'), x)
+
+miteco_urls_from_paths <- function(paths = c('path21', 'path22')) 
+    mapply(function(x)
+        httr::modify_url(getOption('server'), path = getOption(x)),
+        paths,
+        USE.NAMES = FALSE)
+
+msg <- basifoR_figlet()
+
+nfi2 <- function(prov, complain = TRUE){
+## Function to download ifn2 data using a province code
+    if(is.null(prov))
+        return(invisible(NULL))
+u <- miteco_urls_from_paths(c('path21', 'path22'))
+all_links <- unlist(Map(function(x)inspect_links(x,'zip'), u), use.names = FALSE)
+parsed <- mapply(function(x)
+    httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
+    prov. <- prov
+    prov <- find_code_(prov, is.ifn4 = FALSE, df = procods)
+    ## if(is.na(prov) | length(prov) == 0){
+if(is.null(prov)){
+        ## if(complain)
+    ## warning(paste0("Spanish province '", prov., "' not found!\n"))
+        return(invisible(NULL))}
+    ptt <- prov + 5
+if(ptt < 10)
+    ptt <- paste0('0', ptt)
+ptt <- paste0(ptt, '.zip')
+## return(ptt)
+parsed. <- parsed[grepl(ptt, parsed)]
+if(length(parsed.) == 0){
+    warning(paste0("URL for spanish province '", prov., "' not found!\n"),
+            call. = FALSE)
+    return(invisible(NULL))
+}
+return(parsed.)}
+
+nfi3 <- function(prov){
+## Function to download ifn3 data using a province code
+    if(is.null(prov))
+        return(invisible(NULL))
+u <- miteco_urls_from_paths(c('path31', 'path32'))
+all_links <- unlist(Map(function(x)inspect_links(x,"fn3.*\\.zip"), u), use.names = FALSE)
+parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
+prov. <- prov
+msg <- paste0("Warning: Data for codigo '", prov., "' was not found!\n")
+## if(is.character(prov))
+##  prov <- find_provincia_or_codigo(prov)
+prov <- find_code_(prov, is.ifn4 = FALSE, df = procods)
+## if(is.na(prov)){
+##     cat(msg)
+##     return(invisible(NULL))}
+if(is.null(prov)){
+        ## if(complain)
+    ## warning(paste0("Spanish province '", prov., "' not found!\n"))
+        return(invisible(NULL))}
+if(prov < 10)
+    prov <- paste0('0', prov)
+prov <- paste0(prov, '.zip')
+parsed. <- parsed[grepl(prov, parsed)]
+if(length(parsed.) == 0){
+    warning(paste0("URL for spanish province '", prov., "' not found!\n"),
+            call. = FALSE)
+    return(invisible(NULL))
+}
+return(parsed.)}
+
+## nfi4 <- function(prov, complain = TRUE){
+## ## Function to download ifn4 data using a province code
+##     if(is.null(prov))
+##         return(invisible(NULL))
+##     ## u <- 'https://www.mitueco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html'
+## u <- miteco_urls_from_paths('path41')
+## all_links. <- inspect_links(u,'tablas|sig', ignore.case = TRUE) #%>% print()
+## all_links <- inspect_links(u, "fn4.*\\.zip") #%>% print()
+## all_links <- all_links[!all_links%in%all_links.]
+## parsed <- mapply(function(x)httr::modify_url(getOption('server'), path = x), all_links, USE.NAMES = FALSE)
+## prov. <- prov
+## if(!is.character(prov))
+## prov <- find_provincia_or_codigo(prov)
+## parsed. <- parsed[grepl(prov, parsed, ignore.case = TRUE)]
+##     if(length(parsed.) == 0){
+##         if(complain)
+##     cat(paste0("Warning: Data for codigo '", prov., "' was not found!\n"))
+##     return(invisible(NULL))
+## }
+## ## to solve some wrong urls addind ifn/ifn4    
+## parsed. <- insert_ifn_ifn4(parsed.)
+## return(parsed.)}
 
 units. <- c('d','h','ba','n','Hd','v')
 names(units.) <- c('mm','m','m2','','m','dm3')
 
 units.. <- units.
 names(units..) <- c('cm','m','m2','','m','m3')
-
-
-
-## /IFNdyn-master/ github proyect with dominantHeight function for NFI
-## https://github.com/miquelcaceres/IFNdyn
-domheight<-function(h, d, n) {
-  o <-order(d, decreasing=TRUE)
-  h = h[o]
-  n = n[o]
-  ncum = 0 
-  for(i in 1:length(h)) {
-    ncum = ncum + n[i]
-    if(!is.na(ncum)&&ncum>100){
-        return(sum(h[1:i]*n[1:i], na.rm=TRUE)/sum(h[1:i]*n[1:i]/h[1:i], na.rm=TRUE))}
-    ## if(ncum>100) return(sum(h[1:i]*n[1:i], na.rm=TRUE)/sum(h[1:i]*n[1:i]/h[1:i], na.rm=TRUE)) ## this produces an error message if the condition is NA
-  }
-  return(sum(h*n)/sum(n))
-}
-
-
-.onAttach <- function(lib, pkg)
-{
-  version <- read.dcf(file.path(lib, pkg, "DESCRIPTION"), "Version")
-  
-  if(interactive())
-    { # > figlet basifoR
-        packageStartupMessage(
-          "basifoR
-version: ", version)
-}
-else
-    { packageStartupMessage(
-          "Package 'basifoR' version ", version) } 
-
-  packageStartupMessage("Type 'citation(\"basifoR\")' for citing this R package in publications.")
-  invisible()
-}
-
-
-.onLoad <- function(libname, pkgname){
-    op <- options()
-    op.FC <- list(api = 'www.miteco.gov.es',
-                  url2 = "http://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip",
-                  url3 = "http://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/ifn3p01_tcm30-293907.zip",
-                  utm = "+proj=utm +zone=utm.z +ellps=GRS80 +datum=NAD83 +units=m +no_defs",
-                  utm1 = "+proj=utm +zone=utm.z +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0",
-                  longlat = '+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs',
-                  fapp = 'mcmapply',
-                  units = units.,
-                  units1 = units..)
-
-toset <- !(names(op.FC) %in% names(op))
-  if(any(toset)) options(op.FC[toset])
-invisible()
-
-}

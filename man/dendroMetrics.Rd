@@ -1,12 +1,6 @@
 \name{dendroMetrics}
 \alias{dendroMetrics}
 \title{Summarize dendrometrics}
-<<<<<<< HEAD
-\description{This function can summarize dendrometric data of the Spanish
-National Forest Inventory (SNFI). It can also control most other
-functions of the package. Dendrometric variables in the outputs are
-transformed into stand units, see the Details section.}
-=======
 \description{This function summarizes dendrometric data from the Spanish
 National Forest Inventory (SNF). It primarily accepts a province
 name or number, a local compressed SNF file, or a URL to a
@@ -15,20 +9,12 @@ also process data frames previously returned by
 \code{\link{readNFI}}, \code{\link{nfiMetrics}}, or
 \code{\link{metrics2Vol}}. Dendrometric variables in the output
 are transformed into stand units, see Details section.}
->>>>>>> basifoR_0.7.1
 \usage{dendroMetrics(nfi, summ.vr = "Estadillo", 
     cut.dt = "d == d", 
     report = FALSE, mc.cores = getOption("mc.cores", 
         1L), .parallel = TRUE, 
     ...)}
 \arguments{
-<<<<<<< HEAD
-  \item{nfi}{\code{character} or \code{data.frame}.  URL/path to a
-compressed SNFI file (.zip) having data of either
-.dbf or .mdb file extensions; or data frame such as that
-produced by \code{\link{nfiMetrics}}; or data frame such
-as that produced by \code{\link{readNFI}}.}
-=======
   \item{nfi}{\code{character}, \code{data.frame}, or \code{list}. A
 province name or province number used to locate SNF data;
 a local path or URL to a compressed SNF file
@@ -37,9 +23,8 @@ a local path or URL to a compressed SNF file
 returned by \code{\link{readNFI}},
 \code{\link{nfiMetrics}}, or
 \code{\link{metrics2Vol}}; or a list of such objects.}
->>>>>>> basifoR_0.7.1
   \item{summ.vr}{\code{character} or \code{NULL}. Name
-of a Categorical variables in the SNFI
+of a Categorical variables in the SNF
 data used to summarize the outputs. If
 \code{NULL} then output from
 \code{\link{metrics2Vol}} is
@@ -116,39 +101,22 @@ disabled with \code{.parallel = FALSE}.}
 \code{\link{metrics2Vol}}, or a summary of the variables, see
 Details section.}
 
-<<<<<<< HEAD
-\author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (ORCID: <https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <a_cristo@pvs.uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-5354-3760>), Felipe Bravo <fbravo@pvs.uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-7348-6695>)}
-=======
 \author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (ORCID: <https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <angelcristobal.ordonez@uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-5354-3760>), Aitor Vázquez-Veloso <aitor.vazquez.veloso@uva.es> [aut] (ORCID: <https://orcid.org/0000-0003-0227-506X>), Felipe Bravo <felipe.bravo@uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-7348-6695>)}
->>>>>>> basifoR_0.7.1
 
 
 
 
 \examples{
-## SNFI Data from the province of Madrid
-madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
-rmad <- readNFI(madridNFI)[1:100,]
-mmad <- nfiMetrics(rmad)
-vmad <- metrics2Vol(mmad)
-dmad <- dendroMetrics(vmad, cut.dt = 'h > 8')
-head(dmad)
-## see metric units
-attr(dmad,'units')
+## Process SNF data for Toledo stored locally
+# Path to Toledo data file in 'basifoR' package
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
 
-## Retrieval of SNFI data in 'www.miteco.gob.es' and computation
-## of the corresponding dendrometric summary:
+# Decompress SNF data from the specified file path or URL
+fetch_ifn4p45 <- fetchNFI(ifn4p45)
 
-## donttest{
-## path <- '/es/biodiversidad/servicios/banco-datos-naturaleza/090471228013cbbd_tcm30-278511.zip'
-## url2 <- httr::modify_url("https://www.miteco.gob.es", path = path)
-## dmad <- dendroMetrics(url2, cut.dt = 'h >= 11')
-## head(dmad)
-## attr(dmad, 'units')
-## }
+# Read and process the data (first 100 rows)
+get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100,]
 
-<<<<<<< HEAD
-=======
 # Compute some metrics
 metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
 
@@ -176,5 +144,4 @@ attr(dendromet_ifn4p45,'units')
 ## attr(dendromet_ifn4p45,'units')
 ## }
     
->>>>>>> basifoR_0.7.1
 }
