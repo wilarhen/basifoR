@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Internal utility functions used by basifoR
 
 conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
@@ -11,19 +12,914 @@ conv_units <- function(nfi, var = c('d','h'), un = c('cm','m')){
     units_out[pos.]  <- un
     f_conv_unit <- function(x,y,z){
         if(y == "" | z == ""){
+=======
+## `%||%` <- function(x, y) if (is.null(x)) y else x
+null_or <- function(x, y) if (is.null(x)) y else x
+
+
+metrics2Vol_legacy <- structure(function#Tree volumes in NFI data
+### This function computes over bark volumes (\code{'m3'}) processing
+### tree metrics from databases of the SNF data and using volume
+### equations established in 2nd NFI, see Details section. To compute
+### all in-package metrics, run function \code{\link{dendroMetrics}}.
+                         ##details<< The quations from the second SNF
+                         ##used have the forms \code{'v ~ par1 + par2
+                         ##* (d^2) * h'}, and \code{'v ~ par1 *
+                         ##(d^par2) * (h^par3)'}. These equations
+                         ##estimate over bark volumes in \code{'dcm3'}
+                         ##but the function transform the units so the
+                         ##output volumes have \code{'m3'} units. The
+                         ##function assign equation forms and
+                         ##parameters depending on several variables,
+                         ##including the provincial unit, the tree
+                         ##species, the tree diameter, and the tree
+                         ##height. Consequently, objects from
+                         ##\code{\link{nfiMetrics}} must have these
+                         ##variables.
+(
+    nfi,  ##<<\code{character} or \code{data.frame}.  URL/path to a
+          ##compressed file of the NFI (.zip) having data of either
+          ##.dbf or .mdb file extensions; or data frame such as that
+          ##produced by \code{\link{nfiMetrics}}; or data frame such
+          ##as that produced by \code{\link{readNFI}}.
+    cub.met = 'freq', ##<< \code{character}. Cubication
+                      ##method. Default \code{'freq'} implements the
+                      ##equation form that most frequently match the
+                      ##data, see \code{details} section. Additional
+                      ##methods have not yet been implemented.
+    keep.var = FALSE, ##<< \code{logical}. Keep the variables used to
+                      ##compute the volumes. Default \code{FALSE}.
+    ... ##<< Depending on \code{'nfi'}, additional arguments in
+        ##\code{\link{nfiMetrics}} or
+        ##\code{\link{readNFI}}.
+) {
+
+    nfi. <- nfi
+    if (is.null(nfi.))
+        return(nfi)
+
+    if (!inherits(nfi., "nfiMetrics"))
+        nfi <- nfiMetrics(nfi, ...)
+
+    nfi_nr <- attr(nfi, "nfi.nr")
+    spec. <- names(nfi)[grepl('spec', names(nfi), ignore.case = TRUE)]
+    var <- c('pr','h','d')
+    needed <- c('Especie/ESPECIE', var)
+    nd <- paste(needed, collapse = '?,')
+    if(!all(length(spec.) != 0 & var%in%names(nfi))){
+        warning("nfiMetrics: change arguments 'var'and/or 'levels'")
+        stop(paste0('v: missing variables: nfi[,c(',nd,'?, ...)]'))
+    }
+
+    var.. <- getOption('units')
+    var.. <- var..[var..%in%names(nfi)]
+    attr_un <- attr(nfi,'units')
+    if(!is.null(attr_un))
+        names(var..)[var..%in%attr_un] <- names(attr_un)
+    nfi. <- nfi
+
+    nfi <- conv_units(nfi, var = c('d','h'), un = c('mm','dm'))
+    
+    mds <- c('1'  = 'v ~ par1 + par2 * (d^2) * h',
+             '11' = 'v ~ par1 * (d^par2) * (h^par3)')
+    fc <- function(dt, cl.){
+        nt. <- paste(cl., collapse = '|')
+        nt.. <- grep(nt., names(dt),
+                     ignore.case = TRUE)
+        cl.nm <- sort(names(dt)[nt..],
+                      decreasing = TRUE)
+        return(cl.nm)}
+    fmdV <- function(mdb2, ntm = c('pr','spec')){
+        ## data(parEqVcc, envir = environment())
+    ## load('/home/wihe/Documents/tuh32536/bfRdevel/basifoR/R/sysdata.rda')
+        ## load('parEqVcc.RData')
+        vt <- merge(mdb2, parEqVcc,
+                    by.x = fc(mdb2, ntm),
+                    by.y = fc(parEqVcc, ntm),
+                    all.x = TRUE)
+        return(vt)}
+    feV <- function(vt, md){
+        fvarin <- function(fun,ind = TRUE){
+            fun <- formula(fun)
+            allv <- all.vars(fun,
+                             functions = FALSE) 
+            yvar <- all.vars(update(fun, . ~ 1),
+                             functions = FALSE)
+            inds <- allv[!allv%in%yvar]
+            if(!ind)inds <- yvar
+            return(inds)}
+        fev <- function(fun, md){
+            e <- list2env(as.list(md))
+            y <- eval(parse(text=fun), e)
+            return(y)}
+        ind <- fvarin(md)
+        dep <- fvarin(md, F)
+        sbs <- paste(dep,'~', sep = '|') 
+        md. <- gsub(sbs,'',md)
+        md. <- gsub(' ','',md.)
+        vt. <- vt[,ind]
+        vl <- apply(vt.,1,function(x)fev(md.,x))
+        vl <- cbind(vt, vl)
+        names(vl) <- c(names(vt),dep)
+        return(vl)}
+
+    vt <- fmdV(nfi)
+    lvs <- levels(as.factor(vt$'Modelo'))
+    spm <- split(vt, vt[,'Modelo'])
+    nms. <- names(spm)
+    mds. <- mds[nms.]
+    mmod <- Map(function(x,y)
+        feV(x,y),x = spm, y = mds.)
+    mmd <- do.call('rbind', mmod)
+    tex <- fc(mmd,c('mod','par')) 
+    if(!keep.var)
+        mmd <- mmd[,!names(mmd)%in%tex]
+    ffreq <- function(df){
+        tm <- data.frame(table(df$'fc'))
+        tm <- subset(tm,get('Freq')%in%max(get('Freq')))
+        tm <- as.character(tm$'Var1')[1]
+        return(tm)    
+    }
+    if(cub.met%in%'freq')
+        cub.met <- ffreq(mmd)
+    mmd <- subset(mmd, fc%in%as.factor(cub.met))
+    if(!keep.var)
+        mmd <- mmd[,!names(mmd)%in%'fc']
+    vun <- getOption('units')[getOption('units')=='v']
+    attr(mmd, 'units') <- c(attr(nfi, 'units'), vun) 
+    mmd <- conv_units(mmd, var = c('d','h','v'), un = c('cm','m','m3'))        
+    rownames(mmd) <- NULL
+
+n <- names(mmd)
+first <- c("nfi.nr","pr", "estadillo","especie")
+i <- match(first, tolower(n))
+i <- i[!is.na(i)]
+mmd <- mmd[, c(n[i], n[-i]), drop = FALSE]
+    
+    attr(mmd, "nfi.nr") <- nfi_nr
+    class(mmd) <- append('metrics2vol',class(mmd))
+    return(mmd)
+### \code{data.frame}. Depending on \code{keep.var}, short or expanded
+###  data set.  Short data sets contain the volumes \code{v}
+###  (\code{'m3'}) plus the metrics defined in
+###  \code{\link{nfiMetrics}}. The expanded data contains additional
+###  columns with the variables used to compute the volumes.
+}, ex = function(){
+## Process SNF data for Toledo stored locally
+# Path to Toledo data file in 'basifoR' package
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package="basifoR")
+
+# Decompress SNF data from the specified file path or URL
+fetch_ifn4p45 <- fetchNFI(ifn4p45)
+
+# Read and process the data (first 100 rows)
+get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100,]
+
+# Compute some metrics
+metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
+
+# Calculate volume metrics 
+vol_ifn4p45 <- metrics2Vol(metrics_ifn4p45)
+
+## see metric units
+    attr(vol_ifn4p45,'units')
+})
+
+
+find_code__ <- function(input_value, is.ifn4, df) {
+    x <- trimws(as.character(input_value))
+
+    norm <- function(z) {
+        z <- as.character(z)
+        z <- iconv(z, from = "", to = "ASCII//TRANSLIT")
+        tolower(trimws(z))
+    }
+
+    x_norm <- norm(x)
+
+    is_num <- grepl("^[0-9]+$", x_norm)
+
+    if (is_num) {
+        hit <- which(
+            norm(df$codigo)  == x_norm |
+            norm(df$codigo2) == x_norm
+        )[1L]
+    } else {
+        hit <- which(
+            norm(df$provincia)   == x_norm |
+            norm(df$provincia_0) == x_norm |
+            norm(df$provincia_1) == x_norm |
+            norm(df$codigo)      == x_norm |
+            norm(df$codigo2)     == x_norm
+        )[1L]
+
+        if (is.na(hit)) {
+            hit <- which(
+                grepl(x_norm, norm(df$provincia),   fixed = TRUE) |
+                grepl(x_norm, norm(df$provincia_0), fixed = TRUE) |
+                grepl(x_norm, norm(df$provincia_1), fixed = TRUE)
+            )[1L]
+        }
+    }
+
+    if (is.na(hit))
+        return(NA_character_)
+
+    if (is.ifn4) {
+        out <- df$provincia_1[hit]
+    } else {
+        out <- df$codigo[hit]
+    }
+
+    as.character(out)
+}
+
+## find_code__ <- function(input_value, is.ifn4, df) {
+##   result <- df$codigo[
+##     grepl(input_value, ignore.case = TRUE, df$codigo) | 
+##     grepl(input_value, ignore.case = TRUE, df$provincia) | 
+##     grepl(input_value, ignore.case = TRUE, df$codigo2) |
+##     grepl(input_value, ignore.case = TRUE, df$provincia_0) |
+##     grepl(input_value, ignore.case = TRUE, df$provincia_1)
+##     ][1L]
+  
+##   if(is.ifn4){
+##       result <- df$provincia_1[
+##                        grepl(paste0('^',result,'$'), df$codigo,
+##                              ignore.case = TRUE)]}
+##   if(length(result) == 0)
+##       result <- NA
+##   return(result)
+## }
+
+
+
+get_ifn_nr <- function(x) {
+  nm <- basename(x)
+  
+  if (all(grepl("\\.DBF", nm, ignore.case = TRUE))) {
+    return(2L)
+  }
+  
+  m <- regexpr("ifn([0-9]+)", nm, ignore.case = TRUE, perl = TRUE)
+  
+  if (any(m > 0)) {
+    hit <- regmatches(nm, m)[m > 0][1]
+    return(as.integer(sub("(?i)ifn([0-9]+).*", "\\1", hit, perl = TRUE)))
+  }
+  
+  NA_integer_
+}
+## dendroMetrics_ <- structure(function
+## ### Summarize dendrometrics
+## ### This function can summarize dendrometric data of the Spanish
+## ### National Forest Inventory (SNF). It can also control most other
+## ### functions of the package. Dendrometric variables in the outputs are
+## ### transformed into stand units, see the Details section.
+##                            ##details<< Dendrometric variables are
+##                            ## summarized according to the levels of
+##                            ## the argument \code{summ.vr}. The summary
+##                            ## outputs include the categorical columns
+##                            ## formulated in \code{summ.vr} and the
+##                            ## variables defined using
+##                            ## arguments/defaults in
+##                            ## \code{\link{nfiMetrics}}. These
+##                            ## variables include the tree basal area
+##                            ## \code{ba} (\code{'m2 ha-1'}), the
+##                            ## average diameter at breast height
+##                            ## \code{d} (\code{'cm'}), the quadratic
+##                            ## mean diameter \code{dg} (\code{'cm'}),
+##                            ## the average tree height \code{h}
+##                            ## (\code{'m'}), the number of trees by
+##                            ## hectare \code{n} ('dimensionless'), and
+##                            ## the over bark volume \code{v} (\code{'m3
+##                            ## ha-1'}). Subsets of the output summary
+##                            ## are extracted using logical expressions
+##                            ## in argument \code{'cut.dt'}, see syntax
+##                            ## in \code{\link{Logic}}.
+## (
+##     nfi, ##<< \code{character}, \code{list}, or \code{data.frame}.
+##           ## URL/path to a compressed SNF file (.zip) having data of
+##           ## either .dbf or .mdb file extensions; or data frame such
+##           ## as that produced by \code{\link{nfiMetrics}}; or data
+##           ## frame such as that produced by \code{\link{readNFI}}.
+##           ## Several inputs can be supplied as a list or vector and
+##           ## processed in parallel.
+##     summ.vr = "Estadillo", ##<< \code{character} or \code{NULL}. Name
+##                            ## of a categorical variable in the SNF
+##                            ## data used to summarize the outputs. If
+##                            ## \code{NULL} then output from
+##                            ## \code{\link{metrics2Vol}} is returned.
+##                            ## Default \code{"Estadillo"} processes
+##                            ## sample plots.
+##     cut.dt = "d == d", ##<< \code{character}. Logical condition used
+##                        ## to subset the output. Default \code{"d == d"}
+##                        ## avoids subsetting.
+##     report = FALSE, ##<< \code{logical}. Write report files in
+##                     ## \code{report.dir}. When several inputs are
+##                     ## supplied, one file per input is written.
+##     report.dir = getwd(), ##<< \code{character}. Directory where
+##                           ## report files are written.
+##     report.prefix = "report", ##<< \code{character}. Prefix used in
+##                               ## report filenames.
+##     mc.cores = getOption("mc.cores", 1L), ##<< \code{integer}. Number
+##                     ## of worker processes used when several inputs
+##                     ## are supplied in \code{nfi}.
+##     .parallel = TRUE, ##<< \code{logical}. If \code{TRUE} and several
+##                       ## inputs are supplied in \code{nfi}, process
+##                       ## them in parallel.
+##     ...
+## ) {
+
+##     make_report_file <- function(id, dir, prefix) {
+##         if (!dir.exists(dir))
+##             dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+##         file.path(dir, paste0(prefix, "_", id, ".csv"))
+##     }
+
+##     dendro_one <- function(nfi, summ.vr, cut.dt, report, report.file, ...) {
+
+##         nfi. <- nfi
+
+##         if (is.null(nfi.))
+##             return(nfi)
+
+##         if (!inherits(nfi., "metrics2vol"))
+##             nfi <- metrics2Vol(nfi, ...)
+
+##         frm. <- attr(nfi, "units")
+
+##         if (is.null(summ.vr)) {
+##             nfi <- subset(nfi, eval(parse(text = cut.dt)))
+##             attributes(nfi) <- c(attributes(nfi), list(units = frm.))
+
+##             if (report)
+##                 write.csv(nfi, file = report.file, row.names = FALSE)
+
+##             return(nfi)
+##         }
+
+##         summ.vr <- flev(nfi, summ.vr)
+##         var <- getOption("units1")[getOption("units1") %in% names(nfi)]
+##         frm. <- names(attr(nfi, "units"))
+##         to. <- names(var)
+##         var. <- var[var != "n"]
+
+##         nfi <- conv_units(nfi, var = var, un = to.)
+##         msp <- split(nfi, nfi[summ.vr])
+##         msp <- Filter("nrow", msp)
+
+##         fsum <- function(dt) {
+##             dt[, var.] <- dt[, var.] * dt[, "n"]
+
+##             summ <- apply(dt[, var, drop = FALSE], 2, sum, na.rm = TRUE)
+
+##             keep_avg <- intersect(c("d", "h", "Hd"), names(summ))
+##             if (length(keep_avg))
+##                 summ[keep_avg] <- summ[keep_avg] / summ["n"]
+
+##             if (all(c("ba", "n") %in% names(summ)))
+##                 summ["dg"] <- sqrt((4E4 * summ["ba"] / summ["n"]) / pi)
+
+##             summ <- summ[order(names(summ))]
+##             summ <- sapply(summ, function(x) round(x, 3))
+##             summ <- t(as.matrix(summ))
+
+##             fcs. <- names(dt)[!names(dt) %in% var]
+##             fcs <- dt[1, fcs., drop = FALSE]
+
+##             cbind(fcs, summ)
+##         }
+
+##         resm <- lapply(msp, fsum)
+##         resm <- Reduce("rbind", resm)
+##         resm <- data.frame(resm)
+
+##         resm <- subset(resm, eval(parse(text = cut.dt)))
+##         rownames(resm) <- NULL
+
+##         if (report)
+##             write.csv(resm, file = report.file, row.names = FALSE)
+
+##         dgcm <- "dg"
+##         names(dgcm) <- "cm"
+##         attr. <- c(attr(nfi, "units"), dgcm)
+##         attributes(resm) <- c(attributes(resm), list(units = attr.))
+
+##         resm
+##     }
+
+##     is_many <- is.list(nfi) || (length(nfi) > 1L && !is.data.frame(nfi))
+
+##     if (!is_many) {
+##         report.file <- make_report_file(1L, report.dir, report.prefix)
+##         return(dendro_one(
+##             nfi = nfi,
+##             summ.vr = summ.vr,
+##             cut.dt = cut.dt,
+##             report = report,
+##             report.file = report.file,
+##             ...
+##         ))
+##     }
+
+##     nfi_list <- if (is.list(nfi)) nfi else as.list(nfi)
+##     ids <- seq_along(nfi_list)
+##     report.files <- vapply(
+##         ids,
+##         function(i) make_report_file(i, report.dir, report.prefix),
+##         character(1)
+##     )
+
+##     mc.cores <- as.integer(mc.cores)
+##     if (is.na(mc.cores) || mc.cores < 1L)
+##         mc.cores <- 1L
+
+##     if (!.parallel || mc.cores == 1L) {
+
+##         res_list <- Map(
+##             function(x, rf) {
+##                 dendro_one(
+##                     nfi = x,
+##                     summ.vr = summ.vr,
+##                     cut.dt = cut.dt,
+##                     report = report,
+##                     report.file = rf,
+##                     ...
+##                 )
+##             },
+##             x = nfi_list,
+##             rf = report.files
+##         )
+
+##     } else if (.Platform$OS.type == "windows") {
+
+##         cl <- parallel::makeCluster(mc.cores)
+##         on.exit(parallel::stopCluster(cl), add = TRUE)
+
+##         parallel::clusterExport(
+##             cl = cl,
+##             varlist = c(
+##                 "dendro_one",
+##                 "summ.vr",
+##                 "cut.dt",
+##                 "report",
+##                 "nfi_list",
+##                 "report.files"
+##             ),
+##             envir = environment()
+##         )
+
+##         parallel::clusterEvalQ(cl, {
+##             if ("basifoR" %in% loadedNamespaces())
+##                 NULL
+##             else
+##                 library(basifoR)
+##         })
+
+##         res_list <- parallel::parLapply(
+##             cl = cl,
+##             X = ids,
+##             fun = function(i, ...) {
+##                 dendro_one(
+##                     nfi = nfi_list[[i]],
+##                     summ.vr = summ.vr,
+##                     cut.dt = cut.dt,
+##                     report = report,
+##                     report.file = report.files[[i]],
+##                     ...
+##                 )
+##             },
+##             ...
+##         )
+
+##     } else {
+
+##         res_list <- parallel::mclapply(
+##             X = ids,
+##             FUN = function(i, ...) {
+##                 dendro_one(
+##                     nfi = nfi_list[[i]],
+##                     summ.vr = summ.vr,
+##                     cut.dt = cut.dt,
+##                     report = report,
+##                     report.file = report.files[[i]],
+##                     ...
+##                 )
+##             },
+##             ...,
+##             mc.cores = mc.cores
+##         )
+##     }
+
+##     res_list <- Filter(Negate(is.null), res_list)
+
+##     if (!length(res_list))
+##         return(NULL)
+
+##     res_list <- Map(function(x, id) {
+##         if (!is.null(x))
+##             x$source_nfi <- id
+##         x
+##     }, res_list, ids)
+
+##     out <- Reduce(function(a, b) {
+##         if (is.null(a)) return(b)
+##         if (is.null(b)) return(a)
+##         rbind(a, b)
+##     }, res_list)
+
+##     out <- data.frame(out)
+##     rownames(out) <- NULL
+
+##     if (!is.null(attr(res_list[[1]], "units")))
+##         attr(out, "units") <- attr(res_list[[1]], "units")
+
+##     out
+
+## ### \code{data.frame}. Depending on \code{summ.vr = NULL}, an output
+## ### from \code{\link{metrics2Vol}}, or a summary of the variables, see
+## ### Details section.
+## }, ex = function() {
+
+## ## Single input, one report file:
+## ifn4p45 <- system.file("Ifn4_Toledo.zip", package = "basifoR")
+
+## res1 <- dendroMetrics(
+##     nfi = ifn4p45,
+##     report = TRUE,
+##     report.dir = tempdir(),
+##     report.prefix = "report"
+## )
+
+## ## Several inputs, one report per input:
+## z1 <- system.file("Ifn4_Toledo.zip", package = "basifoR")
+## z2 <- system.file("Ifn4_Toledo.zip", package = "basifoR")
+
+## res2 <- dendroMetrics(
+##     nfi = list(z1, z2),
+##     cut.dt = "h > 8",
+##     report = TRUE,
+##     report.dir = tempdir(),
+##     report.prefix = "report",
+##     mc.cores = 2
+## )
+
+## list.files(tempdir(), pattern = "^report_.*\\.csv$")
+
+## })
+
+
+## Testing functions in basifoR
+nfi4 <- function(prov, complain = TRUE){
+## Function to download ifn4 data using a province code
+    if(is.null(prov))
+        return(invisible(NULL))
+    ## dt <- read.csv('procods_Cristobal.csv')
+    dt <- procods
+prov. <- prov
+    ## prov <- find_code(dt, prov)
+        prov <- find_code_(prov, is.ifn4 = TRUE, df = dt)
+    if(is.null(prov))
+        return(invisible(NULL))
+u <- miteco_urls_from_paths('path41')
+    all_links. <- unlist(Map(function(x)
+        inspect_links(x, prov, ignore.case = TRUE), u))
+    pattern <- "[iI]fn4[_\\-p]?"
+  exclude <- "[tT]ablas|[sS]ig"
+  matches <- grep(pattern, all_links., value = TRUE) # Find strings matching 'ifn4'
+  all_links <- matches[!grepl(exclude, matches)]    # Exclude unwanted patterns
+    parsed <- mapply(function(x)
+        httr::modify_url(getOption('server'), path = x),
+        all_links, USE.NAMES = FALSE)
+if(length(parsed) == 0){
+        if(complain)
+            warning(paste0("URL for spanish province '", prov., "' not found!\n"),
+                    call. = FALSE)
+    return(invisible(NULL))
+}
+return(parsed)}
+
+## # Define the function with wildcard support
+## find_code <- function(df, input_value) {
+##     if (is.numeric(input_value)) {  # Check if input is numeric
+##     result <- df$provincia_1[grepl(paste0('^',input_value,'$'), df$codigo,ignore.case = TRUE)]
+##   }else{
+##   # Use grepl for partial matching (case-insensitive search)
+##   result <- df$codigo[
+##     grepl(input_value, df$provincia, ignore.case = FALSE) | 
+##     grepl(input_value, df$codigo2,
+##           ## fixed = TRUE,ignore.case = FALSE) | 
+##           ignore.case = FALSE) |
+##     grepl(input_value, df$provincia_0, ignore.case = FALSE) |
+##     grepl(input_value, df$provincia_1, ignore.case = FALSE)
+##     ][1L]
+##       result <- df$provincia_1[grepl(paste0('^',result,'$'), df$codigo,ignore.case = TRUE)]
+##   }
+##   # Return the result
+##   return(result)
+## }
+
+## find_code_ <- function(input_value, is.ifn4 = TRUE, df) {
+##   result <- df$codigo[
+##     grepl(input_value, df$codigo) | 
+##     grepl(input_value, df$provincia) | 
+##     grepl(input_value, df$codigo2) |
+##     grepl(input_value, df$provincia_0) |
+##     grepl(input_value, df$provincia_1)
+##     ][1L]
+##   if(is.ifn4){
+##       result <- df$provincia_1[
+##                        grepl(paste0('^',result,'$'), df$codigo,
+##                              ignore.case = TRUE)]}
+##   if(length(result) == 0)
+##       result <- NA
+##       if(is.na(result)){
+##           warning(paste0("Spanish province '", input_value, "' not found!\n"),
+##                   call. = FALSE)
+##         return(invisible(NULL))}
+##   ## }
+##   # Return the result
+##   return(result)
+## }
+
+
+find_code_ <- function(input_value, is.ifn4 = TRUE, df, complain = TRUE) {
+  result <- df$codigo[
+    grepl(input_value, df$codigo) | 
+    grepl(input_value, df$provincia) | 
+    grepl(input_value, df$codigo2) |
+    grepl(input_value, df$provincia_0) |
+    grepl(input_value, df$provincia_1)
+    ][1L]
+  if(is.ifn4){
+      result <- df$provincia_1[
+                       grepl(paste0('^',result,'$'), df$codigo,
+                             ignore.case = TRUE)]}
+  if(length(result) == 0)
+      result <- NA
+      if(is.na(result) & complain){
+          warning(paste0("Spanish province '", input_value, "' not found!\n"),
+                  call. = FALSE)
+        return(invisible(NULL))}
+  ## }
+  # Return the result
+  return(result)
+}
+
+## # Define the function
+## find_ifn4 <- function(strings) {
+##   # Regular expression
+##  # Matches 'ifn4' optionally followed by '_', '-', or 'p'
+##     pattern <- "[iI]fn4[_\\-p]?"
+##  # Exclude strings containing 'tables' or 'Sig'
+##   exclude <- "[tT]ablas|[sS]ig"
+##   # Filter strings
+##   matches <- grep(pattern, strings, value = TRUE) # Find strings matching 'ifn4'
+##   result <- matches[!grepl(exclude, matches)]    # Exclude unwanted patterns
+
+##   return(result)
+## }
+
+
+## parsedURL <- function(x, path.='path41', dt = procods){
+##     parsedURL <- Map(function(x)
+##         fparsed(x, path.= path., dt = dt),x)
+##     names(parsedURL) <- x
+## return(parsedURL)}
+
+
+## fparsed <- function(code., path. = 'path41', dt){
+## dt <- read.csv('procods_Cristobal.csv')
+##     u <- miteco_urls_from_paths(path.)
+##     prov <- find_code(dt, code.)
+## ## all_links. <- inspect_links(u, prov, ignore.case = TRUE) #%>% print()
+##     all_links. <- unlist(Map(function(x)
+##         inspect_links(x, prov, ignore.case = TRUE), u))
+## parsed <- mapply(function(x)
+##     httr::modify_url(getOption('server'), path = x),
+##     all_links., USE.NAMES = FALSE)
+##     if(length(parsed) == 0)
+##         parsed = NULL
+## return(parsed)
+## }
+
+## accentless <- function( s ) {
+##   chartr(
+##     "áéóūáéíóúÁÉÍÓÚýÝàèìòùÀÈÌÒÙâêîôûÂÊÎÔÛãõÃÕñÑäëïöüÄËÏÖÜÿçÇ",
+##     "aeouaeiouAEIOUyYaeiouAEIOUaeiouAEIOUaoAOnNaeiouAEIOUycC",
+##     s );
+## }
+
+##-----------------------------------------------------------------
+
+check_extension_in_zip <- function(url, extension){
+  temp_file <- tempfile(fileext=".zip")
+  suppressWarnings(
+    tryCatch({
+      download.file(url, temp_file, mode="wb", quiet=TRUE)
+      zip_contents <- unzip(temp_file, list=TRUE)$Name
+      ## has_extension <- any(grepl(extension, zip_contents, ignore.case=TRUE))
+      has_extension <- grepl(extension, zip_contents, ignore.case=TRUE)
+      has_extension <- url[has_extension]
+      unlink(temp_file)
+      return(has_extension)
+    }, error=function(e){
+      ## message("An error occurred:", e$message)
+      return(FALSE)
+    })
+  )
+}
+
+## check_extension_in_zip <- function(url, extension){
+##   temp_file <- tempfile(fileext=".zip")
+##   tryCatch({
+##     curl_download(url, temp_file)
+##     zip_contents <- unzip(temp_file, list=TRUE)$Name
+##     has_extension <- any(grepl(paste0("\\", extension, "$"), zip_contents, ignore.case=TRUE))
+##     unlink(temp_file)
+##     return(has_extension)
+##   }, error=function(e){
+##     message("An error occurred: ", e$message)
+##     return(FALSE)
+##   })
+## }
+
+#----------------------------------------------------------------
+## Internal utility functions used by basifoR
+
+# Function to replace a row based on two indices
+replace_provincia <- function(df, row1, row2) {
+    if(is.character(row1))
+        row1 <- find_provincia_or_codigo(row1)
+    if(is.character(row2))
+        row1 <- find_provincia_or_codigo(row2)
+  # Check if row indices are within the data frame bounds
+  if (any(row1 > nrow(df) | row2 > nrow(df))) {
+    stop("Row indices are out of bounds")
+  }
+  
+  # Replace the row corresponding to row1 with the row corresponding to row2
+  df[row1, ] <- df[row2, ]
+  
+  return(df)
+}
+
+# Function to test response from a URL
+test_url_response <- function(url) {
+  # Send GET request
+  response <- GET(url)
+  
+  # Check the status code
+  status_code <- status_code(response)
+  ## print(paste("Status Code:", status_code))
+return(status_code)  
+  ## # Check the content type
+  ## content_type <- headers(response)$`content-type`
+  ## print(paste("Content Type:", content_type))
+  
+  ## # Check the content of the response
+  ## content <- content(response, as = "text", encoding = "UTF-8")
+  ## print(paste("Content:", substr(content, 1, 500)))  # Print the first 500 characters
+}
+
+.onAttach <- function(lib, pkg)
+{
+  version <- read.dcf(file.path(lib, pkg, "DESCRIPTION"), "Version")
+  if(interactive())
+  { # > figlet basifoR
+      msg <- basifoR_figlet()
+      packageStartupMessage(msg)
+    }
+    else
+    { packageStartupMessage(
+          "Package 'basifoR' version ", version) }
+    packageStartupMessage("Type 'citation(\"basifoR\")' for citing this R package in publications\n")
+    invisible()
+}
+
+.onLoad <- function(libname, pkgname){
+    op <- options()
+    op.FC <- list(
+        server = "http://www.miteco.gob.es",
+        path21 = "es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_1_25.html",
+        path22 = "es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn2_parcelas_26_50.html",
+        path31 = "es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_1_25.html",
+        path32 = "es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible/ifn3_base_datos_26_50.html",
+        path41 = "es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional/cuarto_inventario.html", 
+        utm = "+proj=utm +zone=utm.z +ellps=GRS80 +datum=NAD83 +units=m +no_defs",
+        utm1 = "+proj=utm +zone=utm.z +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0",
+        longlat = '+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs',
+        fapp = 'mcmapply',
+        dt.ext = c('mdb','DBF', 'accdb'),
+        units = units.,
+        units1 = units..)
+toset <- !(names(op.FC) %in% names(op))
+  if(any(toset)) options(op.FC[toset])
+invisible()
+}
+
+basifoR_figlet <- function(){
+msg <- cat(
+"
+ _           _ ___     _____ 
+| |_ ___ ___|_|  _|___| __  |
+| . | .'|_ -| |  _| . |    -|
+|___|__,|___|_|_| |___|__|__|\n
+"
+)
+vrs <- paste0('basifoR version ',packageVersion("basifoR"),'\n')
+cat(vrs)
+}
+
+
+conv_units <- function(nfi, var = c("d", "h"), un = c("cm", "m")) {
+    units. <- getOption("units")
+    if (!is.null(attr(nfi, "units")))
+        units. <- attr(nfi, "units")
+
+    cols <- names(units.)[names(units.) %in% names(nfi)]
+    units_ini <- units_out <- unname(units.[cols])
+
+    pos. <- match(var, cols)
+    ok <- !is.na(pos.)
+    units_out[pos.[ok]] <- un[ok]
+
+    convert_unit_label <- function(x, from, to) {
+        if (from == "" || to == "" || from == to)
+>>>>>>> basifoR_0.7.1
             return(x)
-        }else{
-            conv_unit(x,y,z)}}
-    nfi[,cols] <- data.frame(
-        mapply(function(x,y,z)
-            f_conv_unit(x,y,z),
-            nfi[,cols],
-            units_ini,
-            units_out))
-    un_attr <- cols 
-    names(un_attr) <- units_out
+
+        if (!grepl(" ", from, fixed = TRUE) && !grepl(" ", to, fixed = TRUE))
+            return(conv_unit(x, from, to))
+
+        rx <- "^(.+) ha-1$"
+        from_m <- regexec(rx, from)
+        to_m   <- regexec(rx, to)
+
+        from_cap <- regmatches(from, from_m)[[1]]
+        to_cap   <- regmatches(to, to_m)[[1]]
+
+        if (length(from_cap) == 2L && length(to_cap) == 2L) {
+            from_num <- from_cap[2]
+            to_num   <- to_cap[2]
+            return(conv_unit(x, from_num, to_num))
+        }
+
+        stop("Unsupported unit conversion from '", from, "' to '", to, "'.")
+    }
+
+    nfi[, cols] <- data.frame(
+        mapply(function(x, y, z) convert_unit_label(x, y, z),
+               nfi[, cols, drop = FALSE],
+               units_ini,
+               units_out,
+               SIMPLIFY = FALSE),
+        check.names = FALSE
+    )
+
+    un_attr <- units_out
+    names(un_attr) <- cols
     attributes(nfi) <- c(attributes(nfi), list(units = un_attr))
-    return(nfi)}
+    return(nfi)
+}
+
+## conv_units <- function(nfi, var = c("d", "h"), un = c("cm", "m")) {
+##     units. <- getOption("units")
+##     if (!is.null(attr(nfi, "units")))
+##         units. <- attr(nfi, "units")
+
+##     cols <- names(units.)[names(units.) %in% names(nfi)]
+##     units_ini <- units_out <- unname(units.[cols])
+
+##     pos. <- match(var, cols)
+##     ok <- !is.na(pos.)
+##     units_out[pos.[ok]] <- un[ok]
+
+##     f_conv_unit <- function(x, y, z) {
+##         if (y == "" || z == "") {
+##             return(x)
+##         } else {
+##             conv_unit(x, y, z)
+##         }
+##     }
+
+##     nfi[, cols] <- data.frame(
+##         mapply(function(x, y, z) f_conv_unit(x, y, z),
+##                nfi[, cols, drop = FALSE],
+##                units_ini,
+##                units_out,
+##                SIMPLIFY = FALSE),
+##         check.names = FALSE
+##     )
+
+##     un_attr <- units_out
+##     names(un_attr) <- cols
+##     attributes(nfi) <- c(attributes(nfi), list(units = un_attr))
+##     return(nfi)
+## }
+
+
 
 flev <- function(vmad, levels){
 nma <- names(vmad)

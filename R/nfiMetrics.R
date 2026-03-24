@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 nfiMetrics <- structure(function#Tree metrics from NFI data
 ### This function recursively implements \code{\link{dbhMetric}} on
 ### data bases of the Spanish National Forest Inventory (NFI) to
@@ -39,68 +40,268 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
         nfi <- readNFI(nfi, ...)
         if(is.null(nfi.))
             return(nfi)}
+=======
+nfiMetrics <- structure(function#Tree-level metrics from Spanish NFI records
+### Compute tree-level metrics from Spanish National Forest Inventory
+### records by applying \code{\link{dbhMetric}}-style logic to NFI
+### tables or to files that \code{\link{readNFI}} can import.  The
+### function returns the requested metrics together with the grouping
+### columns selected through \code{levels}.  To derive the full set of
+### package metrics in one call, see \code{\link{dendroMetrics}}.
+(
+    nfi,  ##<<\code{character} or \code{data.frame}. Input NFI data.
+          ##Supply either \code{(1)} a path or URL to a compressed NFI
+          ##archive readable by \code{\link{readNFI}}, or \code{(2)} a
+          ##data frame already returned by \code{\link{readNFI}}.
+    var = c('d','h','ba','n','Hd'), ##<<\code{character}. Metrics to compute.
+                                    ##Supported values are \code{'d'}
+                                    ##(diameter), \code{'h'} (height),
+                                    ##\code{'ba'} (basal area), \code{'n'}
+                                    ##(trees per hectare), and \code{'Hd'}
+                                    ##(dominant height).  \code{'Hd'}
+                                    ##requires \code{'h'}, \code{'d'}, and
+                                    ##\code{'n'} to be present in
+                                    ##\code{var}.
+    levels = c('esta','espe'), ##<<\code{character}. Grouping columns
+                               ##kept in the output.  The function
+                               ##supports partial matching, and
+                               ##ignores case.  The default usually
+                               ##keeps plot- and species-level
+                               ##identifiers.
+    design = snfi_design(), ##<< Sampling design used when computing
+                            ##\code{'n'}.  Pass a
+                            ##\code{\link{snfi_design}} object, another
+                            ##\code{concentric_design}, or any design
+                            ##supported by \code{trees_per_ha()}.
+    ... ##<< Additional arguments passed to \code{\link{readNFI}} when
+        ##\code{nfi} is not already a \code{readNFI} object.
+
+) {
+    ## Return early on NULL input to preserve the previous behaviour.
+    nfi. <- nfi
+    if(is.null(nfi.))
+        return(nfi)
+
+    ## Import the data only when the input is not already a readNFI object.
+    if(!inherits(nfi., "readNFI"))
+        nfi <- readNFI(nfi, ...)
+
+    nfi_nr <- attr(nfi, "nfi.nr")
+
+    ## Find columns whose names match one or more search patterns.
+>>>>>>> basifoR_0.7.1
     fc <- function(dt, cl.){
         nt. <- paste(cl., collapse = '|')
         nt.. <- grep(nt., names(dt),
                      ignore.case = TRUE)
         cl.nm <- sort(names(dt)[nt..],
                       decreasing = TRUE)
-        return(cl.nm)}
+        return(cl.nm)
+    }
 
-        ## var.. <- getOption('units')
-        ## mn.un <- names(var..[var..%in%var])
+    ## Dominant height is computed later from h, d, and n.
+    var. <- var[!var %in% 'Hd']
 
-        var. <- var[!var%in%'Hd']
+    diam_cols <- character(0)
+    ht_cols <- character(0)
+
+    ## Resolve the raw diameter and height columns only when needed.
+    if(any(var. %in% c('d', 'n', 'ba')))
+        diam_cols <- fc(nfi, c('Dn', 'Diamet'))
+
+    if(any(var. %in% 'h'))
+        ht_cols <- fc(nfi, c('altura', 'Ht'))
+
+    ## Convert selected columns to a numeric matrix while preserving order.
+    get_numeric_matrix <- function(dt, cols) {
+        if(length(cols) == 0L)
+            return(NULL)
+
+        x <- dt[, cols, drop = FALSE]
+        x <- lapply(x, function(z) as.numeric(as.character(z)))
+        x <- as.data.frame(x, check.names = FALSE,
+                           stringsAsFactors = FALSE)
+        as.matrix(x)
+    }
+
+    ## Vectorised trees-per-hectare calculation for concentric designs,
+    ## with fallback to trees_per_ha() for other supported designs.
+    trees_per_ha_vec <- function(dbh_cm, design) {
+
+        if (inherits(design, "concentric_design")) {
+            out <- rep(NA_real_, length(dbh_cm))
+            ok <- !is.na(dbh_cm) & dbh_cm >= design$min_dbh_cm[1]
+            if (any(ok)) {
+                idx <- findInterval(dbh_cm[ok], design$min_dbh_cm)
+                out[ok] <- design$sf[idx]
+            }
+            return(out)
+        }
+
+        vapply(dbh_cm,
+               function(x) trees_per_ha(design = design, dbh_cm = x),
+               numeric(1))
+    }
+
+    ## Pre-allocate derived vectors.
+    diam_mm <- NULL
+    diam_cm <- NULL
+    trees_ha <- NULL
+    ht_dm <- NULL
+
+    ## Diameter-based metrics: treat zeros as missing values and average
+    ## repeated diameter columns row-wise when several measurements exist.
+    if(length(diam_cols) > 0L) {
+        diam_mat <- get_numeric_matrix(nfi, diam_cols)
+        diam_mat[diam_mat == 0] <- NA_real_
+
+        if(ncol(diam_mat) == 1L) {
+            diam_mm <- diam_mat[, 1L]
+        } else {
+            nn <- rowSums(!is.na(diam_mat))
+            diam_mm <- rowMeans(diam_mat, na.rm = TRUE)
+            diam_mm[nn == 0L] <- NA_real_
+        }
+
+        if(any(var. %in% c('ba', 'n')))
+            diam_cm <- conv_unit(diam_mm, from = 'mm', to = 'cm')
+
+        if(any(var. %in% 'n'))
+            trees_ha <- trees_per_ha_vec(diam_cm, design)
+    }
+
+    ## Height-based metrics: treat zeros as missing values and average
+    ## repeated height columns row-wise when present.
+    if(length(ht_cols) > 0L) {
+        ht_mat <- get_numeric_matrix(nfi, ht_cols)
+        ht_mat[ht_mat == 0] <- NA_real_
+
+        if(ncol(ht_mat) == 1L) {
+            ht_m <- ht_mat[, 1L]
+        } else {
+            nn <- rowSums(!is.na(ht_mat))
+            ht_m <- rowMeans(ht_mat, na.rm = TRUE)
+            ht_m[nn == 0L] <- NA_real_
+        }
+
+        ht_dm <- conv_unit(ht_m, from = 'm', to = 'dm')
+    }
+
+    ## Dispatch each metric, using the fast precomputed vectors when the
+    ## relevant raw columns were already resolved above.
     fdn <- function(dbh, var){
-        if(var%in%c('d','n','ba'))
-            dm <- apply(dbh[,fc(dbh,c('Dn','Diamet'))],1,
-                        function(x)dbhMetric(x,var))
-        if(var%in%'h'){
-            ht <- fc(dbh,c('altura','Ht'))
-            ## dbh[,ht] <- as.numeric(as.character(dbh[,ht]))
-            ## dm <- conv_unit(dbh[,ht],
-            ##                 from = 'm', to = 'dm')}
-            dm <- as.numeric(as.character(dbh[,ht]))}
-        ## if(var%in%'pr'){
-        ##     dm <- rep(attr(dbh,'pr.'), nrow(dbh))
-        ## }
-        return(dm)}
-        dmt <- mapply(function(y)
-            fdn(nfi,y), y = var.)
-        if(!is.null(attr(nfi,'pr.')))
-        dmt <- cbind(pr = attr(nfi,'pr.'), dmt)
-        ## nma <- names(nfi)
-        ## app <- paste(levels, collapse = '|')
-        ## gap <- grepl(app,nma, ignore.case = TRUE)
-        ## nms <- nma[gap]
-        nms <- flev(nfi, levels)
-        nm.. <- c(nms, colnames(dmt))
-        dmt <- data.frame(nfi[,nms], dmt)
-        names(dmt) <- nm..
-        
-        if('Hd'%in%var){
-            needed <- c('h','d','n')
-            nd <- paste(needed, collapse = '?,')
-            if(!all(needed%in%var))
-                stop(paste0('Hd: missing variables: var = c(',nd,'?, ...)'))
-            spl <- split(dmt, dmt[,nms], drop = TRUE)
-            dmhe <- Map(function(y)
-                cbind(y, Hd = tryCatch(domheight(y$'h',y$'d',y$'n'),
-                                       error = function(e) NA)), spl)
-            dmt <- do.call('rbind', dmhe) 
-            rownames(dmt) <- NULL}
+        if(var %in% 'd') {
+            if(length(diam_cols) > 0L)
+                return(diam_mm)
+            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+                         function(x) dbhMetric(x, var)))
+        }
 
-        dmt <- conv_units(dmt)
-        
+        if(var %in% 'ba') {
+            if(length(diam_cols) > 0L)
+                return(pi * diam_cm^2 * (4 * 1E4)^-1)
+            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+                         function(x) dbhMetric(x, var)))
+        }
+
+        if(var %in% 'n') {
+            if(length(diam_cols) > 0L)
+                return(trees_ha)
+            return(apply(dbh[, fc(dbh, c('Dn', 'Diamet')), drop = FALSE], 1,
+                         function(x) dbhMetric(x, var, design = design)))
+        }
+
+        if(var %in% 'h') {
+            if(length(ht_cols) > 0L)
+                return(ht_dm)
+            return(apply(dbh[, fc(dbh, c('altura', 'Ht')), drop = FALSE], 1,
+                         function(x) dbhMetric(x, var, design = design)))
+        }
+    }
+
+    ## Compute the requested metrics except dominant height.
+    metric_list <- vector('list', length(var.))
+    if(length(var.) > 0L) {
+        for(i in seq_along(var.))
+            metric_list[[i]] <- fdn(nfi, var.[i])
+    }
+
+    dmt <- data.frame(metric_list, check.names = FALSE,
+                      stringsAsFactors = FALSE)
+    if(length(var.) > 0L)
+        names(dmt) <- var.
+
+    ## Preserve province codes stored as attribute by readNFI().
+    if(!is.null(attr(nfi, 'pr.')))
+        dmt <- cbind(pr = attr(nfi, 'pr.'), dmt)
+
+    nm_all <- names(nfi)
+
+    ## Match grouping columns case-insensitively while preserving their
+    ## original names in the input object.
+    match_cols <- function(want, nm_all) {
+        out <- nm_all[tolower(nm_all) %in% tolower(want)]
+        unique(out)
+    }
+
+    id_cols <- match_cols(c('nfi.nr', 'pr'), nm_all)
+
+    nms_raw <- flev(nfi, levels)
+    nms_raw <- nms_raw[!is.na(nms_raw)]
+    nms <- match_cols(nms_raw, nm_all)
+
+    keep_cols <- unique(c(id_cols, nms))
+    keep_cols <- keep_cols[keep_cols %in% nm_all]
+
+    ## Bind the grouping columns requested through levels.
+    if(length(keep_cols) == 0L) {
+        dmt <- data.frame(dmt, check.names = FALSE)
+    } else {
+        dmt <- data.frame(nfi[, keep_cols, drop = FALSE], dmt,
+                          check.names = FALSE)
+    }
+
+    ## Compute dominant height within each grouping level.
+    if('Hd' %in% var) {
+        needed <- c('h', 'd', 'n')
+        nd <- paste(needed, collapse = '?,')
+        if(!all(needed %in% var))
+            stop(paste0('Hd: missing variables: var = c(', nd, '?, ...)'))
+        spl <- split(dmt, dmt[, nms], drop = TRUE)
+        dmhe <- Map(function(y)
+            cbind(y, Hd = tryCatch(domheight(y$'h', y$'d', y$'n'),
+                                   error = function(e) NA)), spl)
+        dmt <- do.call('rbind', dmhe)
+        rownames(dmt) <- NULL
+    }
+
+    ## Restore attributes, attach unit metadata, and set the output class.
+    attr(dmt, 'nfi.nr') <- nfi_nr
+    dmt <- conv_units(dmt)
+
+metric_units <- c(
+    d  = "mm",
+    h  = "dm",
+    ba = "m2",
+    n  = "",
+    Hd = "dm"
+)
+
+attr(dmt, "units") <- metric_units[intersect(names(dmt), names(metric_units))]
+
+    
+## attr(dmt, "units") <- units_map[names(dmt)]
+    
+    class(dmt) <- append('nfiMetrics', class(dmt))
     return(dmt)
-### \code{data.frame} containing columns which match the strings in
-### \code{levels}, plus the variables defined in \code{var}, including
-### the province \code{pr} (\code{dimensionless}), the diameter
-### \code{d} (\code{'mm'}), the tree height \code{h} (\code{'dm'}),
-### the basal area \code{ba} (\code{'m2 tree-1'}), the number of trees
-### by hectare \code{n} (\code{dimensionless}), and the tree dominant
-### height \code{Hd} (\code{'m'}).
+
+### \code{data.frame} with the grouping columns selected through
+### \code{levels} plus the requested metrics in \code{var}.  The output
+### inherits class \code{'nfiMetrics'}.  Inspect
+### \code{attr(x, 'units')} to see the units attached to each returned
+### variable.
 }, ex = function(){
+<<<<<<< HEAD
     ## seconf NFI
     madridNFI <- system.file("ifn3p28_tcm30-293962.zip", package="basifoR")
     rmad <- readNFI(madridNFI)[1:10,]
@@ -108,4 +309,16 @@ nfiMetrics <- structure(function#Tree metrics from NFI data
     head(rmad,3)
     ## see metric units
     attr(rmad,'units')
+=======
+## Example with bundled Toledo data
+ifn4p45 <- system.file("Ifn4_Toledo.zip", package = "basifoR")
+
+## Decompress the archive and read the first 100 records
+fetch_ifn4p45 <- fetchNFI(ifn4p45)
+get_ifn4p45 <- getNFI(fetch_ifn4p45)[1:100, ]
+
+## Compute default metrics and inspect the reported units
+metrics_ifn4p45 <- nfiMetrics(get_ifn4p45)
+attr(metrics_ifn4p45, 'units')
+>>>>>>> basifoR_0.7.1
 })

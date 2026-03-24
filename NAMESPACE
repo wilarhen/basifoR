@@ -4,7 +4,15 @@ importFrom("Hmisc", "mdb.get")
 importFrom("httr", "GET","http_error","message_for_status","modify_url","timeout")
 importFrom("measurements", "conv_unit")
 importFrom("RODBC", "odbcConnect", "odbcClose", "sqlFetch")
+<<<<<<< HEAD
 importFrom("stats", "formula","na.omit","update")
 importFrom("utils", "data","download.file", "unzip","write.csv")
 export(dbhMetric,dendroMetrics,metrics2Vol,nfiMetrics,readNFI,urlToTemp)
+=======
+importFrom("stats", "formula","na.omit","update", "setNames")
+importFrom("utils", "data","download.file", "packageVersion", "unzip","write.csv")
+export(dbhMetric,default_snfi_volume_equations,dendroMetrics,fetchNFI,getNFI,new_concentric_design,snfi_design,metrics2Vol,snfi_volume_method_registry,nfiMetrics,readNFI,trees_per_ha)
+S3method(trees_per_ha, concentric_design)
+S3method(print, concentric_design)
+>>>>>>> basifoR_0.7.1
 

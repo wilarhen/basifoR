@@ -1,9 +1,14 @@
 Package: basifoR
 Type: Package
+<<<<<<< HEAD
 Title: Retrieval and Processing of the Spanish National Forest
         Inventory
 Version: 0.7.2
 Date: 2026-24-02
+=======
+Title: Retrieval and Processing of the Spanish National Forest Inventory
+Version: 0.7.4
+>>>>>>> basifoR_0.7.1
 Authors@R: 
     c(person(given = "Wilson",
              family = "Lara",
@@ -13,12 +18,17 @@ Authors@R:
       person(given = "Cristobal",
              family = "Ordonez",
              role = "aut",
-	     email = "a_cristo@pvs.uva.es",
+	     email = "angelcristobal.ordonez@uva.es",
 	     comment = c(ORCID = "0000-0001-5354-3760")),
+      person(given = "Aitor",
+             family = "Vázquez-Veloso",
+             role = "aut",
+	     email = "aitor.vazquez.veloso@uva.es",
+	     comment = c(ORCID = "0000-0003-0227-506X")),	     
       person(given = "Felipe",
              family = "Bravo",
              role = "aut",
-	     email = "fbravo@pvs.uva.es",
+	     email = "felipe.bravo@uva.es",
 	     comment = c(ORCID = "0000-0001-7348-6695")))
 Maintainer: Wilson Lara <wilarhen@gmail.com>
 Description: Data sets of the Spanish National Forest Inventory <https://www.miteco.gob.es/es/biodiversidad/servicios/banco-datos-naturaleza/informacion-disponible.html> are processed to compute tree metrics and statistics. Function metrics2Vol() controls most of the routines.
