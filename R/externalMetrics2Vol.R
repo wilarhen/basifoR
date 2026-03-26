@@ -12,7 +12,8 @@ new_volume_method <- function #Create a volume-method definition
     raw_unit = unit, ##<< Unit returned by the raw method before scaling.
     scale_to_m3 = 1, ##<< Multiplier used to convert raw output to cubic metres.
     build_args = function(ctx, pars, resolved) list(), ##<< Function that builds arguments for \code{fun}.
-    fallback = function(ctx, pars, resolved) resolved$preexisting_v_m3 %||% NA_real_, ##<< Fallback used when computation fails or parameters are missing.
+            fallback = function(ctx, pars, resolved) null_or(resolved$preexisting_v_m3, NA_real_),
+    ##<< Fallback used when computation fails or parameters are missing.
     match_by = character(0), ##<< Columns used to match parameter rows.
     get_pars = NULL, ##<< Optional function that resolves parameter rows.
     pars = NULL, ##<< Optional embedded parameter table.
