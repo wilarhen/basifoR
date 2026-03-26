@@ -1,7 +1,7 @@
 Package: basifoR
 Type: Package
 Title: Retrieval and Processing of the Spanish National Forest Inventory
-Version: 0.7.5
+Version: 0.7.6
 Authors@R: 
     c(person(given = "Wilson",
              family = "Lara",
@@ -24,7 +24,10 @@ Authors@R:
 	     email = "felipe.bravo@uva.es",
 	     comment = c(ORCID = "0000-0001-7348-6695")))
 Maintainer: Wilson Lara <wilarhen@gmail.com>
-Description: Data sets of the Spanish National Forest Inventory are fetched to compute tree metrics and statistics. Function dendroMetrics() controls most of the routines.
+Description: Fetches, harmonizes, and analyses data from the Spanish National
+    Forest Inventory for reproducible, design-aware forest inventory analyses.
+    Computes tree- and stand-level metrics, applies inventory-specific expansion
+    factors, estimates volume, and supports customizable processing workflows.
 URL: https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional.html
 License: GPL-3
 Depends: R (>= 4.4.0)
