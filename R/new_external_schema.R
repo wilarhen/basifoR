@@ -2,7 +2,11 @@
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
-new_external_schema <- function(
+new_external_schema <- function #Define a schema for external inventory workflows
+### Creates a reusable schema that stores column aliases, units, grouping defaults, and columns to keep across the external basifoR workflow. The schema can then be supplied to helper wrappers so repeated mappings do not need to be redefined in every call.
+##title<< Define a schema for external inventory workflows
+##description<< Create a reusable schema with column aliases, units, and default grouping settings for the external basifoR workflow.
+(
     colmap,
     units = list(),
     levels = NULL,
@@ -40,6 +44,7 @@ new_external_schema <- function(
     )
     class(schema) <- c("external_schema", "list")
     schema
+    ##value<< An object of class \code{"external_schema"} containing normalized column mappings, unit declarations, grouping defaults, retained columns, and optional defaults.
 }
 
 print.external_schema <- function(x, ...) {

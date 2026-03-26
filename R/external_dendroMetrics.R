@@ -1,5 +1,9 @@
 
-external_dendroMetrics <- structure(function(
+external_dendroMetrics <- structure(function #Summarize external dendrometric and volume data
+### Summarizes external tree data after computing required metrics and optional volume outputs. The function can return filtered tree-level outputs when \code{summ.vr = NULL} or grouped stand-level summaries when \code{summ.vr} is supplied, and it supports processing several inputs with optional parallel execution.
+##title<< Summarize external dendrometric and volume data
+##description<< Summarize external inventory data by computing required metrics, optional volume outputs, and grouped stand-level aggregates for external basifoR workflows.
+(
     x,
     summ.vr = NULL,
     cut.dt = "d == d",
@@ -802,6 +806,7 @@ external_dendroMetrics <- structure(function(
         write.csv(out, file = "report.csv", row.names = FALSE)
 
     finalize_output(out, call0)
+    ##value<< A new \code{"external_dendroMetrics"} object. When \code{summ.vr = NULL} the function returns filtered tree-level outputs; otherwise it returns grouped summaries with unit metadata and any preserved \code{design_meta} or \code{volume_meta}.
 
 }, ex = function() {
     sq_0.1ha <- new_inventory_design(

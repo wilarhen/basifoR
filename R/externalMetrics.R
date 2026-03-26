@@ -1,4 +1,8 @@
-externalMetrics <- structure(function(
+externalMetrics <- structure(function #Compute tree-level metrics from external inventory data
+### Standardizes external tree measurements, resolves diameter and height columns, computes the requested dendrometric variables, and preserves selected grouping columns. The function returns tree-level outputs in standardized units and can also attach design metadata needed for downstream summaries.
+##title<< Compute tree-level metrics from external inventory data
+##description<< Standardize external tree measurements and compute requested dendrometric variables for downstream external basifoR workflows.
+(
     x,
     var = c("d", "h", "ba", "n", "Hd"),
     levels = NULL,
@@ -284,6 +288,7 @@ externalMetrics <- structure(function(
 
     class(out) <- unique(c("externalMetrics", "nfiMetrics", class(out)))
     out
+    ##value<< A \code{data.frame} with the requested tree-level metrics added. The result inherits from \code{"externalMetrics"} and \code{"nfiMetrics"}, includes \code{attr(x, "units")}, and may also carry \code{design_meta} when expansion factors are used.
 }, ex = function() {
 
     sq_0.1ha <- new_inventory_design(

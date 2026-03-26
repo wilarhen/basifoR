@@ -96,7 +96,11 @@ external_volume_method_registry <- function(
 }
 
 
-externalMetrics2Vol <- structure(function(
+externalMetrics2Vol <- structure(function #Compute tree-level volume variables from external inventory data
+### Computes one or more tree-level volume outputs from external inventory data or from precomputed \code{"externalMetrics"} objects. The function standardizes required inputs, optionally builds missing metrics, applies registry-based methods, converts outputs to cubic metres, and can retain provenance metadata.
+##title<< Compute tree-level volume variables from external inventory data
+##description<< Compute requested volume outputs from external inventory data using registry-based methods and optional automatic metric standardization.
+(
     x,
     parametro = c("V"),
     parameter_table = NULL,
@@ -872,6 +876,7 @@ externalMetrics2Vol <- structure(function(
 
     class(out) <- unique(c("externalMetrics2Vol", "metrics2vol", class(out)))
     out
+    ##value<< A \code{data.frame} with the requested volume outputs added. The result inherits from \code{"externalMetrics2Vol"} and \code{"metrics2vol"}, preserves surviving unit metadata, and may include \code{design_meta} and \code{volume_meta} when available.
 }, ex = function() {
     sq_0.1ha <- new_inventory_design(
         sample_area_m2 = 1000,
