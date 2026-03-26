@@ -5,7 +5,7 @@
 inventory metrics. Depending on \code{met}, the function returns
 mean diameter, basal area, trees per hectare, or height in
 decimetres.
-\code{}
+
 The sampling \code{design} is used only when \code{met = "n"}. For
 \code{met = "d"}, \code{"ba"}, and \code{"h"}, the result does not
 depend on \code{design}. This behavior matches the older internal
@@ -23,7 +23,7 @@ factors.}
 << mean diameter at breast height (\code{"d"}),
 << basal area (\code{"ba"}), trees per hectare
 << (\code{"n"}), or height (\code{"h"}).}
-  \item{design}{design \code{}}
+  \item{design}{design }
 }
 
 

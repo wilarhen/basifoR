@@ -10,12 +10,12 @@
 << coefficients required by that model.}
 }
 \details{This function evaluates the SNFI equation for merchantable
-\code{}
+
 volume under bark (VSC) and returns the result in dm3.
-\code{}
+
 It currently supports model 7.}
 \value{Numeric VSC in dm3. Returns \code{NA_real_} when \code{pars}
-\code{}
+
 is empty or when the model is not recognised.
 print("Model not recognized for VSC.")}
 

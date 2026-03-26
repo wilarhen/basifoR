@@ -3,9 +3,9 @@
 \title{Tree-level metrics from Spanish NFI records}
 \description{Compute tree-level metrics from Spanish National Forest Inventory
 records by applying \code{\link{dbhMetric}}-style logic to NFI
-tables or to files that \code{\link{readNFI}} can import. \code{} The
+tables or to files that \code{\link{readNFI}} can import.  The
 function returns the requested metrics together with the grouping
-columns selected through \code{levels}. \code{} To derive the full set of
+columns selected through \code{levels}.  To derive the full set of
 package metrics in one call, see \code{\link{dendroMetrics}}.}
 \usage{nfiMetrics(nfi, var = c("d", 
     "h", "ba", "n", "Hd"), 
@@ -22,14 +22,14 @@ Supported values are \code{'d'}
 (diameter), \code{'h'} (height),
 \code{'ba'} (basal area), \code{'n'}
 (trees per hectare), and \code{'Hd'}
-(dominant height). \code{} \code{'Hd'}
+(dominant height).  \code{'Hd'}
 requires \code{'h'}, \code{'d'}, and
 \code{'n'} to be present in
 \code{var}.}
   \item{levels}{\code{character}. Grouping columns
-kept in the output. \code{} The function
+kept in the output.  The function
 supports partial matching, and
-ignores case. \code{} The default usually
+ignores case.  The default usually
 keeps plot- and species-level
 identifiers.}
   \item{design}{Sampling \code{design} used when computing
@@ -37,7 +37,7 @@ identifiers.}
 \code{\link{snfi_design}}, another
 \code{concentric_design}, or any
 \code{inventory_design} supported by
-\code{trees_per_ha(\code{})}. The returned
+\code{trees_per_ha()}. The returned
 object stores a \code{design_meta}
 attribute with the \code{design} used to derive
 \code{'n'}.}

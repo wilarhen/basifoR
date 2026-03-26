@@ -46,7 +46,8 @@ default_external_volume_methods <- function() {
             raw_unit = "m3",
             scale_to_m3 = 1,
             build_args = function(ctx, pars, resolved) list(),
-            fallback = function(ctx, pars, resolved) resolved$preexisting_v_m3 %||% NA_real_,
+            fallback = function(ctx, pars, resolved) null_or(resolved$preexisting_v_m3, NA_real_)
+            #fallback = function(ctx, pars, resolved) resolved$preexisting_v_m3 %||% NA_real_,
             match_by = character(0),
             required_inputs = "v"
         ),
