@@ -3,9 +3,9 @@
 \title{Build the active registry of SNFI volume methods}
 \description{Return the active SNFI
 volume-method registry.
-
+\code{}
 Builds the final registry of SNFI volume methods used by
-`metrics2Vol()` by combining the defaults with optional
+`metrics2Vol(\code{})` by combining the defaults with optional
 user-defined overrides or additions. The returned registry
 controls which parameters are available and how each requested
 volume output is computed.}
@@ -13,7 +13,7 @@ volume output is computed.}
     inherits = TRUE, 
     ifnotfound = NULL))}
 \arguments{
-  \item{equations}{equations }
+  \item{equations}{equations \code{}}
 }
 
 

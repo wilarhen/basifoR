@@ -12,14 +12,14 @@
 << coefficients required by that model.}
 }
 \details{This function evaluates the SNFI equation for merchantable
-
+\code{}
 volume over bark (VCC) and returns the result in dm3.
-
+\code{}
 It currently supports models 1 and 11 from the SNFI
-
+\code{}
 coefficient table.}
 \value{Numeric VCC in dm3. Returns \code{NA_real_} when \code{pars}
-
+\code{}
 is empty or when the model is not recognised.
 print("Model not recognized for VCC.")}
 

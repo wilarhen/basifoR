@@ -1,5 +1,8 @@
 ## `%||%` <- function(x, y) if (is.null(x)) y else x
 null_or <- function(x, y) if (is.null(x)) y else x
+    `%||%` <- function(a, b) if (is.null(a)) b else a
+
+
 
 
 metrics2Vol_legacy <- structure(function#Tree volumes in NFI data

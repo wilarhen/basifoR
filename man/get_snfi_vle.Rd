@@ -12,16 +12,16 @@
 << coefficients required by that model.}
 }
 \details{This function evaluates the SNFI equation for coarse woody
-
+\code{}
 volume (VLE) and returns the result in dm3.
-
+\code{}
 It supports models 10 and 12.}
 \value{Numeric VLE in dm3. Returns \code{NA_real_} when \code{pars}
-
+\code{}
 is empty, when required inputs are missing, or when the model
-
+\code{}
 is not recognised. Missing required inputs also trigger a
-
+\code{}
 printed message.
 print("Model not recognized for VLE.")}
 

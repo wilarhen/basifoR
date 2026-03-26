@@ -43,7 +43,7 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
 ) {
     call0 <- match.call(expand.dots = TRUE)
 
-    `%||%` <- function(a, b) if (is.null(a)) b else a
+    ## `%||%` <- function(a, b) if (is.null(a)) b else a
     dots <- list(...)
     metric_extra <- dots[intersect(names(dots), c("domheight_fun"))]
 
@@ -862,10 +862,54 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
 })
 
 
-update.external_dendroMetrics <- function(
-    object,
-    ...,
-    evaluate = TRUE
+## update.external_dendroMetrics <- function(
+##     object,
+##     ...,
+##     evaluate = TRUE
+## ) {
+##     if (!inherits(object, "external_dendroMetrics"))
+##         stop(
+##             "'object' must inherit from 'external_dendroMetrics'.",
+##             call. = FALSE
+##         )
+
+##     call0 <- attr(object, "call")
+
+##     if (is.null(call0))
+##         stop(
+##             "No stored call found in 'object'. ",
+##             "Recreate the result with external_dendroMetrics() and then call update(result, ...).",
+##             call. = FALSE
+##         )
+
+##     extras <- as.list(substitute(list(...)))[-1L]
+
+##     if (length(extras)) {
+##         extra_names <- names(extras)
+##         has_name <- !is.na(extra_names) & nzchar(extra_names)
+
+##         if (any(!has_name))
+##             stop("All arguments in '...' must be named.", call. = FALSE)
+
+##         call_list <- as.list(call0)
+##         for (i in seq_along(extras))
+##             call_list[[extra_names[[i]]]] <- extras[[i]]
+##         call0 <- as.call(call_list)
+##     }
+
+##     if (isTRUE(evaluate))
+##         eval(call0, envir = parent.frame())
+##     else
+##         call0
+## }
+
+update.external_dendroMetrics <- function #Update a stored external_dendroMetrics call
+##title<< Update a stored external dendroMetrics call
+##description<< Modify the stored call in an \code{"external_dendroMetrics"} object and optionally re-evaluate it to produce an updated result.
+(
+    object, ##<< An \code{"external_dendroMetrics"} object returned by \code{\link{external_dendroMetrics}}.
+    ..., ##<< Named arguments to replace in the stored call.
+    evaluate = TRUE ##<< Logical; if \code{TRUE}, evaluate the modified call and return the updated result. If \code{FALSE}, return the modified call without evaluating it.
 ) {
     if (!inherits(object, "external_dendroMetrics"))
         stop(
@@ -901,4 +945,5 @@ update.external_dendroMetrics <- function(
         eval(call0, envir = parent.frame())
     else
         call0
+    ##value<< Either an updated \code{"external_dendroMetrics"} object when \code{evaluate = TRUE}, or the modified call when \code{evaluate = FALSE}.
 }

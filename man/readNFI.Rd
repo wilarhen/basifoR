@@ -1,9 +1,9 @@
 \name{readNFI}
 \alias{readNFI}
 \title{Read SNF data from path}
-\description{This function can read compressed data (\code{.zip}) from the 
-Spanish National Forest Inventory (SNF). It can process either 
-\code{URLs} to data stored on the SNF web page 
+\description{This function can read compressed data (\code{.zip}) from the \code{}
+Spanish National Forest Inventory (SNF). It can process either \code{}
+\code{URLs} to data stored on the SNF web page \code{}
 (\code{"http://www.miteco.gob.es"}) or paths to locally stored files.}
 \usage{readNFI(nfi, nfi.nr = 4, 
     dt.nm = "PCMayores", 
@@ -12,7 +12,7 @@ Spanish National Forest Inventory (SNF). It can process either
   \item{nfi}{\code{character}. URL or local path to a compressed
 file (\code{.zip}) containing SNF data, or to a
 decompressed file with these supported extensions.}
-  \item{nfi.nr}{nfi.nr }
+  \item{nfi.nr}{nfi.nr \code{}}
   \item{dt.nm}{\code{character}. Name of a dataset
 stored in the imported NFI data. Defaults
 to \code{'PCMayores'} (3rd NFI) or

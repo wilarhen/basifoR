@@ -16,7 +16,7 @@ provenance information.}
     track_provenance = FALSE, 
     ...)}
 \arguments{
-  \item{nfi}{Input accepted by `nfiMetrics()`, or a precomputed `"nfiMetrics"`
+  \item{nfi}{Input accepted by `nfiMetrics(\code{})`, or a precomputed `"nfiMetrics"`
 object with tree-level metrics.}
   \item{cub.met}{Cubication selector used when several coefficient rows match.}
   \item{parametro}{One or more volume outputs to compute.}
@@ -25,13 +25,13 @@ object with tree-level metrics.}
   \item{method_registry}{Registry that maps each requested output to its equation function,
 output column name, units, and fallback rule.}
   \item{track_provenance}{Add per-row provenance columns and audit metadata.}
-  \item{\dots}{Passed to `nfiMetrics()` when `nfi` is not already an
+  \item{\dots}{Passed to `nfiMetrics(\code{})` when `nfi` is not already an
 `"nfiMetrics"` object.}
 }
 \details{Computes requested volume outputs from standardized NFI
-
+\code{}
 tree metrics using registry-based methods and optional
-
+\code{}
 fallback to legacy estimates.}
 \value{A data.frame with the requested volume outputs added.}
 

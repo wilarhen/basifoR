@@ -33,7 +33,7 @@ externalMetrics <- structure(function #Compute tree-level metrics from external 
     d_unit <- match.arg(d_unit, c("mm", "cm"))
     h_unit <- match.arg(h_unit, c("m", "dm", "cm"))
 
-    `%||%` <- function(a, b) if (is.null(a)) b else a
+    ## `%||%` <- function(a, b) if (is.null(a)) b else a
 
     resolve_measure_cols <- function(dt, aliases) {
         if (is.null(aliases) || !length(aliases))

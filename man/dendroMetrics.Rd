@@ -49,7 +49,7 @@ by \code{summ.vr} together with the
 quantitative variables available after
 processing with \code{\link{nfiMetrics}}
 and \code{\link{metrics2Vol}}.
-
+\code{}
 These variables may include tree basal
 area \code{ba} (\code{'m2 ha-1'}), mean
 diameter at breast height \code{d}
@@ -59,12 +59,12 @@ height \code{h} (\code{'m'}), number of
 trees per hectare \code{n}
 (\code{'dimensionless'}), and over-bark
 volume \code{v} (\code{'m3 ha-1'}).
-
+\code{}
 When \code{summ.vr = NULL}, the function
 returns tree-level outputs from
 \code{\link{metrics2Vol}} after applying
 the filter defined in \code{cut.dt}.
-
+\code{}
 When \code{summ.vr} is not \code{NULL},
 the function converts supported
 variables to stand units, splits the data
@@ -75,16 +75,16 @@ before summation. Variables \code{d},
 \code{h}, and \code{Hd}, when present,
 are returned as averages weighted by
 \code{n}.
-
+\code{}
 If both \code{ba} and \code{n} are
 available, the function also derives the
 quadratic mean diameter \code{dg}.
-
+\code{}
 Output subsets are extracted using the
 logical expression supplied in
 \code{cut.dt}, see syntax in
 \code{\link{Logic}}.
-
+\code{}
 The function accepts one input object or
 several inputs. When several inputs are
 supplied, each one is processed

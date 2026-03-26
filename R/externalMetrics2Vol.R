@@ -1,19 +1,23 @@
-`%||%` <- function(a, b) if (is.null(a)) b else a
+## `%||%` <- function(a, b) if (is.null(a)) b else a
 
-new_volume_method <- function(
-    output,
-    fun = NULL,
-    fun_name = NULL,
-    unit = "m3",
-    raw_unit = unit,
-    scale_to_m3 = 1,
-    build_args = function(ctx, pars, resolved) list(),
-    fallback = function(ctx, pars, resolved) resolved$preexisting_v_m3 %||% NA_real_,
-    match_by = character(0),
-    get_pars = NULL,
-    pars = NULL,
-    filter_pars = NULL,
-    required_inputs = NULL
+
+new_volume_method <- function #Create a volume-method definition
+##title<< Create a volume-method definition
+##description<< Create a method specification used by the external volume registry.
+(
+    output, ##<< Name of the returned output column.
+    fun = NULL, ##<< Function used to compute the output.
+    fun_name = NULL, ##<< Name of a function to look up at run time.
+    unit = "m3", ##<< Returned unit.
+    raw_unit = unit, ##<< Unit returned by the raw method before scaling.
+    scale_to_m3 = 1, ##<< Multiplier used to convert raw output to cubic metres.
+    build_args = function(ctx, pars, resolved) list(), ##<< Function that builds arguments for \code{fun}.
+    fallback = function(ctx, pars, resolved) resolved$preexisting_v_m3 %||% NA_real_, ##<< Fallback used when computation fails or parameters are missing.
+    match_by = character(0), ##<< Columns used to match parameter rows.
+    get_pars = NULL, ##<< Optional function that resolves parameter rows.
+    pars = NULL, ##<< Optional embedded parameter table.
+    filter_pars = NULL, ##<< Optional function that filters candidate parameter rows.
+    required_inputs = NULL ##<< Inputs required by the method.
 ) {
     list(
         output = output,
@@ -30,6 +34,7 @@ new_volume_method <- function(
         filter_pars = filter_pars,
         required_inputs = required_inputs
     )
+    ##value<< A named list describing one external volume-computation method.
 }
 
 

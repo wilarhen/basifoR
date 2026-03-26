@@ -1,6 +1,6 @@
 # Schema support patch for external basifoR workflow
 
-`%||%` <- function(a, b) if (is.null(a)) b else a
+## `%||%` <- function(a, b) if (is.null(a)) b else a
 
 new_external_schema <- function #Define a schema for external inventory workflows
 ### Creates a reusable schema that stores column aliases, units, grouping defaults, and columns to keep across the external basifoR workflow. The schema can then be supplied to helper wrappers so repeated mappings do not need to be redefined in every call.

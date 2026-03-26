@@ -15,18 +15,18 @@
 << coefficients required by that model.}
 }
 \details{This function evaluates the SNFI equation for annual increment
-
+\code{}
 of volume over bark (IAVC) and returns the result in dm3.
-
+\code{}
 It supports models 8, 13, 14, 16, 17, 18, 19, 20, 21, and 25.
-
+\code{}
 The required inputs depend on the selected model.}
 \value{Numeric IAVC in dm3. Returns \code{NA_real_} when \code{pars}
-
+\code{}
 is empty, when required inputs are missing, or when the model
-
+\code{}
 is not recognised. Missing required inputs also trigger a
-
+\code{}
 printed message.
 print("Model not recognized for IAVC.")}
 
