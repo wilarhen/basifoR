@@ -25,9 +25,10 @@ Authors@R:
 	     comment = c(ORCID = "0000-0001-7348-6695")))
 Maintainer: Wilson Lara <wilarhen@gmail.com>
 Description: Fetches, harmonizes, and analyses data from the Spanish National
-    Forest Inventory for reproducible, design-aware forest inventory analyses.
-    Computes tree- and stand-level metrics, applies inventory-specific expansion
-    factors, estimates volume, and supports customizable processing workflows.
+    Forest Inventory for reproducible, design-aware forest inventory workflows.
+    Computes tree- and stand-level metrics, applies sampling-based expansion
+    factors, estimates volume, and supports extensible processing for external
+    inventory designs with custom sampling schemes and volume equations.
 URL: https://www.miteco.gob.es/es/biodiversidad/temas/inventarios-nacionales/inventario-forestal-nacional.html
 License: GPL-3
 Depends: R (>= 4.4.0)
