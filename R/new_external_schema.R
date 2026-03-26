@@ -47,7 +47,13 @@ new_external_schema <- function #Define a schema for external inventory workflow
     ##value<< An object of class \code{"external_schema"} containing normalized column mappings, unit declarations, grouping defaults, retained columns, and optional defaults.
 }
 
-print.external_schema <- function(x, ...) {
+print.external_schema <- function #Print an external schema summary
+##title<< Print an external schema summary
+##description<< Display the column mappings, declared units, and default grouping levels stored in an \code{"external_schema"} object.
+(
+    x, ##<< An \code{"external_schema"} object created by \code{\link{new_external_schema}}.
+    ... ##<< Additional arguments accepted for S3 compatibility and ignored by this method.
+) {
     cat("<external_schema>\n")
     cat("Columns:\n")
     for (nm in names(x$colmap)) {
@@ -62,7 +68,9 @@ print.external_schema <- function(x, ...) {
     if (length(x$levels))
         cat("Levels: ", paste(x$levels, collapse = ", "), "\n", sep = "")
     invisible(x)
+    ##value<< The input \code{"external_schema"} object, returned invisibly.
 }
+
 
 .resolve_external_schema <- function(
     schema = NULL,
