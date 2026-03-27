@@ -39,9 +39,8 @@ update.external_dendroMetrics <- function #Update a stored external_dendroMetric
     if (isTRUE(evaluate))
         eval(call0, envir = parent.frame())
     else
-        call0
-    ##value<< Either an updated \code{"external_dendroMetrics"} object when \code{evaluate = TRUE}, or the modified call when \code{evaluate = FALSE}.
 return(call0)
+    ##value<< Either an updated \code{"external_dendroMetrics"} object when \code{evaluate = TRUE}, or the modified call when \code{evaluate = FALSE}.
 }
 
 
