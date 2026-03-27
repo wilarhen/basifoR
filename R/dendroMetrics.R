@@ -198,8 +198,21 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
         summ <- sapply(summ, function(x) round(x, 3))
         summ <- t(as.matrix(summ))
 
-        fcs. <- names(dt)[!names(dt) %in% unique(c(weighted_mean_vars, sum_vars))]
-        fcs <- dt[1, fcs., drop = FALSE]
+        non_metric_cols <- names(dt)[
+            !names(dt) %in% unique(c(weighted_mean_vars, sum_vars))
+        ]
+
+        is_group_invariant <- function(x) {
+            x <- x[!is.na(x)]
+            if (!length(x))
+                return(TRUE)
+            length(unique(x)) == 1L
+        }
+
+        keep_cols <- non_metric_cols[
+            vapply(dt[non_metric_cols], is_group_invariant, logical(1))
+        ]
+        fcs <- dt[1, keep_cols, drop = FALSE]
 
         cbind(fcs, summ)
     }

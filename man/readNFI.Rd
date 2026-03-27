@@ -7,6 +7,8 @@ Spanish National Forest Inventory (SNF). It can process either
 (\code{"http://www.miteco.gob.es"}) or paths to locally stored files.}
 \usage{readNFI(nfi, nfi.nr = 4, 
     dt.nm = "PCMayores", 
+    file_ext = NULL, 
+    file_name = NULL, 
     ...)}
 \arguments{
   \item{nfi}{\code{character}. URL or local path to a compressed
@@ -17,6 +19,11 @@ decompressed file with these supported extensions.}
 stored in the imported NFI data. Defaults
 to \code{'PCMayores'} (3rd NFI) or
 \code{'PIESMA'} (2nd NFI).}
+  \item{file_ext}{\code{character}. Optional file extension(s)
+passed to \code{\link{fetchNFI}}. Use
+\code{"csv"} to read zipped csv files.}
+  \item{file_name}{\code{character}. Optional file names passed
+to \code{\link{fetchNFI}}.}
   \item{\dots}{Additional arguments for \code{\link{fetchNFI}}.}
 }
 
@@ -41,5 +48,9 @@ to numeric, while preserving the format of character columns.}
 
 ##str(read_ifn2) }
 
+## French NFI tree table read from the official web resource
+## f <- "https://inventaire-forestier.ign.fr/dataifn/data/export_dataifn_2024_en.zip"
+## arbre <- readNFI(f, file_ext = "csv", file_name = "ARBRE")
+## str(arbre)
 
 }
