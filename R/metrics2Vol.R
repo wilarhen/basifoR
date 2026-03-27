@@ -296,7 +296,8 @@ metrics2Vol <- structure(function(
     can_compute_legacy <- all(c("pr", "d", "h") %in% tolower(names(nfi_orig))) &&
         any(grepl("spec|espec", names(nfi_orig), ignore.case = TRUE))
 
-    need_legacy <- keep.legacy || any(parametro %in% c("V", "VCC"))
+    ## need_legacy <- keep.legacy || any(parametro %in% c("V", "VCC"))
+need_legacy <- keep.legacy || "V" %in% parametro
 
     legacy_v_m3 <- rep(NA_real_, nrow(out))
     if (need_legacy && can_compute_legacy) {
