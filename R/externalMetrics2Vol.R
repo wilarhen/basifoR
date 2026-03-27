@@ -386,12 +386,32 @@ externalMetrics2Vol <- structure(function #Compute tree-level volume variables f
         hd = c("Hd", "hd")
     )
 
+    resolve_standardized_col_exact <- function(dt, aliases) {
+        if (is.null(aliases) || !length(aliases))
+            return(NULL)
+
+        nm0 <- names(dt)
+        nml <- tolower(nm0)
+        ali <- unique(tolower(aliases))
+        hit <- match(ali, nml)
+        hit <- hit[!is.na(hit)]
+
+        if (!length(hit))
+            return(NULL)
+
+        nm0[hit[1L]]
+    }
+
     has_standardized_input <- function(dt, key) {
         aliases <- std_aliases[[tolower(key)]]
         if (is.null(aliases))
             return(FALSE)
 
-        col <- resolve_col(dt, aliases, required = FALSE)
+        ## Use exact alias matching only here. This avoids false positives such as
+        ## matching the requested standardized metric "n" to source columns like
+        ## "CAMPAGNE" during the preflight check that decides whether metrics need
+        ## to be computed.
+        col <- resolve_standardized_col_exact(dt, aliases)
         if (is.null(col))
             return(FALSE)
 
