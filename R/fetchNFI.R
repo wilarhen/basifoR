@@ -18,31 +18,6 @@ fetchNFI <- structure(function#Fetch SNF Data
 ) {
     if(is.null(url.))
         return(NULL)
-    ## temp <- tempfile(tmpdir = dir)
-    ## is.remote <- grepl('^https?://',url.)
-    ## if(is.remote){
-    ##     gf <- gracefully_fail(url., timeOut = timeOut)
-    ##     if(is.null(gf))
-    ##         return(gf)
-    ##     download.file(url.,temp)
-    ## }
-    ## if(!is.remote)
-    ##     file.copy(url.,temp)
-    ## con <- unzip(temp,
-    ##              ## exdir = tempdir(),
-    ##              exdir = dir,
-    ##              list = TRUE)
-    ## con <- unzip(temp,
-    ##              ## exdir = tempdir(),
-    ##              exdir = dir,
-    ##              files = NULL)
-    ## supr.only <- file_ext
-    ## tos <- grepl(paste(supr.only,
-    ##                    collapse = "|"), con)
-    ## con  <- tryCatch(
-    ##     con[tos],error = function(e) NULL)
-    ## file.remove(temp)
-    ## return(con)
 is.remote <- grepl("^https?://", url.)
 
 if (is.remote) {
