@@ -246,6 +246,11 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     resm <- subset(resm, eval(parse(text = cut.dt)))
     rownames(resm) <- NULL
 
+    first <- unique(c("nfi.nr", "pr", tolower(summ.vr), "especie"))
+    i <- match(first, tolower(names(resm)))
+    i <- i[!is.na(i)]
+    resm <- resm[, c(i, setdiff(seq_along(resm), i)), drop = FALSE]
+
     if (report)
         write.csv(resm, file = "report.csv", row.names = FALSE)
 
