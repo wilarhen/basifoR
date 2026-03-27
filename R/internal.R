@@ -1,3 +1,20 @@
+# R/internal.R
+
+has_mdbtools_backend <- function() {
+    all(nzchar(Sys.which(c("mdb-tables", "mdb-export"))))
+}
+
+has_windows_access_driver <- function() {
+    if (!identical(unname(Sys.info()[["sysname"]]), "Windows")) {
+        return(FALSE)
+    }
+    TRUE
+}
+
+assert_access_backend <- function(...) {
+    ...
+}
+
 ## `%||%` <- function(x, y) if (is.null(x)) y else x
 null_or <- function(x, y) if (is.null(x)) y else x
     `%||%` <- function(a, b) if (is.null(a)) b else a
