@@ -15,6 +15,7 @@ S3method(print, inventory_design)
 S3method(print, external_schema)
 S3method(update,dendroMetrics)
 S3method(update,external_dendroMetrics)
+S3method(update,inventoryMetrics)
 S3method(update, list)
 
 
