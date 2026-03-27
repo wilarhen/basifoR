@@ -44,9 +44,9 @@ to numeric, while preserving the format of character columns.}
 ## ifn2_url <- httr::modify_url("https://www.miteco.gob.es", path
 ## = ifn2_path)
 
-##read_ifn2 <- readNFI(ifn2_url)
+## read_ifn2 <- readNFI(ifn2_url)
 
-##str(read_ifn2) }
+## str(read_ifn2) }
 
 ## French NFI tree table read from the official web resource
 ## f <- "https://inventaire-forestier.ign.fr/dataifn/data/export_dataifn_2024_en.zip"
