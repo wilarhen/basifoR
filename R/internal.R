@@ -3,6 +3,26 @@ null_or <- function(x, y) if (is.null(x)) y else x
     `%||%` <- function(a, b) if (is.null(a)) b else a
 
 
+domheight_strict <- function(h, d, n, threshold = 100) {
+    ok <- !is.na(h) & !is.na(d) & !is.na(n) & n > 0
+    if (!any(ok))
+        return(NA_real_)
+
+    h <- h[ok]
+    d <- d[ok]
+    n <- n[ok]
+
+    o <- order(d, decreasing = TRUE)
+    h <- h[o]
+    n <- n[o]
+
+    i <- which(cumsum(n) >= threshold)[1]
+    if (is.na(i))
+        return(NA_real_)
+
+    sum(h[seq_len(i)] * n[seq_len(i)], na.rm = TRUE) /
+        sum(n[seq_len(i)], na.rm = TRUE)
+}
 
 
 metrics2Vol_legacy <- structure(function#Tree volumes in NFI data
