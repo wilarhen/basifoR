@@ -14,7 +14,8 @@ externalMetrics <- structure(function #Compute tree-level metrics from external 
     d_unit = c("mm", "cm")[1],
     h_unit = c("m", "dm", "cm")[1],
     keep_cols = NULL,
-    domheight_fun = get0("domheight", mode = "function", inherits = TRUE)
+    domheight_fun = get0("domheight_strict", mode = "function", inherits = TRUE) %||%
+        get0("domheight", mode = "function", inherits = TRUE)
 ) {
 
     x0 <- x
@@ -241,7 +242,7 @@ externalMetrics <- structure(function #Compute tree-level metrics from external 
 
     if ("Hd" %in% var0) {
         if (is.null(domheight_fun))
-            stop("Hd requested but 'domheight()' is not available.",
+            stop("Hd requested but no dominant-height function is available.",
                  call. = FALSE)
 
         grp <- if (length(group_cols)) {
