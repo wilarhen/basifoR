@@ -3,25 +3,109 @@ null_or <- function(x, y) if (is.null(x)) y else x
     `%||%` <- function(a, b) if (is.null(a)) b else a
 
 
-domheight_strict <- function(h, d, n, threshold = 100) {
-    ok <- !is.na(h) & !is.na(d) & !is.na(n) & n > 0
-    if (!any(ok))
-        return(NA_real_)
+# Cleaner Hd computation helpers for basifoR external workflows
+#
+# Use with:
+# external_dendroMetrics(..., domheight_fun = domheight_strict)
+# external_dendroMetrics(..., domheight_fun = domheight_mean_fallback)
+# external_dendroMetrics(..., domheight_fun = domheight_flexible)
+
+prepare_domheight_inputs <- function(h, d, n) {
+    h <- as.numeric(h)
+    d <- as.numeric(d)
+    n <- as.numeric(n)
+
+    if (!(length(h) == length(d) && length(d) == length(n))) {
+        stop("'h', 'd', and 'n' must have the same length.", call. = FALSE)
+    }
+
+    ok <- is.finite(h) & is.finite(d) & is.finite(n) & h > 0 & d > 0 & n > 0
+    if (!any(ok)) {
+        return(list(h = numeric(0), d = numeric(0), n = numeric(0)))
+    }
 
     h <- h[ok]
     d <- d[ok]
     n <- n[ok]
 
     o <- order(d, decreasing = TRUE)
-    h <- h[o]
-    n <- n[o]
+    list(h = h[o], d = d[o], n = n[o])
+}
+
+weighted_height_mean <- function(h, n) {
+    sw <- sum(n, na.rm = TRUE)
+    if (!is.finite(sw) || sw <= 0) {
+        return(NA_real_)
+    }
+    sum(h * n, na.rm = TRUE) / sw
+}
+
+select_domheight_slice <- function(n, threshold = 100) {
+    threshold <- as.numeric(threshold)[1]
+    if (!is.finite(threshold) || threshold <= 0) {
+        stop("'threshold' must be a single positive number.", call. = FALSE)
+    }
 
     i <- which(cumsum(n) >= threshold)[1]
-    if (is.na(i))
-        return(NA_real_)
+    if (is.na(i)) {
+        return(integer(0))
+    }
 
-    sum(h[seq_len(i)] * n[seq_len(i)], na.rm = TRUE) /
-        sum(n[seq_len(i)], na.rm = TRUE)
+    seq_len(i)
+}
+
+# Strict dominant height:
+# returns NA when the observed trees with valid h, d, n do not reach the threshold.
+domheight_strict <- function(h, d, n, threshold = 100) {
+    x <- prepare_domheight_inputs(h, d, n)
+    if (!length(x$h)) {
+        return(NA_real_)
+    }
+
+    idx <- select_domheight_slice(x$n, threshold = threshold)
+    if (!length(idx)) {
+        return(NA_real_)
+    }
+
+    weighted_height_mean(x$h[idx], x$n[idx])
+}
+
+# Backward-compatible dominant height:
+# returns the weighted mean height of all valid trees when the threshold is not reached.
+domheight_mean_fallback <- function(h, d, n, threshold = 100) {
+    x <- prepare_domheight_inputs(h, d, n)
+    if (!length(x$h)) {
+        return(NA_real_)
+    }
+
+    idx <- select_domheight_slice(x$n, threshold = threshold)
+    if (!length(idx)) {
+        return(weighted_height_mean(x$h, x$n))
+    }
+
+    weighted_height_mean(x$h[idx], x$n[idx])
+}
+
+# Flexible dominant height:
+# fallback = "mean" reproduces the current package logic more clearly.
+# fallback = "na" is the safer option for sparse external NFI height data.
+domheight_flexible <- function(h, d, n, threshold = 100,
+                               fallback = c("mean", "na")) {
+    fallback <- match.arg(fallback)
+    x <- prepare_domheight_inputs(h, d, n)
+    if (!length(x$h)) {
+        return(NA_real_)
+    }
+
+    idx <- select_domheight_slice(x$n, threshold = threshold)
+    if (!length(idx)) {
+        if (identical(fallback, "na")) {
+            return(NA_real_)
+        }
+        return(weighted_height_mean(x$h, x$n))
+    }
+
+    weighted_height_mean(x$h[idx], x$n[idx])
 }
 
 
