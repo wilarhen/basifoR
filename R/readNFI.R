@@ -5,8 +5,8 @@ readNFI <- structure(function#Read SNF data from path
 ### (\code{"http://www.miteco.gob.es"}) or paths to locally stored files.
                      ## details<< Compressed data files with
                      ## extensions other than \code{.dbf} \code{.mdb}
-                     ## (Linux only), or \code{.accdb} are not
-                     ## supported.  Most databases in the 2nd and 3rd
+                     ## (Linux only), \code{.accdb}, or \code{.csv}
+                     ## are not supported.  Most databases in the 2nd and 3rd
                      ## stages of the SNF can be imported directly
                      ## from \code{http://www.miteco.gob.es} using
                      ## appropriate URLs.  Data sets from the 2nd
@@ -17,7 +17,9 @@ readNFI <- structure(function#Read SNF data from path
                      ## systems).  On Windows, install the Office
                      ## driver via \code{'AccessDatabaseEngine.exe'}
                      ## from Microsoft.  On Unix-like systems, install
-                     ## the \code{mdbtools} dependency.
+                     ## the \code{mdbtools} dependency.  When \code{.csv}
+                     ## files are requested, the function returns either
+                     ## one data frame or a named list of data frames.
 (                                                                                                                                                       
     nfi,  ##<< \code{character}. URL or local path to a compressed
           ##file (\code{.zip}) containing SNF data, or to a
@@ -27,28 +29,14 @@ readNFI <- structure(function#Read SNF data from path
                          ##stored in the imported NFI data. Defaults
                          ##to \code{'PCMayores'} (3rd NFI) or
                          ##\code{'PIESMA'} (2nd NFI).
+    file_ext = NULL, ##<< \code{character}. Optional file extension(s)
+                     ##passed to \code{\link{fetchNFI}}. Use
+                     ##\code{"csv"} to read zipped csv files.
+    file_name = NULL, ##<< \code{character}. Optional file names passed
+                      ##to \code{\link{fetchNFI}}.
     ... ##<< Additional arguments for \code{\link{fetchNFI}}.
 ) {
     imp <- nfi
-
-
-## find_code__ <- function(input_value, is.ifn4, df) {
-##   result <- df$codigo[
-##     grepl(input_value, ignore.case = TRUE, df$codigo) | 
-##     grepl(input_value, ignore.case = TRUE, df$provincia) | 
-##     grepl(input_value, ignore.case = TRUE, df$codigo2) |
-##     grepl(input_value, ignore.case = TRUE, df$provincia_0) |
-##     grepl(input_value, ignore.case = TRUE, df$provincia_1)
-##     ][1L]
-  
-##   if(is.ifn4){
-##       result <- df$provincia_1[
-##                        grepl(paste0('^',result,'$'), df$codigo,
-##                              ignore.case = TRUE)]}
-##   if(length(result) == 0)
-##       result <- NA
-##   return(result)
-## }
 
     is.ifn4 <- nfi.nr == 4
 
@@ -58,25 +46,85 @@ readNFI <- structure(function#Read SNF data from path
             !is.na(x) &&
             tolower(tools::file_ext(x)) == "zip"
     }
-    
-    ## code_match <- NA_character_
-    ## if (is.character(imp) && length(imp) == 1L) {
-        code_match <- find_code__(imp, is.ifn4 = is.ifn4, df = procods)
-        pr. <- find_code__(imp, FALSE, df = procods)
-    ## }
 
-    
+    is_csv <- function(x) {
+        is.character(x) &&
+            length(x) > 0L &&
+            all(grepl("\\.csv$", x, ignore.case = TRUE))
+    }
+
+    detect_sep <- function(fi, n = 5L) {
+        hdr <- tryCatch(readLines(fi, n = n, warn = FALSE),
+                        error = function(e) character(0))
+        hdr <- hdr[nzchar(trimws(hdr))]
+        if (length(hdr) == 0L)
+            return(",")
+        hdr <- hdr[1L]
+        cand <- c(";", ",", "\t", "|")
+        cnt <- vapply(cand, function(sep)
+            length(strsplit(hdr, sep, fixed = TRUE)[[1L]]) - 1L,
+            integer(1))
+        if (all(cnt <= 0L))
+            return(",")
+        cand[which.max(cnt)]
+    }
+
+    read_one_csv <- function(fi) {
+        sep <- detect_sep(fi)
+        tryCatch(
+            utils::read.table(fi,
+                              header = TRUE,
+                              sep = sep,
+                              quote = '"',
+                              dec = '.',
+                              fill = TRUE,
+                              comment.char = '',
+                              stringsAsFactors = FALSE,
+                              check.names = FALSE),
+            error = function(e) NULL
+        )
+    }
+
+    read_csv_files <- function(x) {
+        out <- lapply(x, read_one_csv)
+        ok <- !vapply(out, is.null, logical(1))
+        out <- out[ok]
+        x <- x[ok]
+        if (length(out) == 0L)
+            return(NULL)
+        names(out) <- tools::file_path_sans_ext(basename(x))
+        if (length(out) == 1L)
+            return(out[[1L]])
+        out
+    }
+
+    fetch_args <- c(list(url. = NULL), list(...))
+    if (!is.null(file_ext))
+        fetch_args$file_ext <- file_ext
+    if (!is.null(file_name))
+        fetch_args$file_name <- file_name
+
+    code_match <- find_code__(imp, is.ifn4 = is.ifn4, df = procods)
+    pr. <- find_code__(imp, FALSE, df = procods)
+
     if (!is.na(code_match) && !is_zip_path(imp)) {
         nfi. <- paste0("nfi", nfi.nr)
         imp <- do.call(nfi., list(prov = imp))
-        imp <- fetchNFI(imp, ...)
+        fetch_args$url. <- imp
+        imp <- do.call(fetchNFI, fetch_args)
     } else if (is_zip_path(imp)) {
-        imp <- fetchNFI(imp, ...)
-        nfi.nr  <- get_ifn_nr(imp)
+        fetch_args$url. <- imp
+        imp <- do.call(fetchNFI, fetch_args)
+        if (!is.null(imp) && !is_csv(imp))
+            nfi.nr  <- get_ifn_nr(imp)
     }
 
-  if(is.null (imp))
+    if (is.null(imp))
         return(imp)
+
+    if (is_csv(imp))
+        return(read_csv_files(imp))
+
     fwin <- function(x, dt.nm){
         ife <-RODBC::odbcConnectAccess2007(x, rows_at_time = 1)
         on.exit(odbcClose(ife))
@@ -152,6 +200,10 @@ readNFI <- structure(function#Read SNF data from path
     ##read_ifn2 <- readNFI(ifn2_url)
 
     ##str(read_ifn2) }
-    
+
+    ## French NFI tree table read from the official web resource
+    ## f <- "https://inventaire-forestier.ign.fr/dataifn/data/export_dataifn_2024_en.zip"
+    ## arbre <- readNFI(f, file_ext = "csv", file_name = "ARBRE")
+    ## str(arbre)
     
 })
