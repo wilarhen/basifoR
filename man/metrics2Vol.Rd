@@ -51,6 +51,7 @@ Preallocate all requested output columns.
 Compute the legacy volume once so modern methods can fall back to
 it when needed.
 Decide whether legacy estimates can be computed from the input.
+need_legacy <- keep.legacy || any(parametro \%in\% c("V", "VCC"))
 Load and normalize the coefficient table used by registry-based
 methods.
 Convert relevant inputs and coefficient keys to numeric values.

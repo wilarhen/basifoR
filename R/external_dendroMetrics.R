@@ -1,3 +1,50 @@
+update.external_dendroMetrics <- function #Update a stored external_dendroMetrics call
+##title<< Update a stored external dendroMetrics call
+##description<< Modify the stored call in an \code{"external_dendroMetrics"} object and optionally re-evaluate it to produce an updated result.
+(
+    object, ##<< An \code{"external_dendroMetrics"} object returned by \code{\link{external_dendroMetrics}}.
+    ..., ##<< Named arguments to replace in the stored call.
+    evaluate = TRUE ##<< Logical; if \code{TRUE}, evaluate the modified call and return the updated result. If \code{FALSE}, return the modified call without evaluating it.
+) {
+    if (!inherits(object, "external_dendroMetrics"))
+        stop(
+            "'object' must inherit from 'external_dendroMetrics'.",
+            call. = FALSE
+        )
+
+    call0 <- attr(object, "call")
+
+    if (is.null(call0))
+        stop(
+            "No stored call found in 'object'. ",
+            "Recreate the result with external_dendroMetrics() and then call update(result, ...).",
+            call. = FALSE
+        )
+
+    extras <- as.list(substitute(list(...)))[-1L]
+
+    if (length(extras)) {
+        extra_names <- names(extras)
+        has_name <- !is.na(extra_names) & nzchar(extra_names)
+
+        if (any(!has_name))
+            stop("All arguments in '...' must be named.", call. = FALSE)
+
+        call_list <- as.list(call0)
+        for (i in seq_along(extras))
+            call_list[[extra_names[[i]]]] <- extras[[i]]
+        call0 <- as.call(call_list)
+    }
+
+    if (isTRUE(evaluate))
+        eval(call0, envir = parent.frame())
+    else
+        call0
+    ##value<< Either an updated \code{"external_dendroMetrics"} object when \code{evaluate = TRUE}, or the modified call when \code{evaluate = FALSE}.
+return(call0)
+}
+
+
 external_dendroMetrics <- structure(function #Summarize external dendrometric and volume data
 ### Summarizes external tree data after computing required metrics and optional volume outputs. The function can return filtered tree-level outputs when \code{summ.vr = NULL} or grouped stand-level summaries when \code{summ.vr} is supplied, and it supports processing several inputs with optional parallel execution.
 ##title<< Summarize external dendrometric and volume data
@@ -798,3 +845,4 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
     finalize_output(combined, call0)
 },
 class = c("function", "basifoR"))
+
