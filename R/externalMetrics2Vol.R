@@ -251,55 +251,29 @@ externalMetrics2Vol <- structure(function #Compute tree-level volume variables f
         invisible(un)
     }
 
-    convert_value_units <- function(z, from, to) {
-        if (is.null(from) || is.na(from) || !nzchar(from))
-            stop("Cannot convert from an unknown unit.", call. = FALSE)
-
-        from <- tolower(from)
-        to <- tolower(to)
-
-        if (identical(from, to))
-            return(z)
-
-        to_base <- function(x, un) {
-            if (un == "mm") return(x / 1000)
-            if (un == "cm") return(x / 100)
-            if (un == "dm") return(x / 10)
-            if (un == "m")  return(x)
-            if (un == "cm3") return(x / 1e6)
-            if (un == "dm3") return(x / 1000)
-            if (un == "m3")  return(x)
-            stop("Unsupported unit: ", un, call. = FALSE)
-        }
-
-        from_base <- function(x, un) {
-            if (un == "mm") return(x * 1000)
-            if (un == "cm") return(x * 100)
-            if (un == "dm") return(x * 10)
-            if (un == "m")  return(x)
-            if (un == "cm3") return(x * 1e6)
-            if (un == "dm3") return(x * 1000)
-            if (un == "m3")  return(x)
-            stop("Unsupported unit: ", un, call. = FALSE)
-        }
-
-        from_base(to_base(z, from), to)
-    }
-
-    convert_col <- function(dt, col, target_unit) {
-        if (is.null(col))
+    normalize_cols_to_units <- function(dt, mapping) {
+        un <- get_units_map(dt)
+        if (!length(un))
             return(dt)
 
-        un <- get_units_map(dt)
-        from_unit <- un[[col]]
-        dt[[col]] <- convert_value_units(
-            suppressWarnings(as.numeric(as.character(dt[[col]]))),
-            from = from_unit,
-            to = target_unit
+        mapping <- mapping[!is.na(mapping) & nzchar(mapping)]
+        if (!length(mapping))
+            return(dt)
+
+        mapping <- mapping[names(mapping) %in% names(dt)]
+        if (!length(mapping))
+            return(dt)
+
+        mapping <- mapping[names(mapping) %in% names(un)]
+        if (!length(mapping))
+            return(dt)
+
+        mapping <- mapping[!duplicated(names(mapping), fromLast = TRUE)]
+        conv_units(
+            nfi = dt,
+            var = names(mapping),
+            un = unname(mapping)
         )
-        un[col] <- target_unit
-        attr(dt, "units") <- un
-        dt
     }
 
     method_has_equation <- function(param) {
@@ -535,14 +509,15 @@ externalMetrics2Vol <- structure(function #Compute tree-level volume variables f
     units_now <- get_units_map(x)
     has_unit_col <- function(col) !is.null(col) && col %in% names(units_now)
 
-    if (has_unit_col(col_d))
-        x <- convert_col(x, col_d, "mm")
-    if (has_unit_col(col_h))
-        x <- convert_col(x, col_h, "m")
-    if (has_unit_col(col_dnm))
-        x <- convert_col(x, col_dnm, "mm")
-    if (has_unit_col(col_v))
-        x <- convert_col(x, col_v, "m3")
+    normalize_map <- c(
+        if (has_unit_col(col_d))   stats::setNames("mm", col_d),
+        if (has_unit_col(col_h))   stats::setNames("m", col_h),
+        if (has_unit_col(col_dnm)) stats::setNames("mm", col_dnm),
+        if (has_unit_col(col_v))   stats::setNames("m3", col_v)
+    )
+
+    if (length(normalize_map))
+        x <- normalize_cols_to_units(x, normalize_map)
 
     out <- x_orig
 

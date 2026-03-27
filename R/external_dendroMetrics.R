@@ -218,77 +218,28 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
         nm %in% names(get_units_map(dt))
     }
 
-    convert_value_units <- function(z, from, to) {
-        if (is.null(to) || is.na(to))
-            return(z)
-
-        from_chr <- if (is.null(from) || is.na(from)) "" else as.character(from)
-        to_chr <- as.character(to)
-
-        if (!nzchar(to_chr))
-            return(z)
-
-        if (!nzchar(from_chr))
-            stop("Cannot convert from an unknown unit.", call. = FALSE)
-
-        from <- tolower(from_chr)
-        to <- tolower(to_chr)
-
-        if (identical(from, to))
-            return(z)
-
-        to_base <- function(x, un) {
-            if (un == "mm") return(x / 1000)
-            if (un == "cm") return(x / 100)
-            if (un == "dm") return(x / 10)
-            if (un == "m")  return(x)
-            if (un == "cm3") return(x / 1e6)
-            if (un == "dm3") return(x / 1000)
-            if (un == "m3")  return(x)
-            stop("Unsupported unit: ", un, call. = FALSE)
-        }
-
-        from_base <- function(x, un) {
-            if (un == "mm") return(x * 1000)
-            if (un == "cm") return(x * 100)
-            if (un == "dm") return(x * 10)
-            if (un == "m")  return(x)
-            if (un == "cm3") return(x * 1e6)
-            if (un == "dm3") return(x * 1000)
-            if (un == "m3")  return(x)
-            stop("Unsupported unit: ", un, call. = FALSE)
-        }
-
-        from_base(to_base(z, from), to)
-    }
-
     convert_cols_to_units <- function(dt, mapping) {
         un <- get_units_map(dt)
         if (!length(un))
             return(dt)
 
-        for (nm in names(mapping)) {
-            if (!nm %in% names(dt) || !nm %in% names(un))
-                next
+        mapping <- mapping[!is.na(mapping) & nzchar(mapping)]
+        if (!length(mapping))
+            return(dt)
 
-            target_unit <- mapping[[nm]]
-            if (is.null(target_unit) || is.na(target_unit) || !nzchar(as.character(target_unit)))
-                next
+        mapping <- mapping[names(mapping) %in% names(dt)]
+        if (!length(mapping))
+            return(dt)
 
-            current_unit <- un[[nm]]
-            if (is.null(current_unit) || is.na(current_unit) || !nzchar(as.character(current_unit)))
-                next
+        mapping <- mapping[names(mapping) %in% names(un)]
+        if (!length(mapping))
+            return(dt)
 
-            dt[[nm]] <- convert_value_units(
-                suppressWarnings(as.numeric(as.character(dt[[nm]]))),
-                from = current_unit,
-                to = target_unit
-            )
-            un[[nm]] <- target_unit
-        }
-
-        attr(dt, "units") <- un
-        dt
+        conv_units(
+            nfi = dt,
+            var = names(mapping),
+            un = unname(mapping)
+        )
     }
 
     build_metric_var <- function(var, summ.vr, parametro, method_registry) {
