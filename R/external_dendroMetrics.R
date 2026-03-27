@@ -1,4 +1,3 @@
-
 external_dendroMetrics <- structure(function #Summarize external dendrometric and volume data
 ### Summarizes external tree data after computing required metrics and optional volume outputs. The function can return filtered tree-level outputs when \code{summ.vr = NULL} or grouped stand-level summaries when \code{summ.vr} is supplied, and it supports processing several inputs with optional parallel execution.
 ##title<< Summarize external dendrometric and volume data
@@ -42,13 +41,13 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
     track_provenance = FALSE,
     compute_metrics_if_needed = TRUE,
     schema = NULL,
+    domheight_fun = get0("domheight_strict", mode = "function", inherits = TRUE) %||%
+        get0("domheight", mode = "function", inherits = TRUE),
     ...
 ) {
     call0 <- match.call(expand.dots = TRUE)
 
-    ## `%||%` <- function(a, b) if (is.null(a)) b else a
     dots <- list(...)
-    metric_extra <- dots[intersect(names(dots), c("domheight_fun"))]
 
     if (!is.null(schema)) {
         resolve_schema_fun <- get0(
@@ -270,6 +269,7 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
         metric_d_unit,
         metric_h_unit,
         compute_metrics_if_needed,
+        domheight_fun,
         ...
     ) {
         if (is.null(x))
@@ -307,18 +307,16 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
 
         do.call(
             metric_fun,
-            c(
-                list(
-                    x = x,
-                    var = tree_var_needed,
-                    levels = metric_levels,
-                    design = design,
-                    colmap = metric_colmap,
-                    d_unit = metric_d_unit,
-                    h_unit = metric_h_unit,
-                    keep_cols = keep_needed
-                ),
-                metric_extra
+            list(
+                x = x,
+                var = tree_var_needed,
+                levels = metric_levels,
+                design = design,
+                colmap = metric_colmap,
+                d_unit = metric_d_unit,
+                h_unit = metric_h_unit,
+                keep_cols = keep_needed,
+                domheight_fun = domheight_fun
             )
         )
     }
@@ -344,6 +342,7 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
         selector,
         track_provenance,
         compute_metrics_if_needed,
+        domheight_fun,
         ...
     ) {
         x0 <- x
@@ -399,6 +398,7 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
                 metric_colmap = metric_colmap,
                 metric_d_unit = metric_d_unit,
                 metric_h_unit = metric_h_unit,
+                domheight_fun = domheight_fun,
                 ...
             )
         } else {
@@ -412,6 +412,7 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
                 metric_d_unit = metric_d_unit,
                 metric_h_unit = metric_h_unit,
                 compute_metrics_if_needed = compute_metrics_if_needed,
+                domheight_fun = domheight_fun,
                 ...
             )
         }
@@ -500,39 +501,50 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
         msp <- Filter("nrow", msp)
 
         fsum <- function(z) {
-            scale_vars <- unique(c(setdiff(weighted_mean_vars, "n"),
-                                   setdiff(sum_vars, "n")))
+            weighted_source_vars <- intersect(c("d", "h", "hd"), names(z))
+            sum_source_vars <- intersect(c("ba", "n", "v", "vcc", "vsc", "iavc", "vle"), names(z))
 
+            z_work <- z
+            scale_vars <- setdiff(unique(c(weighted_source_vars, sum_source_vars)), "n")
             if (length(scale_vars))
-                z[, scale_vars] <- z[, scale_vars, drop = FALSE] * z[, "n"]
+                z_work[, scale_vars] <- z_work[, scale_vars, drop = FALSE] * z_work[, "n"]
 
-            summ_names <- unique(c(intersect("n", names(z)),
-                                   weighted_mean_vars,
-                                   sum_vars))
+            summ_names <- unique(c(intersect("n", names(z_work)), weighted_source_vars, sum_source_vars))
 
             if (length(summ_names)) {
                 sum_or_na <- function(v) {
                     if (all(is.na(v))) NA_real_ else sum(v, na.rm = TRUE)
                 }
-                summ <- vapply(z[, summ_names, drop = FALSE], sum_or_na, numeric(1))
+                summ <- vapply(z_work[, summ_names, drop = FALSE], sum_or_na, numeric(1))
             } else {
                 summ <- numeric(0)
             }
 
-            keep_avg <- intersect(weighted_mean_vars, names(summ))
+            keep_avg <- intersect(weighted_source_vars, names(summ))
             if (length(keep_avg) && "n" %in% names(summ) &&
-                is.finite(summ["n"]) && summ["n"] > 0)
+                is.finite(summ["n"]) && summ["n"] > 0) {
                 summ[keep_avg] <- summ[keep_avg] / summ["n"]
+            }
 
-            if (all(c("ba", "n") %in% names(summ)) &&
-                is.finite(summ["n"]) && summ["n"] > 0)
-                summ["dg"] <- sqrt((4E4 * summ["ba"] / summ["n"]) / pi)
+            if (all(c("d", "n") %in% names(z))) {
+                ok_dg <- !is.na(z$d) & !is.na(z$n) & is.finite(z$d) & is.finite(z$n) & z$n > 0
+                if (any(ok_dg)) {
+                    n_sum_dg <- sum(z$n[ok_dg], na.rm = TRUE)
+                    if (is.finite(n_sum_dg) && n_sum_dg > 0) {
+                        summ["dg"] <- sqrt(sum(z$n[ok_dg] * z$d[ok_dg]^2, na.rm = TRUE) / n_sum_dg)
+                    } else {
+                        summ["dg"] <- NA_real_
+                    }
+                } else {
+                    summ["dg"] <- NA_real_
+                }
+            }
 
             summ <- summ[order(names(summ))]
             summ <- sapply(summ, function(v) round(v, 3))
             summ <- t(as.matrix(summ))
 
-            non_metric <- names(z)[!names(z) %in% unique(c(weighted_mean_vars, sum_vars))]
+            non_metric <- names(z)[!names(z) %in% unique(c(weighted_source_vars, sum_source_vars))]
             non_metric <- intersect(non_metric, summ_cols)
             fcs <- z[1, non_metric, drop = FALSE]
 
@@ -631,7 +643,7 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
         "design", "parameter_table", "method_registry", "metric_levels",
         "metric_keep_cols", "metric_colmap", "metric_d_unit", "metric_h_unit",
         "tree_d_unit_out", "tree_h_unit_out", "volume_colmap", "selector", "track_provenance",
-        "compute_metrics_if_needed", "var", "parametro"
+        "compute_metrics_if_needed", "var", "parametro", "domheight_fun"
     )
 
     arg_values <- list(
@@ -650,7 +662,8 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
         track_provenance = track_provenance,
         compute_metrics_if_needed = compute_metrics_if_needed,
         var = var,
-        parametro = parametro
+        parametro = parametro,
+        domheight_fun = domheight_fun
     )
 
     x_list <- recycle_arg(x, n_inputs, "x")
@@ -776,191 +789,12 @@ external_dendroMetrics <- structure(function #Summarize external dendrometric an
         rbind(a[, cols, drop = FALSE], b[, cols, drop = FALSE])
     }
 
-    collect_units <- function(x) {
-        units_list <- lapply(x, function(y) attr(y, "units"))
-        units_list <- Filter(Negate(is.null), units_list)
-
-        if (!length(units_list))
-            return(NULL)
-
-        out_units <- do.call(c, units_list)
-        out_units[!duplicated(names(out_units))]
-    }
-
-    collect_attr <- function(x, attr_name) {
-        vals <- lapply(x, function(y) attr(y, attr_name))
-        vals <- Filter(Negate(is.null), vals)
-
-        if (!length(vals))
-            return(NULL)
-        if (length(vals) == 1L)
-            return(vals[[1L]])
-
-        same <- vapply(vals[-1L], function(z) identical(z, vals[[1L]]), logical(1))
-        if (all(same))
-            return(vals[[1L]])
-
-        vals
-    }
-
-    out <- Reduce(bind_rows_fill, res_list)
-    out <- data.frame(out, check.names = FALSE)
-    rownames(out) <- NULL
-
-    out_units <- collect_units(res_list)
-    if (!is.null(out_units))
-        attr(out, "units") <- out_units[names(out_units) %in% names(out)]
-
-    out_design_meta <- collect_attr(res_list, "design_meta")
-    if (!is.null(out_design_meta))
-        attr(out, "design_meta") <- out_design_meta
-
-    out_volume_meta <- collect_attr(res_list, "volume_meta")
-    if (!is.null(out_volume_meta))
-        attr(out, "volume_meta") <- out_volume_meta
+    combined <- Reduce(bind_rows_fill, res_list, init = NULL)
+    combined <- data.frame(combined, check.names = FALSE)
 
     if (report)
-        write.csv(out, file = "report.csv", row.names = FALSE)
+        write.csv(combined, file = "report.csv", row.names = FALSE)
 
-    finalize_output(out, call0)
-    ##value<< A new \code{"external_dendroMetrics"} object. When \code{summ.vr = NULL} the function returns filtered tree-level outputs; otherwise it returns grouped summaries with unit metadata and any preserved \code{design_meta} or \code{volume_meta}.
-
-}, ex = function() {
-    sq_0.1ha <- new_inventory_design(
-        sample_area_m2 = 1000,
-        min_dbh_cm = 7.5,
-        name = "Square 0.1-ha plot"
-    )
-
-    x <- data.frame(
-        plot = c("P1", "P1", "P2"),
-        species = c("sp1", "sp1", "sp2"),
-        Diameter = c(120, 185, 260),
-        Height = c(7.1, 9.4, 13.2)
-    )
-
-    pars <- data.frame(
-        parameter = "V",
-        species = c("sp1", "sp2"),
-        a = c(0.00002, 0.00003),
-        b = c(2.30, 2.10),
-        model = c("demo_sp1", "demo_sp2")
-    )
-
-    ext_methods <- external_volume_method_registry(list(
-        V = new_volume_method(
-            output = "v",
-            fun = function(dbh_mm, h_m, pars) {
-                dbh_cm <- dbh_mm / 10
-                pars$a + pars$b * (dbh_cm^2) * h_m
-            },
-            raw_unit = "cm3",
-            unit = "m3",
-            scale_to_m3 = 1 / 1e6,
-            build_args = function(ctx, pars, resolved) {
-                list(dbh_mm = ctx$d_mm, h_m = ctx$h_m, pars = pars)
-            },
-            fallback = function(ctx, pars, resolved) NA_real_,
-            match_by = "species",
-            required_inputs = c("d", "h")
-        )
-    ))
-
-    external_dendroMetrics(
-        x = x,
-        summ.vr = "plot",
-        design = sq_0.1ha,
-        parameter_table = pars,
-        method_registry = ext_methods,
-        metric_colmap = list(d = "Diameter", h = "Height"),
-        metric_d_unit = "mm",
-        metric_h_unit = "m"
-    )
-})
-
-
-## update.external_dendroMetrics <- function(
-##     object,
-##     ...,
-##     evaluate = TRUE
-## ) {
-##     if (!inherits(object, "external_dendroMetrics"))
-##         stop(
-##             "'object' must inherit from 'external_dendroMetrics'.",
-##             call. = FALSE
-##         )
-
-##     call0 <- attr(object, "call")
-
-##     if (is.null(call0))
-##         stop(
-##             "No stored call found in 'object'. ",
-##             "Recreate the result with external_dendroMetrics() and then call update(result, ...).",
-##             call. = FALSE
-##         )
-
-##     extras <- as.list(substitute(list(...)))[-1L]
-
-##     if (length(extras)) {
-##         extra_names <- names(extras)
-##         has_name <- !is.na(extra_names) & nzchar(extra_names)
-
-##         if (any(!has_name))
-##             stop("All arguments in '...' must be named.", call. = FALSE)
-
-##         call_list <- as.list(call0)
-##         for (i in seq_along(extras))
-##             call_list[[extra_names[[i]]]] <- extras[[i]]
-##         call0 <- as.call(call_list)
-##     }
-
-##     if (isTRUE(evaluate))
-##         eval(call0, envir = parent.frame())
-##     else
-##         call0
-## }
-
-update.external_dendroMetrics <- function #Update a stored external_dendroMetrics call
-##title<< Update a stored external dendroMetrics call
-##description<< Modify the stored call in an \code{"external_dendroMetrics"} object and optionally re-evaluate it to produce an updated result.
-(
-    object, ##<< An \code{"external_dendroMetrics"} object returned by \code{\link{external_dendroMetrics}}.
-    ..., ##<< Named arguments to replace in the stored call.
-    evaluate = TRUE ##<< Logical; if \code{TRUE}, evaluate the modified call and return the updated result. If \code{FALSE}, return the modified call without evaluating it.
-) {
-    if (!inherits(object, "external_dendroMetrics"))
-        stop(
-            "'object' must inherit from 'external_dendroMetrics'.",
-            call. = FALSE
-        )
-
-    call0 <- attr(object, "call")
-
-    if (is.null(call0))
-        stop(
-            "No stored call found in 'object'. ",
-            "Recreate the result with external_dendroMetrics() and then call update(result, ...).",
-            call. = FALSE
-        )
-
-    extras <- as.list(substitute(list(...)))[-1L]
-
-    if (length(extras)) {
-        extra_names <- names(extras)
-        has_name <- !is.na(extra_names) & nzchar(extra_names)
-
-        if (any(!has_name))
-            stop("All arguments in '...' must be named.", call. = FALSE)
-
-        call_list <- as.list(call0)
-        for (i in seq_along(extras))
-            call_list[[extra_names[[i]]]] <- extras[[i]]
-        call0 <- as.call(call_list)
-    }
-
-    if (isTRUE(evaluate))
-        eval(call0, envir = parent.frame())
-    else
-        call0
-    ##value<< Either an updated \code{"external_dendroMetrics"} object when \code{evaluate = TRUE}, or the modified call when \code{evaluate = FALSE}.
-}
+    finalize_output(combined, call0)
+},
+class = c("function", "basifoR"))
