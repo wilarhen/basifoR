@@ -1,23 +1,18 @@
 update.external_dendroMetrics <- function
 ##title<< Update a stored external_dendroMetrics call
-##description<< Re-run \code{\link{external_dendroMetrics}} from the call stored
-## in a previous \code{"external_dendroMetrics"} result while replacing one or
-## more named arguments in \code{...}. This method supports reproducible
-## re-evaluation of the original external workflow and can either return the
-## updated result or the reconstructed call.
+##description<< Rebuild the call stored in a previous \code{"external_dendroMetrics"} result, optionally replace named arguments, and either evaluate the updated call or return it unevaluated.
 (
-    object, ##<< A \code{"external_dendroMetrics"} object created by
-            ## the updatable \code{\link{external_dendroMetrics}} workflow.
-    ..., ##<< Named arguments used to replace entries in the stored
-         ## call before evaluation.
-    evaluate = TRUE ##<< \code{logical}. If \code{TRUE}, evaluate the
-                    ## updated call and return the resulting object.
-                    ## If \code{FALSE}, return the reconstructed call
-                    ## without evaluation.
+    object, ##<< Object returned by \code{external_dendroMetrics()}.
+    ..., ##<< Named arguments used to replace entries in the stored call.
+    evaluate = TRUE ##<< If \code{TRUE}, evaluate the updated call; otherwise return the call.
 ) {
+    ##details<< The method checks that \code{object} inherits from \code{"external_dendroMetrics"} and that the original matched call is stored in \verb{attr(object, "call")}. It then replaces any named arguments supplied in \code{...} inside that stored call.
+    ##details<< Use \code{evaluate = FALSE} to inspect the reconstructed call before execution. This is useful when debugging filters, grouping variables, schemas, or volume-method options.
+    ##value<< A new \code{"external_dendroMetrics"} object when \code{evaluate = TRUE}; otherwise the updated call.
+
     ##details<< The method checks that \code{object} inherits from
     ## \code{"external_dendroMetrics"} and that it stores the original
-    ## matched call in \code{attr(object, "call")}. It then replaces any
+    ## matched call in \verb{attr(object, "call")}. It then replaces any
     ## named arguments supplied in \code{...} inside that stored call.
     ##
     ## Use \code{evaluate = FALSE} to inspect the reconstructed call
@@ -64,8 +59,6 @@ update.external_dendroMetrics <- function
         eval(call0, envir = parent.frame())
     else
         call0
-    ##value<< A new \code{"external_dendroMetrics"} object when
-    ## \code{evaluate = TRUE}; otherwise the updated call.
 }
 
 attr(update.external_dendroMetrics, "ex") <- function() {

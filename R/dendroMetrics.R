@@ -675,7 +675,7 @@ update.dendroMetrics <- function #Update a dendroMetrics result
 
 update.list <- function #Guard against raw dendroMetrics inputs
 ##title<< Guard raw list inputs in \code{update}
-##description<< Catch attempts to call \code{\link[utils:update]{update}}
+##description<< Catch attempts to call \code{update}
 ## on raw input lists intended for \code{\link{dendroMetrics}} and
 ## return a workflow-specific error message. When the input does not
 ## look like a \code{dendroMetrics} workflow, this method falls back to

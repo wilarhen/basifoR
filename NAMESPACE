@@ -5,7 +5,6 @@ importFrom("httr", "GET","http_error","message_for_status","modify_url","status_
 importFrom("measurements", "conv_unit")
 importFrom("rvest", "html_attr", "html_nodes", "read_html")
 importFrom("RODBC", "odbcConnect", "odbcClose", "sqlFetch")
-importFrom("odbc", "odbc")
 importFrom("stats", "formula","na.omit","update", "setNames")
 importFrom("utils", "data","download.file", "getS3method","packageVersion", "unzip","write.csv")
 export(dbhMetric,
@@ -18,6 +17,7 @@ export(dbhMetric,
        fetchNFI,
        getNFI,
        inventoryMetrics,
+       new_external_schema,
        new_volume_method,
        new_concentric_design,
        new_inventory_design,

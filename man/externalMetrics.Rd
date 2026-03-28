@@ -1,69 +1,41 @@
 \name{externalMetrics}
 \alias{externalMetrics}
 \title{Compute tree-level metrics from external inventory data}
-\description{Standardize external tree measurements into basifoR metric
-units and compute requested tree-level outputs for external
-inventory workflows. The function resolves diameter and height
-columns from user-supplied aliases, optionally keeps grouping
-columns in the output, and attaches \code{design} metadata when
-expansion factors are needed downstream.}
-\usage{"\\nexternalMetrics(x, var = c(\\"d\\", \\"h\\", \\"ba\\", \\"n\\", \\"Hd\\"), levels = NULL, design, colmap = list(d = c(\\"d\\", \\"dbh\\", \\"diameter\\", \\"diameter_mm\\"), h = c(\\"h\\", \\"height\\", \\"height_m\\")), d_unit = c(\\"mm\\", \\"cm\\")[1], h_unit = c(\\"m\\", \\"dm\\", \\"cm\\")[1], keep_cols = NULL, domheight_fun = get0(\\"domheight_strict\\", mode = \\"function\\", inherits = TRUE) \\\%||\\\% get0(\\"domheight\\", mode = \\"function\\", inherits = TRUE))\\n"}
+\description{Standardize external tree measurements for external inventory workflows and return requested tree-level metrics in basifoR units.}
+\usage{externalMetrics(x, var = c("d", 
+    "h", "ba", "n", "Hd"), 
+    levels = NULL, design, 
+    colmap = NULL, d_unit = c("mm", 
+        "cm")[1], h_unit = c("m", 
+        "dm", "cm")[1], 
+    keep_cols = NULL, 
+    domheight_fun = NULL)}
 \arguments{
-  \item{x}{A \code{data.frame} with one row per tree or stem. The input
-<< must contain at least the columns needed to resolve the
-<< requested measurements through \code{colmap}.}
-  \item{var}{Character vector of metrics to
-<< return. Supported values are
-<< \code{"d"} for diameter,
-<< \code{"h"} for height,
-<< \code{"ba"} for basal area,
-<< \code{"n"} for trees per
-<< hectare, and \code{"Hd"} for
-<< dominant height. Requesting
-<< \code{"Hd"} also requires
-<< \code{"d"}, \code{"h"}, and
-<< \code{"n"}.}
-  \item{levels}{Optional character vector of grouping columns to
-<< preserve in the output. When \code{"Hd"} is
-<< requested, the function computes dominant height
-<< within groups defined by the resolved columns in
-<< \code{levels} together with \code{keep_cols}.}
-  \item{design}{An object inheriting from \code{"inventory_design"}.
-<< The function uses it to compute expansion factors for
-<< \code{"n"} and to store \code{design} metadata in the result.}
-  \item{colmap}{colmap }
-  \item{d_unit}{Input unit for diameter columns named in
-<< \code{colmap$d}. Returned diameter is
-<< always standardized to millimetres.}
-  \item{h_unit}{Input unit for height columns named
-<< in \code{colmap$h}. Returned height
-<< is always standardized to decimetres.}
-  \item{keep_cols}{Optional character vector of additional columns to
-<< carry into the output without modification. These
-<< columns are also included in the grouping used for
-<< \code{"Hd"} when dominant height is requested.}
-  \item{domheight_fun}{domheight_fun }
+  \item{x}{Input data.frame with one row per tree or stem.}
+  \item{var}{Supported values are \code{"d"}, \code{"h"}, \code{"ba"},
+Requested metrics to return.
+\code{"n"}, and \code{"Hd"}. Requesting \code{"Hd"} also
+Requested metrics to return.
+requires \code{"d"}, \code{"h"}, and \code{"n"}.
+Requested metrics to return.}
+  \item{levels}{Grouping columns to keep in the output.}
+  \item{design}{Inventory \code{design} used to compute expansion factors for \code{n}.}
+  \item{colmap}{Named list of candidate raw column names for diameter and height.
+Matching is case-insensitive and also accepts numeric suffixes such
+as \code{diameter_1} or \code{height.2}.}
+  \item{d_unit}{Unit of raw diameter columns in \code{colmap$d}.}
+  \item{h_unit}{Unit of raw height columns in \code{colmap$h}.}
+  \item{keep_cols}{Additional source columns to carry into the result.}
+  \item{domheight_fun}{Function used when \code{"Hd"} is requested.}
 }
-\details{When \code{var} includes \code{"Hd"}, the function computes
+\details{The function first resolves measurement columns from \code{colmap}. Exact matches are preferred, then case-insensitive matches with optional numeric suffixes are considered. When several repeated measurement columns are found for the same variable, row-wise non-missing means are used.
 
-dominant height after binding the requested output columns and
+Zero values in resolved diameter or height columns are treated as missing before aggregation. Returned units are standardized to millimetres for \code{d}, decimetres for \code{h} and \code{Hd}, square metres per tree for \code{ba}, and trees per hectare for \code{n}.
 
-grouping columns. The dominant-height calculation is applied
+When \code{var} includes \code{"n"}, the function uses \code{design} to obtain expansion factors. Fixed-area designs call \code{trees_per_ha()}, while concentric designs choose the proper factor from the \code{design} thresholds. When \code{var} includes \code{"Hd"}, dominant height is computed within each resolved group defined by \code{levels} and \code{keep_cols}.}
+\value{A data.frame containing the requested tree-level metrics, optionally preceded by resolved grouping columns.
 
-separately within each resolved group.}
-\value{Standardized output columns use these units:
-
-\code{d} in millimetres, \code{h} in decimetres,
-
-\code{ba} in square metres per tree, \code{n} in trees per
-
-hectare, and \code{Hd} in decimetres. A named unit vector is
-
-stored in \code{attr(\code{x}, "units")}. When \code{var} includes
-
-\code{"n"} or \code{"Hd"}, the object also stores sampling
-
-\code{design} information in \code{attr(\code{x}, "design_meta")}.}
+The returned object inherits from classes \code{"externalMetrics"} and \code{"nfiMetrics"}. Unit metadata are stored in \code{attr(out, "units")}. When \code{var} includes \code{"n"} or \code{"Hd"}, the result also stores sampling \code{design} metadata in \code{attr(out, "design_meta")}.}
 
 \author{Wilson Lara <wilarhen@gmail.com> [aut, cre] (ORCID: <https://orcid.org/0000-0003-3527-1380>), Cristobal Ordonez <angelcristobal.ordonez@uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-5354-3760>), Aitor Vázquez-Veloso <aitor.vazquez.veloso@uva.es> [aut] (ORCID: <https://orcid.org/0000-0003-0227-506X>), Felipe Bravo <felipe.bravo@uva.es> [aut] (ORCID: <https://orcid.org/0000-0001-7348-6695>)}
 
@@ -71,7 +43,6 @@ stored in \code{attr(\code{x}, "units")}. When \code{var} includes
 
 
 \examples{
-
 sq_0.1ha <- new_inventory_design(
     sample_area_m2 = 1000,
     min_dbh_cm = 7.5,

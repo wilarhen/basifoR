@@ -5,7 +5,7 @@ inventoryMetrics <- structure(function #Unified dispatcher for inventory workflo
 ### inventories. The function is intentionally thin: it decides which
 ### backend to use, forwards the relevant arguments, and stores the
 ### original call so the result can be updated later with
-### \code{\link[utils]{update}}.
+### \code{\link[basifoR:update.inventoryMetrics]{update}}.
 (
     nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. One
          ##<< inventory input or several inputs accepted by the selected

@@ -8,7 +8,7 @@ inputs or to \code{external_dendroMetrics()} for external
 inventories. The function is intentionally thin: it decides which
 \code{backend} to use, forwards the relevant arguments, and stores the
 original call so the result can be updated later with
-\code{\link[utils]{update}}.}
+\code{\link[basifoR:update.inventoryMetrics]{update}}.}
 \usage{inventoryMetrics(nfi, 
     backend = c("auto", 
         "snfi", "external"), 

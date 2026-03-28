@@ -1,4 +1,4 @@
-# R/internal.R
+><# R/internal.R
 
 has_mdbtools_backend <- function() {
     all(nzchar(Sys.which(c("mdb-tables", "mdb-export"))))
@@ -11,9 +11,9 @@ has_windows_access_driver <- function() {
     TRUE
 }
 
-assert_access_backend <- function(...) {
-    ...
-}
+## assert_access_backend <- function(...) {
+##     ...
+## }
 
 ## `%||%` <- function(x, y) if (is.null(x)) y else x
 null_or <- function(x, y) if (is.null(x)) y else x
@@ -254,9 +254,23 @@ metrics2Vol_legacy <- structure(function#Tree volumes in NFI data
     mmd <- subset(mmd, fc%in%as.factor(cub.met))
     if(!keep.var)
         mmd <- mmd[,!names(mmd)%in%'fc']
-    vun <- getOption('units')[getOption('units')=='v']
-    attr(mmd, 'units') <- c(attr(nfi, 'units'), vun) 
-    mmd <- conv_units(mmd, var = c('d','h','v'), un = c('cm','m','m3'))        
+    ## vun <- getOption('units')[getOption('units')=='v']
+    ## attr(mmd, 'units') <- c(attr(nfi, 'units'), vun) 
+    ## mmd <- conv_units(mmd, var = c('d','h','v'), un = c('cm','m','m3'))        
+
+## fix
+u <- attr(nfi, "units")
+if (is.null(u))
+    u <- c(d = "mm", h = "dm")
+u["v"] <- "dm3"
+attr(mmd, "units") <- u
+
+mmd <- conv_units(
+    mmd,
+    var = c("d", "h", "v"),
+    un  = c("cm", "m", "m3")
+
+
     rownames(mmd) <- NULL
 
 n <- names(mmd)
