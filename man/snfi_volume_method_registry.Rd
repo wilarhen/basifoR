@@ -48,9 +48,13 @@ Each element describes one computation pathway and commonly includes:
 
 
 
-\examples{reg <- snfi_volume_method_registry()
-names(reg)
-reg$VCC$output
-custom <- list(VCC = list(output = 'vcc_m3'))
-reg2 <- snfi_volume_method_registry(custom)
-reg2$VCC$output}
+\examples{
+c(
+    "reg <- snfi_volume_method_registry()",
+    "names(reg)",
+    "reg$VCC$output",
+    "custom <- list(VCC = list(output = 'vcc_m3'))",
+    "reg2 <- snfi_volume_method_registry(custom)",
+    "reg2$VCC$output"
+)
+}
