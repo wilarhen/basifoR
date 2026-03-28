@@ -1,7 +1,7 @@
 Package: basifoR
 Type: Package
 Title: Retrieval and Processing of the Spanish National Forest Inventory
-Version: 0.7.6
+Version: 0.7.7
 Authors@R: 
     c(person(given = "Wilson",
              family = "Lara",

@@ -65,7 +65,7 @@ snfi_volume_method_registry <- structure(function(
 
     utils::modifyList(defaults, equations)
 },
-ex = c(x
+ex = c(
     "reg <- snfi_volume_method_registry()",
     "names(reg)",
     "reg$VCC$output",
@@ -73,3 +73,4 @@ ex = c(x
     "reg2 <- snfi_volume_method_registry(custom)",
     "reg2$VCC$output"
 ))
+
