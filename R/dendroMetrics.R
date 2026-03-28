@@ -88,7 +88,6 @@ nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. A
         ##including \code{nfi.nr} when required.
 
 ) {
-
     call0 <- match.call(expand.dots = TRUE)
 
     finalize_output <- function(out, call) {
@@ -143,13 +142,9 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
         return(nfi)
     }
 
-    summ_cols <- unique(tolower(flev(nfi, summ.vr)))
-
+    summ_cols <- flev(nfi, summ.vr)
     if (!length(summ_cols))
-        stop(
-            "None of the requested 'summ.vr' columns were found in the input.",
-            call. = FALSE
-        )
+        stop("None of 'summ.vr' were found in 'nfi'.", call. = FALSE)
 
     weighted_mean_vars <- intersect(c("d", "h", "hd"), names(nfi))
     sum_vars <- intersect(c("ba", "n", "v", "vcc", "vsc", "iavc", "vle"),
@@ -164,7 +159,7 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
         )
     }
 
-    msp <- split(nfi, nfi[summ_cols])
+    msp <- split(nfi, nfi[summ_cols], drop = TRUE)
     msp <- Filter("nrow", msp)
 
     fsum <- function(dt) {
@@ -209,7 +204,19 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
             !names(dt) %in% unique(c(weighted_mean_vars, sum_vars))
         ]
 
-        keep_cols <- intersect(non_metric_cols, summ_cols)
+        is_group_invariant <- function(x) {
+            x <- x[!is.na(x)]
+            if (!length(x))
+                return(TRUE)
+            length(unique(x)) == 1L
+        }
+
+        invariant_cols <- non_metric_cols[
+            vapply(dt[non_metric_cols], is_group_invariant, logical(1))
+        ]
+
+        id_cols <- intersect(invariant_cols, c("nfi.nr", "pr", "provincia"))
+        keep_cols <- unique(c(id_cols, intersect(non_metric_cols, summ_cols)))
         fcs <- dt[1, keep_cols, drop = FALSE]
 
         cbind(fcs, summ)
@@ -244,8 +251,8 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     resm <- subset(resm, eval(parse(text = cut.dt)))
     rownames(resm) <- NULL
 
-    first <- unique(c("nfi.nr", "pr", summ_cols))
-    i <- match(first, tolower(names(resm)))
+    first <- unique(c("nfi.nr", "pr", "provincia", summ_cols))
+    i <- match(tolower(first), tolower(names(resm)))
     i <- i[!is.na(i)]
     resm <- resm[, c(i, setdiff(seq_along(resm), i)), drop = FALSE]
 
