@@ -21,10 +21,17 @@ export(dbhMetric,
        new_concentric_design,
        new_inventory_design,
        nfiMetrics,
+       print.concentric_design,
+       print.inventory_design,
+       print.external_schema,
        snfi_design,metrics2Vol,
        snfi_volume_method_registry,
        readNFI,
-       trees_per_ha)
+       trees_per_ha,
+       update.external_dendroMetrics,
+       update.dendroMetrics,
+       update.inventoryMetrics,
+       update.list)
 S3method(trees_per_ha, concentric_design)
 S3method(trees_per_ha, inventory_design)
 S3method(print, concentric_design)
