@@ -1,4 +1,4 @@
-><# R/internal.R
+# R/internal.R
 
 has_mdbtools_backend <- function() {
     all(nzchar(Sys.which(c("mdb-tables", "mdb-export"))))
@@ -268,7 +268,7 @@ attr(mmd, "units") <- u
 mmd <- conv_units(
     mmd,
     var = c("d", "h", "v"),
-    un  = c("cm", "m", "m3")
+    un  = c("cm", "m", "m3"))
 
 
     rownames(mmd) <- NULL
