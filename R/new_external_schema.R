@@ -1,18 +1,35 @@
-# Schema support patch for external basifoR workflow
-
-## `%||%` <- function(a, b) if (is.null(a)) b else a
-
-new_external_schema <- function #Define a schema for external inventory workflows
-### Creates a reusable schema that stores column aliases, units, grouping defaults, and columns to keep across the external basifoR workflow. The schema can then be supplied to helper wrappers so repeated mappings do not need to be redefined in every call.
-##title<< Define a schema for external inventory workflows
-##description<< Create a reusable schema with column aliases, units, and default grouping settings for the external basifoR workflow.
+new_external_schema <- structure(function #Define a schema for external inventory workflows
+### Create a reusable \code{"external_schema"} object that records how
+### source columns in an external inventory correspond to the standardized
+### field names used by the basifoR external workflow. The schema can also
+### store declared measurement units, default grouping levels, columns to
+### preserve during processing, and auxiliary defaults that wrapper
+### functions may reuse across repeated calls.
 (
-    colmap,
-    units = list(),
-    levels = NULL,
-    keep_cols = NULL,
-    defaults = list()
+    colmap, ##<< Named \code{list} mapping standardized variables to one or more candidate source column names in the input data.
+    units = list(), ##<< Named \code{list} of declared units for standardized variables, usually entries such as \code{list(d = "mm", h = "m")}.
+    levels = NULL, ##<< Optional \code{character} vector of default grouping variables for downstream summaries.
+    keep_cols = NULL, ##<< Optional \code{character} vector naming source columns that should be retained in downstream outputs.
+    defaults = list() ##<< Optional named \code{list} of auxiliary defaults or metadata that wrappers may reuse.
 ) {
+    ##description<< Create a reusable schema with column aliases, units, default grouping settings, retained columns, and optional defaults for the external basifoR workflow.
+    ##details<<
+    ##details<< The constructor standardizes all mapping entries to
+    ##details<< non-empty character vectors. This lets wrappers search for
+    ##details<< several possible source column names for the same
+    ##details<< standardized variable.
+    ##details<<
+    ##details<< Unit entries are stored as single character values, while
+    ##details<< \code{levels} and \code{keep_cols} are normalized to
+    ##details<< non-empty character vectors. Empty strings and missing
+    ##details<< values are removed during normalization.
+    ##details<<
+    ##details<< The returned object is lightweight. It validates the basic
+    ##details<< structure of the inputs, assigns class
+    ##details<< \code{c("external_schema", "list")}, and leaves semantic
+    ##details<< interpretation to downstream helpers such as
+    ##details<< \code{externalMetrics()}, \code{externalMetrics2Vol()}, or
+    ##details<< \code{external_dendroMetrics()}.
     if (!is.list(colmap) || !length(colmap)) {
         stop("'colmap' must be a non-empty named list.", call. = FALSE)
     }
@@ -44,8 +61,27 @@ new_external_schema <- function #Define a schema for external inventory workflow
     )
     class(schema) <- c("external_schema", "list")
     schema
-    ##value<< An object of class \code{"external_schema"} containing normalized column mappings, unit declarations, grouping defaults, retained columns, and optional defaults.
-}
+    ##value<< An object of class \code{"external_schema"} containing normalized \code{colmap}, \code{units}, \code{levels}, \code{keep_cols}, and \code{defaults} components, ready to pass to external workflow wrappers.
+}, ex = function() {
+    sch <- new_external_schema(
+        colmap = list(
+            plot = c("plot_id", "plot"),
+            species = c("species_code", "sp"),
+            d = c("dbh_mm", "diameter_mm"),
+            h = c("height_m", "h")
+        ),
+        units = list(d = "mm", h = "m"),
+        levels = "plot",
+        keep_cols = c("plot_id", "species_code"),
+        defaults = list(selector = "priority")
+    )
+
+    class(sch)
+    sch$colmap$d
+    sch$units
+    sch$levels
+})
+
 
 print.external_schema <- function #Print an external schema summary
 ##title<< Print an external schema summary
