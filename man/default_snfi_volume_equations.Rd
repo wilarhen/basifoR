@@ -1,12 +1,12 @@
 \name{default_snfi_volume_equations}
 \alias{default_snfi_volume_equations}
 \title{Default SNFI volume-equation methods}
-\description{Return the default SNFI volume-equation registry.
-
-Creates the default set of method definitions used by `metrics2Vol()`
-to compute tree-level volume variables. Each registry entry describes
-how one output is computed, including the target column name, equation
-function, unit conversion, argument builder, and fallback rule.}
+\description{Return the default SNFI volume-equation registry.  Creates the
+default set of method definitions used by `metrics2Vol()` to
+compute tree-level volume variables. Each registry entry describes
+how one output is computed, including the target column name,
+equation function, unit conversion, argument builder, and fallback
+rule.}
 \usage{default_snfi_volume_equations()}
 
 
