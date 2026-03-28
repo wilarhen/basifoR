@@ -1,6 +1,6 @@
 externalMetrics2Vol <- structure(function
-##description<< Compute one or more tree-level volume outputs from external inventory data or from a precomputed \code{"externalMetrics"} object. The function resolves the required inputs for the selected methods, standardizes units, optionally derives missing tree metrics with \code{externalMetrics()}, evaluates registry-based volume methods, converts raw results to cubic metres, and can retain provenance metadata for each returned output.
 ##title<< Compute tree-level volume outputs from external inventory data
+##description<< Compute one or more tree-level volume outputs from external inventory data or from a precomputed \code{"externalMetrics"} object. The function resolves the required inputs for the selected methods, standardizes units, optionally derives missing tree metrics with \code{externalMetrics()}, evaluates registry-based volume methods, converts raw results to cubic metres, and can retain provenance metadata for each returned output.
 (
     x, ##<< A \code{data.frame} with external tree records, or a precomputed \code{"externalMetrics"} object. Standardized input columns such as \code{d}, \code{h}, \code{dnm}, or \code{v} must carry named unit metadata in \code{attr(x, "units")}.
     parametro = c("V"), ##<< Character vector of requested volume outputs. Values must match method names in \code{method_registry}; with the default registry these are typically \code{"V"}, \code{"VCC"}, and \code{"VSC"}.

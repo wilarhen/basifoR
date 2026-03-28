@@ -1,9 +1,11 @@
-externalMetrics <- structure(function #Compute tree-level metrics from external inventory data
-### Standardize external tree measurements into basifoR metric units and
-### compute requested tree-level outputs for external inventory workflows.
-### The function resolves diameter and height columns from user-supplied
-### aliases, optionally keeps grouping columns in the output, and attaches
-### design metadata when expansion factors are needed downstream.
+externalMetrics <- structure(function
+##title<< Compute tree-level metrics from external inventory data
+##description<< Standardize external tree measurements into basifoR
+##metric units and compute requested tree-level outputs for external
+##inventory workflows.  The function resolves diameter and height
+##columns from user-supplied aliases, optionally keeps grouping
+##columns in the output, and attaches design metadata when expansion
+##factors are needed downstream.
 (
     x, ##<< A \code{data.frame} with one row per tree or stem. The input
        ##<< must contain at least the columns needed to resolve the
