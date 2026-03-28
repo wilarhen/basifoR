@@ -1,67 +1,52 @@
-externalMetrics <- structure(function
-##title<< Compute tree-level metrics from external inventory data
-##description<< Standardize external tree measurements into basifoR
-##metric units and compute requested tree-level outputs for external
-##inventory workflows.  The function resolves diameter and height
-##columns from user-supplied aliases, optionally keeps grouping
-##columns in the output, and attaches design metadata when expansion
-##factors are needed downstream.
+externalMetrics <- structure(function # Compute tree-level metrics from external inventory data
+### Standardize external tree measurements into basifoR metric units and
+### compute requested tree-level outputs for external inventory workflows.
+### The function resolves diameter and height columns from user-supplied
+### aliases, optionally preserves grouping columns, and attaches design
+### metadata when expansion factors are needed downstream.
 (
-    x, ##<< A \code{data.frame} with one row per tree or stem. The input
-       ##<< must contain at least the columns needed to resolve the
-       ##<< requested measurements through \code{colmap}.
-    var = c("d", "h", "ba", "n", "Hd"), ##<< Character vector of metrics to
-                                             ##<< return. Supported values are
-                                             ##<< \code{"d"} for diameter,
-                                             ##<< \code{"h"} for height,
-                                             ##<< \code{"ba"} for basal area,
-                                             ##<< \code{"n"} for trees per
-                                             ##<< hectare, and \code{"Hd"} for
-                                             ##<< dominant height. Requesting
-                                             ##<< \code{"Hd"} also requires
-                                             ##<< \code{"d"}, \code{"h"}, and
-                                             ##<< \code{"n"}.
-    levels = NULL, ##<< Optional character vector of grouping columns to
-                   ##<< preserve in the output. When \code{"Hd"} is
-                   ##<< requested, the function computes dominant height
-                   ##<< within groups defined by the resolved columns in
-                   ##<< \code{levels} together with \code{keep_cols}.
-    design, ##<< An object inheriting from \code{"inventory_design"}.
-            ##<< The function uses it to compute expansion factors for
-            ##<< \code{"n"} and to store design metadata in the result.
+    x,
+### A \code{data.frame} with one row per tree or stem. The input must
+### contain the columns needed to resolve the requested measurements
+### through \code{colmap}.
+    var = c("d", "h", "ba", "n", "Hd"),
+### Character vector of metrics to return. Supported values are
+### \code{"d"} for diameter, \code{"h"} for height, \code{"ba"}
+### for basal area, \code{"n"} for trees per hectare, and \code{"Hd"}
+### for dominant height. Requesting \code{"Hd"} also requires
+### \code{"d"}, \code{"h"}, and \code{"n"}.
+    levels = NULL,
+### Optional character vector of grouping columns to preserve in the
+### output. When \code{"Hd"} is requested, the function computes dominant
+### height within groups defined by the resolved columns in
+### \code{levels} together with \code{keep_cols}.
+    design,
+### An object inheriting from \code{"inventory_design"}. The function
+### uses it to compute expansion factors for \code{"n"} and to store
+### design metadata in the result.
     colmap = list(
         d = c("d", "dbh", "diameter", "diameter_mm"),
         h = c("h", "height", "height_m")
-    ), ##<< Named list of candidate input column names. Element
-        ##<< \code{d} lists aliases for diameter columns and element
-        ##<< \code{h} lists aliases for height columns. The function
-        ##<< resolves names case-insensitively and also matches numbered
-        ##<< suffixes such as \code{diameter_1} and \code{diameter_2}.
-    d_unit = c("mm", "cm")[1], ##<< Input unit for diameter columns named in
-                                ##<< \code{colmap$d}. Returned diameter is
-                                ##<< always standardized to millimetres.
-    h_unit = c("m", "dm", "cm")[1], ##<< Input unit for height columns named
-                                     ##<< in \code{colmap$h}. Returned height
-                                     ##<< is always standardized to decimetres.
-    keep_cols = NULL, ##<< Optional character vector of additional columns to
-                      ##<< carry into the output without modification. These
-                      ##<< columns are also included in the grouping used for
-                      ##<< \code{"Hd"} when dominant height is requested.
+    ),
+### Named list of candidate input column names. Element \code{d} lists
+### aliases for diameter columns and element \code{h} lists aliases for
+### height columns. The function resolves names case-insensitively and
+### also matches numbered suffixes such as \code{diameter_1} and
+### \code{diameter_2}.
+    d_unit = c("mm", "cm")[1],
+### Input unit for diameter columns named in \code{colmap$d}. Returned
+### diameter is always standardized to millimetres.
+    h_unit = c("m", "dm", "cm")[1],
+### Input unit for height columns named in \code{colmap$h}. Returned
+### height is always standardized to decimetres.
+    keep_cols = NULL,
+### Optional character vector of additional columns to carry into the
+### output without modification. These columns are also included in the
+### grouping used for \code{"Hd"} when dominant height is requested.
     domheight_fun = get0("domheight_strict", mode = "function", inherits = TRUE) %||%
-        get0("domheight", mode = "function", inherits = TRUE) ##<< Function
-                                                               ##<< used to
-                                                               ##<< compute
-                                                               ##<< dominant
-                                                               ##<< height from
-                                                               ##<< \code{h},
-                                                               ##<< \code{d},
-                                                               ##<< and
-                                                               ##<< \code{n}.
-                                                               ##<< This is only
-                                                               ##<< required
-                                                               ##<< when
-                                                               ##<< \code{"Hd"}
-                                                               ##<< is requested.
+        get0("domheight", mode = "function", inherits = TRUE)
+### Function used to compute dominant height from \code{h}, \code{d},
+### and \code{n}. This is only required when \code{"Hd"} is requested.
 ) {
     ##details<<
     ##details<< The function first resolves measurement columns from
@@ -358,18 +343,18 @@ externalMetrics <- structure(function
 
     class(out) <- unique(c("externalMetrics", "nfiMetrics", class(out)))
     out
-    ##value<< A \code{data.frame} containing the requested tree-level
-    ##value<< metrics, optionally preceded by resolved grouping columns.
-    ##value<< The returned object inherits from \code{"externalMetrics"}
-    ##value<< and \code{"nfiMetrics"}.
-    ##value<<
-    ##value<< Standardized output columns use these units:
-    ##value<< \code{d} in millimetres, \code{h} in decimetres,
-    ##value<< \code{ba} in square metres per tree, \code{n} in trees per
-    ##value<< hectare, and \code{Hd} in decimetres. A named unit vector is
-    ##value<< stored in \code{attr(x, "units")}. When \code{var} includes
-    ##value<< \code{"n"} or \code{"Hd"}, the object also stores sampling
-    ##value<< design information in \code{attr(x, "design_meta")}.
+### A \code{data.frame} containing the requested tree-level metrics,
+### optionally preceded by resolved grouping columns. The returned
+### object inherits from \code{"externalMetrics"} and
+### \code{"nfiMetrics"}.
+###
+### Standardized output columns use these units: \code{d} in
+### millimetres, \code{h} in decimetres, \code{ba} in square metres
+### per tree, \code{n} in trees per hectare, and \code{Hd} in
+### decimetres. A named unit vector is stored in
+### \code{attr(x, "units")}. When \code{var} includes \code{"n"}
+### or \code{"Hd"}, the object also stores sampling design
+### information in \code{attr(x, "design_meta")}.
 }, ex = function() {
 
     sq_0.1ha <- new_inventory_design(
