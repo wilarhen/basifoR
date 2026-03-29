@@ -10,6 +10,7 @@ also process data frames previously returned by
 \code{\link{metrics2Vol}}. Dendrometric variables in the output
 are transformed into stand units, see Details section.}
 \usage{dendroMetrics(nfi, summ.vr = "Estadillo", 
+    metric_levels = NULL, 
     cut.dt = "d == d", 
     report = FALSE, mc.cores = getOption("mc.cores", 
         1L), ...)}
@@ -29,6 +30,11 @@ data used to summarize the outputs. If
 \code{\link{metrics2Vol}} is
 returned. Default \code{'Estadillo'}
 processes sample plots.}
+  \item{metric_levels}{\code{character} or \code{NULL}. Grouping
+variables used to compute tree-level
+metrics such as \code{Hd} before final
+summarization. When \code{NULL}, metric
+computation follows \code{summ.vr}.}
   \item{cut.dt}{\code{character}. Logical condition used
 to subset the output. Default \code{'d == d'}
 avoids subsetting.}
@@ -131,13 +137,13 @@ attr(dendromet_ifn4p45,'units')
 ## Alternatively, download data from 'www.miteco.gob.es'
 ## Specify province name/number to compute dendrometrics:
 
-## donttest{
-### Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
-## dendromet_ifn4p45 <- dendroMetrics(provincia=45,nfi=4,cut.dt='h >= 8')
-### Display first few rows
-## head(dendromet_ifn4p45)
-### Check units of metrics
-## attr(dendromet_ifn4p45,'units')
-## }
+\donttest{
+# Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
+dendromet_ifn4p45 <- dendroMetrics('toledo',nfi.nr =4,cut.dt='h >= 8')
+# Display first few rows
+head(dendromet_ifn4p45)
+# Check units of metrics
+attr(dendromet_ifn4p45,'units')
+}
     
 }

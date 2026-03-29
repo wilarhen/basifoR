@@ -660,7 +660,7 @@ attr(dendromet_ifn4p45,'units')
 
 ## donttest{
 ### Compute dendrometrics for Toledo (code 45) for NFI 4, height >= 8
-## dendromet_ifn4p45 <- dendroMetrics(provincia=45,nfi=4,cut.dt='h >= 8')
+## dendromet_ifn4p45 <- dendroMetrics('toledo',nfi.nr=4,cut.dt='h >= 8')
 ### Display first few rows
 ## head(dendromet_ifn4p45)
 ### Check units of metrics
