@@ -75,6 +75,11 @@ nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. A
                            ##\code{\link{metrics2Vol}} is
                            ##returned. Default \code{'Estadillo'}
                            ##processes sample plots.
+    metric_levels = NULL, ##<< \code{character} or \code{NULL}. Grouping
+                          ## variables used to compute tree-level
+                          ## metrics such as \code{Hd} before final
+                          ## summarization. When \code{NULL}, metric
+                          ## computation follows \code{summ.vr}.
     cut.dt = 'd == d', ##<< \code{character}. Logical condition used
                        ##to subset the output. Default \code{'d == d'}
                        ##avoids subsetting.
@@ -99,7 +104,7 @@ nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. A
         out
     }
 
-dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
+dendro_one <- function(nfi, summ.vr, metric_levels, cut.dt, report, ...) {
     nfi. <- nfi
     if (is.null(nfi.))
         return(nfi)
@@ -146,9 +151,56 @@ dendro_one <- function(nfi, summ.vr, cut.dt, report, ...) {
     if (!length(summ_cols))
         stop("None of 'summ.vr' were found in 'nfi'.", call. = FALSE)
 
+    metric_cols <- if (is.null(metric_levels)) {
+        summ_cols
+    } else {
+        flev(nfi, metric_levels)
+    }
+    if (!length(metric_cols))
+        stop("None of 'metric_levels' were found in 'nfi'.", call. = FALSE)
+
     weighted_mean_vars <- intersect(c("d", "h", "hd"), names(nfi))
     sum_vars <- intersect(c("ba", "n", "v", "vcc", "vsc", "iavc", "vle"),
                           names(nfi))
+
+    if (length(unique(c(weighted_mean_vars, sum_vars))) && !"n" %in% names(nfi)) {
+        stop(
+            "Summarization requires column 'n' (trees/ha). ",
+            "Provide raw data or processed input that includes 'n'.",
+            call. = FALSE
+        )
+    }
+
+    if ("hd" %in% names(nfi) && all(c("d", "h", "n") %in% names(nfi))) {
+        domheight_fun <- get0("domheight_strict", mode = "function", inherits = TRUE)
+        if (is.null(domheight_fun))
+            domheight_fun <- get0("domheight", mode = "function", inherits = TRUE)
+
+        if (!is.null(domheight_fun)) {
+            ok_hd <- !is.na(nfi$d) & !is.na(nfi$h) & !is.na(nfi$n) &
+                is.finite(nfi$d) & is.finite(nfi$h) & is.finite(nfi$n) &
+                nfi$n > 0
+
+            hd_new <- rep(NA_real_, nrow(nfi))
+            if (any(ok_hd)) {
+                grp_hd <- interaction(
+                    nfi[ok_hd, metric_cols, drop = FALSE],
+                    drop = TRUE,
+                    lex.order = TRUE
+                )
+                idx_hd <- split(which(ok_hd), grp_hd, drop = TRUE)
+
+                for (idx in idx_hd) {
+                    hd_val <- tryCatch(
+                        domheight_fun(h = nfi$h[idx], d = nfi$d[idx], n = nfi$n[idx]),
+                        error = function(e) NA_real_
+                    )
+                    hd_new[idx] <- hd_val
+                }
+            }
+            nfi$hd <- hd_new
+        }
+    }
 
     mean_target_units <- c(d = "cm", h = "m", hd = "m")
     if (length(weighted_mean_vars)) {
@@ -344,6 +396,7 @@ run_job <- function(job) {
                 list(
                     nfi = job$nfi,
                     summ.vr = summ.vr,
+                    metric_levels = metric_levels,
                     cut.dt = cut.dt,
                     report = FALSE
                 ),
@@ -370,6 +423,7 @@ run_job <- function(job) {
                 list(
                     nfi = jobs[[1]]$nfi,
                     summ.vr = summ.vr,
+                    metric_levels = metric_levels,
                     cut.dt = cut.dt,
                     report = report
                 ),
@@ -462,7 +516,7 @@ run_job <- function(job) {
 
         parallel::clusterExport(
             cl = cl,
-            varlist = c("jobs", "run_job", "dendro_one", "summ.vr", "cut.dt"),
+            varlist = c("jobs", "run_job", "dendro_one", "summ.vr", "metric_levels", "cut.dt"),
             envir = environment()
         )
 
