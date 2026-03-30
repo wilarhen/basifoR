@@ -6,7 +6,7 @@ importFrom("measurements", "conv_unit")
 importFrom("rvest", "html_attr", "html_nodes", "read_html")
 importFrom("RODBC", "odbcConnect", "odbcClose", "sqlFetch")
 importFrom("stats", "formula","na.omit","update", "setNames")
-importFrom("utils", "data","download.file", "getS3method","packageVersion", "unzip","write.csv")
+importFrom("utils", "data","download.file","getFromNamespace", "getS3method","packageVersion", "unzip","write.csv")
 export(dbhMetric,
        default_external_volume_methods,
        default_snfi_volume_equations,
