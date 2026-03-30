@@ -48,6 +48,17 @@ nfiMetrics <- structure(function#Tree-level metrics for Spanish NFI inputs
         ##<< \code{nfi} is not already a \code{"readNFI"} object.
 
 ) {
+    ns_fun <- function(name) {
+        fn <- get0(name, mode = "function", inherits = TRUE)
+        if (is.null(fn)) {
+            fn <- tryCatch(
+                getFromNamespace(name, "basifoR"),
+                error = function(e) NULL
+            )
+        }
+        fn
+    }
+
     ##details<< When \code{nfi} is not already a \code{"readNFI"}
     ##details<< object, \code{nfiMetrics()} first calls
     ##details<< \code{\link{readNFI}(nfi, ...)}.
@@ -155,7 +166,7 @@ nfiMetrics <- structure(function#Tree-level metrics for Spanish NFI inputs
             return(NULL)
 
         x <- dt[, cols, drop = FALSE]
-        x <- lapply(x, function(z) as.numeric(as.character(z)))
+        x <- lapply(x, function(z) suppressWarnings(as.numeric(as.character(z))))
         x <- as.data.frame(x, check.names = FALSE,
                            stringsAsFactors = FALSE)
         as.matrix(x)
@@ -287,7 +298,11 @@ nfiMetrics <- structure(function#Tree-level metrics for Spanish NFI inputs
 
     id_cols <- match_cols(c('nfi.nr', 'pr'), nm_all)
 
-    nms_raw <- flev(nfi, levels)
+    flev_fun <- ns_fun("flev")
+    if (is.null(flev_fun))
+        stop("Could not resolve internal helper 'flev'.", call. = FALSE)
+
+    nms_raw <- flev_fun(nfi, levels)
     nms_raw <- nms_raw[!is.na(nms_raw)]
     nms <- match_cols(nms_raw, nm_all)
 
@@ -310,7 +325,12 @@ nfiMetrics <- structure(function#Tree-level metrics for Spanish NFI inputs
             stop(paste0('Hd: missing variables: var = c(', nd, '?, ...)'))
         spl <- split(dmt, dmt[, nms], drop = TRUE)
         dmhe <- Map(function(y)
-            cbind(y, Hd = tryCatch(domheight(y$'h', y$'d', y$'n'),
+            cbind(y, Hd = tryCatch({
+                domheight_fun <- ns_fun("domheight")
+                if (is.null(domheight_fun))
+                    stop("Could not resolve internal helper 'domheight'.", call. = FALSE)
+                domheight_fun(y$'h', y$'d', y$'n')
+            },
                                    error = function(e) NA)), spl)
         dmt <- do.call('rbind', dmhe)
         rownames(dmt) <- NULL
@@ -318,7 +338,11 @@ nfiMetrics <- structure(function#Tree-level metrics for Spanish NFI inputs
 
     ## Restore attributes, attach unit metadata, and set the output class.
     attr(dmt, 'nfi.nr') <- nfi_nr
-    dmt <- conv_units(dmt)
+    conv_units_fun <- ns_fun("conv_units")
+    if (is.null(conv_units_fun))
+        stop("Could not resolve internal helper 'conv_units'.", call. = FALSE)
+
+    dmt <- conv_units_fun(dmt)
 
 metric_units <- c(
     d  = "mm",

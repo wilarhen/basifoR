@@ -104,6 +104,18 @@ nfi, ##<< \code{character}, \code{data.frame}, or \code{list}. A
         out
     }
 
+    ns_fun <- function(name) {
+        fn <- get0(name, mode = "function", inherits = TRUE)
+        if (is.null(fn)) {
+            fn <- tryCatch(
+                getFromNamespace(name, "basifoR"),
+                error = function(e) NULL
+            )
+        }
+        fn
+    }
+
+
 dendro_one <- function(nfi, summ.vr, metric_levels, cut.dt, report, ...) {
     nfi. <- nfi
     if (is.null(nfi.))
@@ -147,14 +159,18 @@ dendro_one <- function(nfi, summ.vr, metric_levels, cut.dt, report, ...) {
         return(nfi)
     }
 
-    summ_cols <- flev(nfi, summ.vr)
+    flev_fun <- ns_fun("flev")
+    if (is.null(flev_fun))
+        stop("Could not resolve internal helper 'flev'.", call. = FALSE)
+
+    summ_cols <- flev_fun(nfi, summ.vr)
     if (!length(summ_cols))
         stop("None of 'summ.vr' were found in 'nfi'.", call. = FALSE)
 
     metric_cols <- if (is.null(metric_levels)) {
         summ_cols
     } else {
-        flev(nfi, metric_levels)
+        flev_fun(nfi, metric_levels)
     }
     if (!length(metric_cols))
         stop("None of 'metric_levels' were found in 'nfi'.", call. = FALSE)
@@ -172,9 +188,9 @@ dendro_one <- function(nfi, summ.vr, metric_levels, cut.dt, report, ...) {
     }
 
     if ("hd" %in% names(nfi) && all(c("d", "h", "n") %in% names(nfi))) {
-        domheight_fun <- get0("domheight_strict", mode = "function", inherits = TRUE)
+        domheight_fun <- ns_fun("domheight_strict")
         if (is.null(domheight_fun))
-            domheight_fun <- get0("domheight", mode = "function", inherits = TRUE)
+            domheight_fun <- ns_fun("domheight")
 
         if (!is.null(domheight_fun)) {
             ok_hd <- !is.na(nfi$d) & !is.na(nfi$h) & !is.na(nfi$n) &
@@ -204,7 +220,11 @@ dendro_one <- function(nfi, summ.vr, metric_levels, cut.dt, report, ...) {
 
     mean_target_units <- c(d = "cm", h = "m", hd = "m")
     if (length(weighted_mean_vars)) {
-        nfi <- conv_units(
+        conv_units_fun <- ns_fun("conv_units")
+        if (is.null(conv_units_fun))
+            stop("Could not resolve internal helper 'conv_units'.", call. = FALSE)
+
+        nfi <- conv_units_fun(
             nfi,
             var = weighted_mean_vars,
             un = unname(mean_target_units[weighted_mean_vars])
@@ -384,7 +404,15 @@ vol_vars <- intersect(c("v", "vcc", "vsc", "iavc", "vle"), names(resm))
         names(dots_i) <- dot_names
         if (!is.null(nfi.nr_list[[i]]))
             dots_i[["nfi.nr"]] <- nfi.nr_list[[i]]
-        list(nfi = nfi_list[[i]], dots = dots_i)
+
+        list(
+            nfi = nfi_list[[i]],
+            input_label = paste0(
+                "nfi=", paste(nfi_list[[i]], collapse = ", "),
+                ", nfi.nr=", paste(nfi.nr_list[[i]], collapse = ", ")
+            ),
+            dots = dots_i
+        )
     })
 
 
@@ -407,6 +435,7 @@ run_job <- function(job) {
             structure(
                 list(
                     message = conditionMessage(e),
+                    input_label = job$input_label,
                     nfi = job$nfi,
                     nfi.nr = job$dots[["nfi.nr"]]
                 ),
@@ -492,10 +521,8 @@ run_job <- function(job) {
         if (any(preload_errs)) {
             msg <- vapply(jobs[preload_errs], function(x) {
                 paste0(
-                    "dendroMetrics failed while preloading nfi = ",
-                    paste(x$nfi, collapse = ", "),
-                    ", nfi.nr = ",
-                    paste(x$nfi.nr, collapse = ", "),
+                    "dendroMetrics failed while preloading ",
+                    x$input_label,
                     ": ",
                     x$message
                 )
@@ -513,6 +540,11 @@ run_job <- function(job) {
 
         cl <- parallel::makeCluster(mc.cores)
         on.exit(parallel::stopCluster(cl), add = TRUE)
+
+        parallel::clusterEvalQ(cl, {
+            suppressPackageStartupMessages(library(basifoR))
+            NULL
+        })
 
         parallel::clusterExport(
             cl = cl,
@@ -536,10 +568,8 @@ errs <- vapply(res_list, inherits, logical(1), what = "dendroMetrics_error")
 if (any(errs)) {
     msg <- vapply(res_list[errs], function(x) {
         paste0(
-            "dendroMetrics failed for nfi = ",
-            paste(x$nfi, collapse = ", "),
-            ", nfi.nr = ",
-            paste(x$nfi.nr, collapse = ", "),
+            "dendroMetrics failed for ",
+            x$input_label,
             ": ",
             x$message
         )
