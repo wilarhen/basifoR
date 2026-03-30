@@ -399,6 +399,25 @@ vol_vars <- intersect(c("v", "vcc", "vsc", "iavc", "vle"), names(resm))
     })
     names(dot_lists) <- dot_names
 
+    describe_job_input <- function(x) {
+        if (is.null(x))
+            return("NULL")
+
+        if (is.atomic(x) && !is.list(x))
+            return(paste(as.character(x), collapse = ", "))
+
+        if (is.data.frame(x)) {
+            cls <- paste(class(x), collapse = "/")
+            nr <- tryCatch(nrow(x), error = function(e) NA_integer_)
+            nc <- tryCatch(ncol(x), error = function(e) NA_integer_)
+            return(paste0("<", cls, ":", nr, "x", nc, ">"))
+        }
+
+        cls <- paste(class(x), collapse = "/")
+        len <- tryCatch(length(x), error = function(e) NA_integer_)
+        paste0("<", cls, ":length=", len, ">")
+    }
+
     jobs <- lapply(seq_len(n_inputs), function(i) {
         dots_i <- lapply(dot_lists, function(x) x[[i]])
         names(dots_i) <- dot_names
@@ -408,8 +427,8 @@ vol_vars <- intersect(c("v", "vcc", "vsc", "iavc", "vle"), names(resm))
         list(
             nfi = nfi_list[[i]],
             input_label = paste0(
-                "nfi=", paste(nfi_list[[i]], collapse = ", "),
-                ", nfi.nr=", paste(nfi.nr_list[[i]], collapse = ", ")
+                "nfi=", describe_job_input(nfi_list[[i]]),
+                ", nfi.nr=", describe_job_input(nfi.nr_list[[i]])
             ),
             dots = dots_i
         )
@@ -508,6 +527,7 @@ run_job <- function(job) {
                     structure(
                         list(
                             message = conditionMessage(e),
+                            input_label = job$input_label,
                             nfi = job$nfi,
                             nfi.nr = job$dots[["nfi.nr"]]
                         ),
@@ -520,9 +540,10 @@ run_job <- function(job) {
         preload_errs <- vapply(jobs, inherits, logical(1), what = "dendroMetrics_error")
         if (any(preload_errs)) {
             msg <- vapply(jobs[preload_errs], function(x) {
+                label <- if (is.null(x$input_label)) "<input>" else x$input_label
                 paste0(
                     "dendroMetrics failed while preloading ",
-                    x$input_label,
+                    label,
                     ": ",
                     x$message
                 )
@@ -567,9 +588,10 @@ errs <- vapply(res_list, inherits, logical(1), what = "dendroMetrics_error")
 
 if (any(errs)) {
     msg <- vapply(res_list[errs], function(x) {
+        label <- if (is.null(x$input_label)) "<input>" else x$input_label
         paste0(
             "dendroMetrics failed for ",
-            x$input_label,
+            label,
             ": ",
             x$message
         )
