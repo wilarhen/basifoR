@@ -248,8 +248,66 @@ readNFI <- structure(function
     if (is_csv(imp))
         return(read_csv_files(imp))
 
+    connect_access_windows <- function(path) {
+        ext <- tolower(tools::file_ext(path))
+
+        try_open <- function(open_fun) {
+            tryCatch(
+                suppressWarnings(open_fun(path, rows_at_time = 1)),
+                error = function(e) NULL
+            )
+        }
+
+        if (identical(ext, "accdb")) {
+            con <- try_open(RODBC::odbcConnectAccess2007)
+            if (is.null(con)) {
+                stop(
+                    paste(
+                        "Could not open Access file:",
+                        basename(path),
+                        "with RODBC::odbcConnectAccess2007()."
+                    ),
+                    call. = FALSE
+                )
+            }
+            return(con)
+        }
+
+        if (identical(ext, "mdb")) {
+            con <- try_open(RODBC::odbcConnectAccess)
+            if (!is.null(con))
+                return(con)
+
+            con <- try_open(RODBC::odbcConnectAccess2007)
+            if (!is.null(con))
+                return(con)
+
+            stop(
+                paste(
+                    "Could not open Access file:",
+                    basename(path),
+                    "The file appears to be a legacy .mdb that the available Windows Access driver cannot read.",
+                    "Try converting it to .accdb or CSV, or read it on a Unix-like system with mdbtools."
+                ),
+                call. = FALSE
+            )
+        }
+
+        stop(
+            "Internal error: unsupported Access extension. Expected '.mdb' or '.accdb'.",
+            call. = FALSE
+        )
+    }
+
     fwin <- function(x, dt.nm) {
-        ife <- RODBC::odbcConnectAccess2007(x, rows_at_time = 1)
+        if (length(x) != 1L) {
+            stop(
+                "Windows Access import expects a single '.mdb' or '.accdb' file.",
+                call. = FALSE
+            )
+        }
+
+        ife <- connect_access_windows(x)
         on.exit(RODBC::odbcClose(ife))
         ifc <- Map(function(x)
             RODBC::sqlFetch(ife, sqtable = x), dt.nm)
