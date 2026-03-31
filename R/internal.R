@@ -936,10 +936,12 @@ return(status_code)
         fapp = 'mcmapply',
         dt.ext = c('mdb','DBF', 'accdb'),
         units = units.,
-        units1 = units..)
-toset <- !(names(op.FC) %in% names(op))
-  if(any(toset)) options(op.FC[toset])
-invisible()
+        units1 = units..,
+        basifoR.units.tree = units.,
+        basifoR.units.stand = units..)
+    toset <- !(names(op.FC) %in% names(op))
+    if(any(toset)) options(op.FC[toset])
+    invisible()
 }
 
 basifoR_figlet <- function(){
@@ -957,11 +959,28 @@ cat(vrs)
 
 
 conv_units <- function(nfi, var = c("d", "h"), un = c("cm", "m")) {
-    units. <- getOption("units")
-    if (!is.null(attr(nfi, "units")))
-        units. <- attr(nfi, "units")
+    units. <- attr(nfi, "units")
+
+    if (is.null(units.)) {
+        units. <- getOption("basifoR.units.tree")
+
+        legacy_units <- getOption("units")
+        if (!is.null(legacy_units) && !is.null(names(legacy_units))) {
+            overlaps <- names(legacy_units) %in% names(nfi)
+            if (any(overlaps))
+                units. <- legacy_units
+        }
+    }
+
+    if (is.null(units.) || is.null(names(units.)))
+        return(nfi)
 
     cols <- names(units.)[names(units.) %in% names(nfi)]
+    if (!length(cols)) {
+        attr(nfi, "units") <- units.[0]
+        return(nfi)
+    }
+
     units_ini <- units_out <- unname(units.[cols])
 
     pos. <- match(var, cols)
@@ -1268,8 +1287,20 @@ return(parsed.)}
 ## parsed. <- insert_ifn_ifn4(parsed.)
 ## return(parsed.)}
 
-units. <- c('d','h','ba','n','Hd','v')
-names(units.) <- c('mm','m','m2','','m','dm3')
+units. <- c(
+    d = 'mm',
+    h = 'dm',
+    ba = 'm2 tree-1',
+    n = 'ha-1',
+    Hd = 'dm',
+    v = 'm3 tree-1'
+)
 
-units.. <- units.
-names(units..) <- c('cm','m','m2','','m','m3')
+units.. <- c(
+    d = 'cm',
+    h = 'm',
+    ba = 'm2 ha-1',
+    n = 'ha-1',
+    Hd = 'm',
+    v = 'm3 ha-1'
+)
