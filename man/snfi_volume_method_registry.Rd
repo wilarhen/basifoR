@@ -31,7 +31,7 @@ Each element describes one computation pathway and commonly includes:
 
 \item{\code{fun_name}}{Name of the equation helper called at run time, or \code{NULL} for direct passthrough methods.}
 
-\item{\code{unit}}{Returned unit after scaling, usually \code{"m3"}.}
+\item{\code{unit}}{Returned unit after scaling, usually \code{"m3 tree-1"}.}
 
 \item{\code{raw_unit}}{Unit returned by the underlying equation before scaling.}
 
