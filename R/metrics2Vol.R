@@ -656,9 +656,9 @@ need_legacy <- keep.legacy || "V" %in% parametro
             ))[1L]
 
             if (is.na(hit))
-                return("m3")
+                return("m3 tree-1")
 
-            method_registry[[hit]]$unit %||% "m3"
+            method_registry[[hit]]$unit %||% "m3 tree-1"
         },
         character(1)
     )
@@ -690,7 +690,7 @@ need_legacy <- keep.legacy || "V" %in% parametro
                         param = param,
                         output = def$output %||% tolower(param),
                         raw_unit = def$raw_unit %||% NA_character_,
-                        returned_unit = def$unit %||% "m3",
+                        returned_unit = def$unit %||% "m3 tree-1",
                         scale_to_m3 = def$scale_to_m3 %||% (1 / 1000)
                     )
                 }
