@@ -338,21 +338,16 @@ nfiMetrics <- structure(function#Tree-level metrics for Spanish NFI inputs
 
     ## Restore attributes, attach unit metadata, and set the output class.
     attr(dmt, 'nfi.nr') <- nfi_nr
-    conv_units_fun <- ns_fun("conv_units")
-    if (is.null(conv_units_fun))
-        stop("Could not resolve internal helper 'conv_units'.", call. = FALSE)
 
-    dmt <- conv_units_fun(dmt)
+    metric_units <- c(
+        d  = "mm",
+        h  = "dm",
+        ba = "m2 tree-1",
+        n  = "ha-1",
+        Hd = "dm"
+    )
 
-metric_units <- c(
-    d  = "mm",
-    h  = "dm",
-    ba = "m2",
-    n  = "",
-    Hd = "dm"
-)
-
-attr(dmt, "units") <- metric_units[intersect(names(dmt), names(metric_units))]
+    attr(dmt, "units") <- metric_units[intersect(names(dmt), names(metric_units))]
 
     if (any(var %in% c("n", "Hd"))) {
         design_meta <- list(
@@ -363,7 +358,7 @@ attr(dmt, "units") <- metric_units[intersect(names(dmt), names(metric_units))]
             expansion_factor = if (!is.null(design$sf)) design$sf else NA_real_,
             metadata = if (!is.null(design$metadata)) design$metadata else list(),
             used_for = "n",
-            returned_unit = "trees/ha"
+            returned_unit = "ha-1"
         )
         attr(dmt, "design_meta") <- design_meta
     }
