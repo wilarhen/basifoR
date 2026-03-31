@@ -11,8 +11,8 @@ default_snfi_volume_equations <- function(
         V = list(
             output = "v",
             fun_name = NULL,
-            unit = "m3",
-            raw_unit = "m3",
+            unit = "m3 tree-1",
+            raw_unit = "m3 tree-1",
             scale_to_m3 = 1,
             build_args = function(ctx, pars, resolved) list(),
             fallback = function(ctx, pars, resolved) resolved$legacy_v_m3 %||% NA_real_
@@ -20,8 +20,8 @@ default_snfi_volume_equations <- function(
         VCC = list(
             output = "vcc",
             fun_name = "get_snfi_vcc",
-            unit = "m3",
-            raw_unit = "dm3",
+            unit = "m3 tree-1",
+            raw_unit = "dm3 tree-1",
             scale_to_m3 = 1 / 1000,
             build_args = function(ctx, pars, resolved) {
                 list(dbh_mm = ctx$d_mm, h_t = ctx$h_m, pars = pars)
@@ -31,8 +31,8 @@ default_snfi_volume_equations <- function(
         VSC = list(
             output = "vsc",
             fun_name = "get_snfi_vsc",
-            unit = "m3",
-            raw_unit = "dm3",
+            unit = "m3 tree-1",
+            raw_unit = "dm3 tree-1",
             scale_to_m3 = 1 / 1000,
             build_args = function(ctx, pars, resolved) {
                 vcc_m3 <- resolved$vcc_m3
@@ -135,7 +135,7 @@ metrics2Vol <- structure(function(
     ##details<<
     ##details<< The function normalizes diameter and height units internally
     ##details<< before evaluating equations, and it always returns computed
-    ##details<< volume outputs in cubic metres. If the input already inherits
+    ##details<< volume outputs in cubic metres per tree. If the input already inherits
     ##details<< from \code{"nfiMetrics"}, the relevant variables must carry
     ##details<< named unit metadata in \code{attr(x, "units")}. 
     ##details<<
@@ -779,9 +779,9 @@ need_legacy <- keep.legacy || "V" %in% parametro
             ))[1L]
 
             if (is.na(hit))
-                return("m3")
+                return("m3 tree-1")
 
-            method_registry[[hit]]$unit %||% "m3"
+            method_registry[[hit]]$unit %||% "m3 tree-1"
         },
         character(1)
     )
@@ -813,7 +813,7 @@ need_legacy <- keep.legacy || "V" %in% parametro
                         param = param,
                         output = def$output %||% tolower(param),
                         raw_unit = def$raw_unit %||% NA_character_,
-                        returned_unit = def$unit %||% "m3",
+                        returned_unit = def$unit %||% "m3 tree-1",
                         scale_to_m3 = def$scale_to_m3 %||% (1 / 1000)
                     )
                 }
@@ -848,8 +848,8 @@ ex = function(){
         VCC = list(
             output = "vcc",
             fun = function(dbh_mm, h_t, pars) pars$a + pars$b * dbh_mm^2 * h_t,
-            unit = "m3",
-            raw_unit = "dm3",
+            unit = "m3 tree-1",
+            raw_unit = "dm3 tree-1",
             scale_to_m3 = 1 / 1000,
             build_args = function(ctx, pars, resolved) {
                 list(dbh_mm = ctx$d_mm, h_t = ctx$h_m, pars = pars)
