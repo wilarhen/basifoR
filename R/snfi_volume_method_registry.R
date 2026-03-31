@@ -40,7 +40,7 @@ snfi_volume_method_registry <- structure(function(
     ##value<< \describe{
     ##value<<   \item{\code{output}}{Name of the output column returned by the method.}
     ##value<<   \item{\code{fun_name}}{Name of the equation helper called at run time, or \code{NULL} for direct passthrough methods.}
-    ##value<<   \item{\code{unit}}{Returned unit after scaling, usually \code{"m3"}.}
+    ##value<<   \item{\code{unit}}{Returned unit after scaling, usually \code{"m3 tree-1"}.}
     ##value<<   \item{\code{raw_unit}}{Unit returned by the underlying equation before scaling.}
     ##value<<   \item{\code{scale_to_m3}}{Multiplier applied to raw outputs to express them in cubic metres.}
     ##value<<   \item{\code{build_args}}{Function that builds the argument list for the equation helper.}

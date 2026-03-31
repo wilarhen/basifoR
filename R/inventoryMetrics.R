@@ -107,6 +107,39 @@ inventoryMetrics <- structure(function #Unified dispatcher for inventory workflo
         out
     }
 
+    warn_cross_plot_summary <- function(summ.vr, nfi) {
+        if (is.null(summ.vr) || length(summ.vr) == 0L)
+            return(invisible(NULL))
+
+        grp <- tolower(summ.vr)
+        plot_like <- c("estadillo", "plot", "plot_id", "idp")
+
+        if (any(grp %in% plot_like))
+            return(invisible(NULL))
+
+        data_has_plot <- TRUE
+        if (is.data.frame(nfi)) {
+            nm <- tolower(names(nfi))
+            data_has_plot <- any(nm %in% plot_like)
+        } else if (inherits(nfi, c("nfiMetrics", "metrics2Vol", "dendroMetrics", "inventoryMetrics"))) {
+            nm <- tolower(names(nfi))
+            data_has_plot <- any(nm %in% plot_like)
+        }
+
+        if (isTRUE(data_has_plot)) {
+            warning(
+                paste(
+                    "'summ.vr' does not include a plot identifier.",
+                    "Returned n, ba, and volume variables aggregate across plots",
+                    "within each group and should not be interpreted as single-stand metrics."
+                ),
+                call. = FALSE
+            )
+        }
+
+        invisible(NULL)
+    }
+
     backend <- match.arg(backend)
 
     if (backend == "auto")
@@ -135,10 +168,17 @@ inventoryMetrics <- structure(function #Unified dispatcher for inventory workflo
         )
 
     if (backend == "snfi") {
+        summ_vr_snfi <- if (summ_missing) "Estadillo" else summ.vr
+
+        warn_cross_plot_summary(
+            summ.vr = summ_vr_snfi,
+            nfi = nfi
+        )
+
         args <- compact_args(c(
             list(
                 nfi,
-                summ.vr = if (summ_missing) "Estadillo" else summ.vr,
+                summ.vr = summ_vr_snfi,
                 cut.dt = cut.dt,
                 report = report,
                 mc.cores = mc.cores,
