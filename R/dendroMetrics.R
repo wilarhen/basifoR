@@ -121,8 +121,30 @@ dendro_one <- function(nfi, summ.vr, metric_levels, cut.dt, report, ...) {
     if (is.null(nfi.))
         return(nfi)
 
-    if (!inherits(nfi., "metrics2vol"))
-        nfi <- metrics2Vol(nfi, ...)
+    is_precomputed_metrics <- function(x) {
+        if (!is.data.frame(x))
+            return(FALSE)
+
+        nm <- tolower(names(x))
+        has_metric <- any(nm %in% c(
+            "d", "h", "hd", "ba", "n",
+            "v", "vcc", "vsc", "iavc", "vle"
+        ))
+
+        if (!has_metric)
+            return(FALSE)
+
+        un <- attr(x, "units")
+        !is.null(un)
+    }
+
+    if (!inherits(nfi., "metrics2vol")) {
+        if (is_precomputed_metrics(nfi.)) {
+            nfi <- nfi.
+        } else {
+            nfi <- metrics2Vol(nfi, ...)
+        }
+    }
 
     design_meta <- attr(nfi, "design_meta")
     volume_meta <- attr(nfi, "volume_meta")
