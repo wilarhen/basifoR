@@ -1,21 +1,41 @@
 # basifoR
 
-`basifoR` provides reproducible workflows for Spanish National Forest Inventory (SNFI) data in R.
+`basifoR` provides reproducible, design-aware workflows for Spanish National Forest Inventory (SNFI) data in R.
 
-The package helps users move from raw inventory archives to analysis-ready outputs. It supports archive retrieval and ingestion, design-aware dendrometric computation, tree-level volume estimation, and stand-level summarization. It also exposes extensible components for custom sampling designs, schemas, and volume methods, so users can adapt the same processing logic to external inventory data under explicit assumptions.
+The package helps users move from raw inventory archives to analysis-ready outputs. It supports archive retrieval and ingestion, tree-level metric computation, tree-level volume estimation, and stand-level summarization. It also exposes extensible components for custom sampling designs, schemas, and volume methods, so the same workflow can be adapted to external inventory data under explicit assumptions.
 
 This repository contains the version used in the manuscript:
 
 > **R Package basifoR: Reproducible Workflows for the Spanish National Forest Inventory**
 
+## Quick example
+
+The main user-facing entry point is `inventoryMetrics()`. It accepts one inventory input or several inputs and returns grouped stand-level summaries.
+
+```r
+library(basifoR)
+
+dm <- inventoryMetrics(
+  list("toledo", "palencia", "madrid"),
+  nfi.nr = list(4, 3, 2),
+  mc.cores = 3,
+  summ.vr = c("pr", "estadillo")
+)
+
+str(dm)
+attr(dm, "units")
+```
+
+This example processes three Spanish provinces from three SNFI stages in one call. `inventoryMetrics()` resolves each input, dispatches the required SNFI workflow internally, computes tree-level metrics and volume where needed, and returns stand-level summaries grouped by province (`pr`) and plot (`estadillo`). With `mc.cores = 3`, the inputs can be processed in parallel when your system supports it. The returned object is a data frame with standard summary variables such as basal area, mean diameter, quadratic mean diameter, mean height, trees per hectare, and volume, together with unit metadata.
+
 ## Main features
 
 - Retrieve and import SNFI archives distributed as compressed files
-- Read legacy SNFI tables stored as `.dbf`, `.mdb`, and `.accdb`
-- Compute tree-level metrics such as diameter, height, basal area, and expansion factors
-- Estimate tree-level volume with native SNFI volume equations
+- Read SNFI tables stored as `.dbf`, `.mdb`, and `.accdb`
+- Compute design-aware tree-level metrics such as diameter, height, basal area, and expansion factors
+- Estimate tree-level volume with the native SNFI volume equations
 - Summarize stand-level outputs such as `n`, `d`, `dg`, `h`, `ba`, and volume
-- Run the workflow stepwise or through a single entry point with `inventoryMetrics()`
+- Run the workflow stepwise or through a single dispatcher with `inventoryMetrics()`
 - Adapt the workflow to external inventories with explicit designs, schemas, and volume methods
 
 ## Installation
@@ -66,15 +86,11 @@ brew install mdbtools
 
 These external components affect only archive import from legacy database files. Once data are in R, the downstream workflow runs normally.
 
-If import fails after installation, first check that:
-- the external database engine matches your local system configuration
-- you restarted the R session
+## SNFI workflow
 
-## Quick start
+`basifoR` supports both a stepwise workflow and a one-call workflow.
 
 ### One-call workflow
-
-`inventoryMetrics()` provides the main user-facing entry point.
 
 ```r
 library(basifoR)
@@ -84,11 +100,7 @@ head(dtol)
 attr(dtol, "units")
 ```
 
-This call retrieves the SNFI data for Toledo, filters trees with height greater than or equal to 8 m, and returns stand-level summaries.
-
 ### Stepwise workflow
-
-You can also run the workflow explicitly:
 
 ```r
 library(basifoR)
@@ -110,87 +122,74 @@ This route makes each processing step explicit:
 readNFI() -> nfiMetrics() -> metrics2Vol() -> inventoryMetrics()
 ```
 
-## Minimal examples
-
-### Import a local archive shipped with the package
-
-```r
-library(basifoR)
-
-z <- system.file("ifn3p28.zip", package = "basifoR")
-x <- readNFI(z)
-
-is.data.frame(x)
-dim(x)
-```
-
-### Compute tree-level metrics
-
-```r
-library(basifoR)
-
-dbh_mm <- c(80, 130, 230, 430)
-
-dbhMetric(dbh_mm, met = "ba")
-dbhMetric(dbh_mm, met = "n")
-```
-
-### Summarize by plot
-
-```r
-library(basifoR)
-
-z <- system.file("ifn3p28.zip", package = "basifoR")
-s <- inventoryMetrics(z, summ.vr = "Estadillo")
-
-head(s)
-attr(s, "units")
-```
-
 ## External inventory support
 
-`basifoR` can also process external inventory data when you define:
+`basifoR` can also process external inventory data through the same design-aware logic used for the SNFI. External workflows make the required assumptions explicit: you define the sampling design, declare how source columns map to diameter and height, and supply a volume method or parameter table when tree volume must be computed.
 
-- the sampling design
-- the column mapping
-- the volume method
+The external workflow can start from raw tree tables or from already standardized metric tables. In a typical workflow:
 
-Core helpers for this workflow include:
+1. define the inventory design with `new_inventory_design()` or `new_concentric_design()`
+2. define reusable column mappings and units with `new_external_schema()`
+3. compute tree-level metrics with `externalMetrics()` when needed
+4. compute tree-level volume outputs with `externalMetrics2Vol()` and a registry built with `external_volume_method_registry()` and `new_volume_method()`
+5. summarize tree-level or grouped outputs with `external_dendroMetrics()` or through `inventoryMetrics(..., backend = "external")`
 
-- `new_concentric_design()`
+These helpers let you standardize measurements, compute design-aware expansion factors, derive optional dominant height and volume outputs, and return either tree-level records or grouped stand summaries. The external backend supports repeated workflows, grouped summaries, optional provenance tracking, and custom volume definitions.
+
+A minimal set of core helpers is:
+
+- `new_inventory_design()` or `new_concentric_design()`
 - `new_external_schema()`
+- `externalMetrics()`
 - `new_volume_method()`
 - `external_volume_method_registry()`
+- `externalMetrics2Vol()`
 - `external_dendroMetrics()`
 - `inventoryMetrics(..., backend = "external")`
 
-This extension is useful when you want to reuse the same design-aware processing logic beyond the SNFI under explicit assumptions.
-
 ## Main functions
 
-### Data access and import
+### Workflow dispatcher
 
-- `getNFI()`
-- `fetchNFI()`
-- `readNFI()`
+- `inventoryMetrics()` — unified entry point that dispatches complete workflows for SNFI and external inventories
 
-### Tree-level computation
+### SNFI archive access and import
 
-- `dbhMetric()`
-- `nfiMetrics()`
-- `metrics2Vol()`
+- `getNFI()` — resolve a province identifier or archive input and fetch matching SNFI files
+- `fetchNFI()` — download and extract files from local or remote compressed archives
+- `readNFI()` — import extracted SNFI tables into R
+
+### Tree-level metric computation
+
+- `dbhMetric()` — compute compact tree-level metrics such as diameter, height, basal area, and trees per hectare
+- `nfiMetrics()` — standardize SNFI measurements and compute tree-level dendrometric variables
+
+### Tree-level volume computation
+
+- `metrics2Vol()` — compute tree-level SNFI volume outputs from standardized metrics
+- `snfi_volume_method_registry()` — inspect the active SNFI volume-method registry
+- `default_snfi_volume_equations()` — return the bundled SNFI equation definitions
 
 ### Stand-level summarization
 
-- `inventoryMetrics()`
+- `dendroMetrics()` — summarize SNFI tree data into grouped stand-level outputs
 
-### External inventory extensions
+### External inventory design and schemas
 
-- `new_concentric_design()`
-- `new_external_schema()`
-- `new_volume_method()`
-- `external_volume_method_registry()`
-- `external_dendroMetrics()`
+- `new_inventory_design()` — define custom fixed-area sampling designs
+- `new_concentric_design()` — define custom concentric sampling designs
+- `new_external_schema()` — store reusable external column mappings, units, and defaults
+
+### External tree-level processing
+
+- `externalMetrics()` — standardize external tree measurements into basifoR metric units
+- `externalMetrics2Vol()` — compute external tree-level volume outputs from standardized metrics or raw inputs
+- `external_volume_method_registry()` — build the active registry of external volume methods
+- `new_volume_method()` — define one custom external volume method
+
+### External summarization
+
+- `external_dendroMetrics()` — process external tree tables and return tree-level or grouped stand-level outputs
 
 ## Data sources
 
@@ -206,7 +205,7 @@ The exact version used in the manuscript is available as GitHub release `v0.7.7`
 
 ## License
 
-MIT License
+GPL-3 License
 
 ## Citation
 
@@ -215,4 +214,4 @@ If you use `basifoR`, please cite the package and the associated manuscript when
 ## Contact
 
 Wilson Lara  
-wilson.lara@uva.es
+wilarhen@gmail.com
