@@ -44,7 +44,7 @@ This example processes three Spanish provinces from three SNFI stages in one cal
 
 ```r
 install.packages("remotes")
-remotes::install_github("wilarhen/basifoR@v0.7.7")
+remotes::install_github("wilarhen/basifoR")
 ```
 
 ### Load the package
